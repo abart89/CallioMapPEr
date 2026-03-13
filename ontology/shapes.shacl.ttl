@@ -1,0 +1,6 @@
+# shapes.shacl.ttl — AUTO-GENERATED, DO NOT EDIT
+#
+# SHACL shapes generated from calliope_oeo.linkml.yaml via `make generate`.
+# Used by calliomapper/utils/validation.py (pyshacl) to validate produced KGs.
+#
+# Regenerate by running: make generate

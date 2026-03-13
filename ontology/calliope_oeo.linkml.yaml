@@ -1,0 +1,12 @@
+# calliope_oeo.linkml.yaml — PLACEHOLDER
+#
+# LinkML schema derived from calliope_oeo.ttl.
+# This is the tool's entry point for schema processing.
+#
+# Used to auto-generate:
+#   - Pydantic classes  → calliomapper/generated/
+#   - SHACL shapes      → ontology/shapes.shacl.ttl
+#
+# Run `make generate` to regenerate artifacts after editing this file.
+#
+# Status: to be authored — mirrors calliope_oeo.ttl in LinkML syntax.
