@@ -1,0 +1,3 @@
+costs,techs,cost_flow_out
+monetary,csp,0.002
+monetary,region1_to_region2,0.002

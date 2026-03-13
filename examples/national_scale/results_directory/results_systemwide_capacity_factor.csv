@@ -1,0 +1,9 @@
+techs,carriers,systemwide_capacity_factor
+battery,power,0.13173452333333333
+ccgt,power,0.9468816238888889
+csp,power,0.48265792104630734
+demand_power,power,0.0
+region1_to_region1_1,power,0.32982314625046294
+region1_to_region1_2,power,0.0
+region1_to_region1_3,power,0.02471137134435594
+region1_to_region2,power,0.3738133753575211

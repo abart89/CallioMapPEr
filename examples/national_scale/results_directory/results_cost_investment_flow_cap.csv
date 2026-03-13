@@ -1,0 +1,7 @@
+nodes,techs,carriers,costs,cost_investment_flow_cap
+region1,ccgt,power,monetary,22500000.0
+region1,region1_to_region2,power,monetary,323047.29000000004
+region1_1,csp,power,monetary,10000000.0
+region1_2,csp,power,monetary,0.0
+region1_3,csp,power,monetary,2533762.1
+region2,region1_to_region2,power,monetary,323047.29000000004

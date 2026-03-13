@@ -1,0 +1,6 @@
+techs,carriers,flow_out_eff
+X1_to_X2,electricity,0.98
+X1_to_X3,electricity,0.98
+boiler,gas,0.85
+boiler,heat,0.85
+chp,electricity,0.405

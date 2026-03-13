@@ -1,15 +1,15 @@
 [build-system]
 requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "calliomapper"
 version = "0.0.1"
 description = "Transforms Calliope v0.7 energy models into linked-data knowledge graphs using the Open Energy Ontology."
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
 dependencies = [
-    "calliope>=0.7",
+    "calliope>=0.7.0.dev1",
     "rdflib>=7.0",
     "linkml>=1.7",
     "linkml-runtime>=1.7",
@@ -19,6 +19,10 @@ dependencies = [
     "netCDF4",
     "pyyaml",
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["calliomapper*"]
 
 [project.optional-dependencies]
 dev = [

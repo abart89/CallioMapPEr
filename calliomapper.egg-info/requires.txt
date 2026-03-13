@@ -1,0 +1,13 @@
+calliope>=0.7.0.dev1
+rdflib>=7.0
+linkml>=1.7
+linkml-runtime>=1.7
+pyshacl>=0.25
+pydantic>=2.0
+xarray
+netCDF4
+pyyaml
+
+[dev]
+pytest
+pytest-cov

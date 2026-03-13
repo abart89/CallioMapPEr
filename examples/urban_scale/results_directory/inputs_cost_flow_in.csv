@@ -1,0 +1,4 @@
+techs,costs,cost_flow_in
+boiler,monetary,0.004
+supply_gas,monetary,0.025
+supply_grid_power,monetary,0.1

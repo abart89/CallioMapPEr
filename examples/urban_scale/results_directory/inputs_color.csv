@@ -1,0 +1,13 @@
+techs,color
+N1_to_X2,#823739
+N1_to_X3,#823739
+X1_to_N1,#823739
+X1_to_X2,#6783E3
+X1_to_X3,#6783E3
+boiler,#8E2999
+chp,#E4AB97
+demand_electricity,#072486
+demand_heat,#660507
+pv,#F9D956
+supply_gas,#C98AAD
+supply_grid_power,#C5ABE3

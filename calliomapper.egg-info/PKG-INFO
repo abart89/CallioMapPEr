@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: calliomapper
+Version: 0.0.1
+Summary: Transforms Calliope v0.7 energy models into linked-data knowledge graphs using the Open Energy Ontology.
+License-Expression: Apache-2.0
+Requires-Python: >=3.10
+Requires-Dist: calliope>=0.7.0.dev1
+Requires-Dist: rdflib>=7.0
+Requires-Dist: linkml>=1.7
+Requires-Dist: linkml-runtime>=1.7
+Requires-Dist: pyshacl>=0.25
+Requires-Dist: pydantic>=2.0
+Requires-Dist: xarray
+Requires-Dist: netCDF4
+Requires-Dist: pyyaml
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"

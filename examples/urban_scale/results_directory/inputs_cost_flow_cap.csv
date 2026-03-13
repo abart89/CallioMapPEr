@@ -1,0 +1,11 @@
+nodes,techs,costs,carriers,cost_flow_cap
+X1,chp,monetary,electricity,750.0
+X1,pv,monetary,electricity,1350.0
+X1,supply_gas,monetary,gas,1.0
+X1,supply_grid_power,monetary,electricity,100.0
+X2,boiler,monetary,heat,43.1
+X2,pv,monetary,electricity,1350.0
+X2,supply_gas,monetary,gas,1.0
+X3,boiler,monetary,heat,78.0
+X3,pv,monetary,electricity,1350.0
+X3,supply_gas,monetary,gas,1.0

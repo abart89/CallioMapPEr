@@ -1,0 +1,9 @@
+techs,name
+battery,Battery storage
+ccgt,Combined cycle gas turbine
+csp,Concentrating solar power
+demand_power,Power demand
+region1_to_region1_1,Local power transmission
+region1_to_region1_2,Local power transmission
+region1_to_region1_3,Local power transmission
+region1_to_region2,AC power transmission

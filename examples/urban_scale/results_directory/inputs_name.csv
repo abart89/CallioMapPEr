@@ -1,0 +1,13 @@
+techs,name
+N1_to_X2,District heat distribution
+N1_to_X3,District heat distribution
+X1_to_N1,District heat distribution
+X1_to_X2,Electrical power distribution
+X1_to_X3,Electrical power distribution
+boiler,Natural gas boiler
+chp,Combined heat and power
+demand_electricity,Electrical demand
+demand_heat,Heat demand
+pv,Solar photovoltaic power
+supply_gas,Natural gas import
+supply_grid_power,National grid import
