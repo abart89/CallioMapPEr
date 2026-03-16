@@ -1,0 +1,27 @@
+# Virtual environments
+dev_calliomapper/
+.venv/
+venv/
+env/
+
+# Build / packaging artifacts
+*.egg-info/
+dist/
+build/
+__pycache__/
+*.py[cod]
+
+# Generated artifacts (regenerate with `make generate`)
+calliomapper/generated/*.py
+
+# Test & coverage outputs
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+.DS_Store

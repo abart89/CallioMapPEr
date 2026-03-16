@@ -1,15 +1,48 @@
 # Makefile — project automation shortcuts.
 
-# Regenerate all artifacts from the LinkML schema.
-# Produces: calliomapper/generated/ Pydantic classes, ontology/shapes.shacl.ttl
+VENV    := dev_calliomapper/bin
+SCHEMA  := ontology
+GEN     := calliomapper/generated
+
+# ---------------------------------------------------------------------------
+# Schema generation — YAML-first workflow (preferred)
+#
+# Primary authoring surface is the LinkML YAML file.
+# The .ttl is generated from the YAML via gen-owl and is a build artifact.
+# ---------------------------------------------------------------------------
+
+# Regenerate all artifacts from the real LinkML schema.
+# Preferred entry point: edit calliope_oeo.yaml, then run this target.
+# Produces:
+#   calliomapper/generated/calliope_oeo.py  — Pydantic classes
+#   ontology/calliope_oeo_shapes.ttl        — SHACL shapes
+#   ontology/calliope_oeo.ttl               — OWL/Turtle (for Protégé / ontologists)
 generate:
-	@echo "TODO: implement LinkML code generation pipeline"
-	# gen-pydantic ontology/calliope_oeo.linkml.yaml > calliomapper/generated/model.py
-	# gen-shacl ontology/calliope_oeo.linkml.yaml > ontology/shapes.shacl.ttl
+	$(VENV)/gen-pydantic $(SCHEMA)/calliope_oeo.yaml > $(GEN)/calliope_oeo.py
+	$(VENV)/gen-shacl   $(SCHEMA)/calliope_oeo.yaml > $(SCHEMA)/calliope_oeo_shapes.ttl
+	$(VENV)/gen-owl     $(SCHEMA)/calliope_oeo.yaml > $(SCHEMA)/calliope_oeo.ttl
+
+# Regenerate artifacts from the dummy schema (development only).
+generate-dummy:
+	$(VENV)/gen-pydantic $(SCHEMA)/dummy_schema.yaml > $(GEN)/dummy_schema.py
+	$(VENV)/gen-shacl   $(SCHEMA)/dummy_schema.yaml > $(SCHEMA)/dummy_shapes.ttl
+	$(VENV)/gen-owl     $(SCHEMA)/dummy_schema.yaml > $(SCHEMA)/dummy.ttl
+
+# ---------------------------------------------------------------------------
+# TTL-first workflow (for ontologists using Protégé)
+#
+# If the .ttl is edited directly in Protégé, the YAML must be manually synced.
+# There is no automated TTL→YAML converter. After syncing, run `make generate`.
+#
+# Checklist when editing .ttl in Protégé:
+#   1. Edit calliope_oeo.ttl in Protégé
+#   2. Manually update calliope_oeo.yaml to reflect the changes (class_uri, slots, mixins)
+#   3. make generate
+# ---------------------------------------------------------------------------
 
 # Run the test suite.
 test:
-	pytest tests/
+	$(VENV)/pytest tests/ -v
 
 # Install development dependencies.
 install:

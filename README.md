@@ -37,12 +37,12 @@ Calliope model directory
 ### Schema pipeline
 
 ```
-calliope_oeo.ttl  (source of truth)
+calliope_oeo.ttl      (source of truth — curated Turtle ontology)
       ↓
-calliope_oeo.linkml.yaml  (tool entry point — committed to repo)
+calliope_oeo.yaml     (LinkML schema — tool entry point, committed to repo)
       ↓
-calliomapper/generated/   (Pydantic classes — never hand-edited)
-ontology/shapes.shacl.ttl (SHACL shapes — auto-generated)
+calliomapper/generated/           (Pydantic classes — never hand-edited)
+ontology/calliope_oeo_shapes.ttl  (SHACL shapes — auto-generated)
 ```
 
 Run `make generate` to regenerate artifacts after editing the LinkML schema.
@@ -56,6 +56,7 @@ t = Translator(
     model_dir="path/to/calliope_model/",
     sidecar="path/to/epistemic_sidecar.yaml",  # optional
     results="path/to/results.nc",              # optional
+    schema="path/to/my_schema.yaml",           # optional — custom LinkML schema
 )
 graph = t.translate()
 t.save("output/my_model.nq")

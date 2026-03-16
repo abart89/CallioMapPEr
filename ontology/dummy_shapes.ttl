@@ -1,0 +1,26 @@
+@prefix sh:     <http://www.w3.org/ns/shacl#> .
+@prefix ontocal: <https://w3id.org/ontocal/> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+
+# ------------------------------------------------------------
+# SHACL shapes for the dummy CallioMapper schema.
+#
+# Validates that every ontocal:CalliopeThing instance has a
+# required rdf:type assertion and a well-formed id (URI).
+#
+# These shapes are manually authored because gen-shacl requires
+# network access to resolve linkml:types at generation time.
+# They will be replaced by gen-shacl output once the real
+# calliope_oeo.yaml schema is in place.
+# ------------------------------------------------------------
+
+ontocal:CalliopeThingShape
+    a sh:NodeShape ;
+    sh:targetClass ontocal:CalliopeThing ;
+    sh:nodeKind sh:IRI ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] .

@@ -16,7 +16,7 @@
 | :--- | :--- | :--- |
 | `oeo:` | Open Energy Ontology | Core energy system concepts |
 | `prov:` | W3C PROV-O | Data lineage and provenance |
-| `semcal:` | Internal (TBD) | Tool-specific predicates and extensions |
+| `ontocal:` | Internal (TBD) | Tool-specific predicates and extensions |
 
 ### Named Graph Partitioning Strategy (N-Quads)
 Each model run produces a `.nq` file with distinct named graphs:

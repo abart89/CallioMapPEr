@@ -17,6 +17,12 @@ CallioMapPEr/
 └── README.md             # Public-facing project description
 ```
 
+### File naming conventions
+
+- LinkML schema files: `<name>.yaml` (no extra infix — e.g. `calliope_oeo.yaml`, not `calliope_oeo.linkml.yaml`)
+- SHACL shape files: `<name>_shapes.ttl` (e.g. `calliope_oeo_shapes.ttl`)
+- Turtle ontology files: `<name>.ttl`
+
 ---
 
 ## `calliomapper/` — The Python Package
@@ -32,8 +38,11 @@ calliomapper/
 │   ├── epistemic.py      # EpistemicEngine: sidecar YAML → PROV-O provenance graph (M2)
 │   └── results.py        # ResultsMapper: results.nc → aggregate observation triples (M3)
 ├── ontology/
-│   └── namespaces.py     # rdflib Namespace objects (OEO, PROV, SEMCAL) — import from here
+│   └── namespaces.py     # rdflib Namespace objects for the DEFAULT schema (BFO, PROV, ONTOCAL)
+│                         # Internal use only — not a user-facing extension point.
+│                         # Custom namespaces come from a user-supplied schema via Translator(schema=...).
 ├── generated/            # AUTO-GENERATED — Pydantic classes from LinkML. Never hand-edit.
+│                         # Regenerate with `make generate`.
 └── utils/
     ├── io.py             # All filesystem I/O: load YAMLs, NetCDF, serialize .nq, push to endpoint
     └── validation.py     # pyshacl wrapper — validates graph before output
@@ -61,16 +70,44 @@ calliomapper/
 
 ```
 ontology/
-├── calliope_oeo.ttl           # SOURCE OF TRUTH — curated Turtle ontology (Calliope → OEO mapping)
-├── calliope_oeo.linkml.yaml   # LinkML schema derived from .ttl — tool entry point
-└── shapes.shacl.ttl           # AUTO-GENERATED SHACL shapes from LinkML (run `make generate`)
+├── calliope_oeo.yaml          # SOURCE OF TRUTH — LinkML schema (preferred authoring entry point)
+├── calliope_oeo.ttl           # AUTO-GENERATED OWL/Turtle from calliope_oeo.yaml (`make generate`)
+│                              # Also serves as the Protégé entry point for ontologist collaborators.
+├── calliope_oeo_shapes.ttl    # AUTO-GENERATED SHACL shapes from calliope_oeo.yaml
+│
+│   # Dummy schema — used during development while the real OEO mapping is being curated.
+│   # Mirrors the same pipeline as the real schema; contains only CalliopeThing (BFO:entity subclass).
+├── dummy_schema.yaml          # Dummy LinkML schema — authoring entry point for dev/testing
+├── dummy.ttl                  # AUTO-GENERATED OWL/Turtle from dummy_schema.yaml
+└── dummy_shapes.ttl           # SHACL shapes for the dummy schema
+│                              # NOTE: currently hand-authored because gen-shacl requires network
+│                              # access to resolve linkml:types. Replace with generated output
+│                              # once the network issue is resolved or a workaround is found.
 ```
 
-### Ontology pipeline
-The `.ttl` file is authoritative. When the domain model changes:
-1. Edit `calliope_oeo.ttl`
-2. Sync changes to `calliope_oeo.linkml.yaml`
-3. Run `make generate` → regenerates `calliomapper/generated/` and `shapes.shacl.ttl`
+### Ontology pipeline — two authoring workflows
+
+**Preferred (YAML-first):** Edit the LinkML YAML; generate everything else.
+```
+calliope_oeo.yaml   ← author this (text editor, AI-assisted)
+      ↓ make generate
+calliope_oeo.ttl         — OWL/Turtle for Protégé / ontologist review (generated artifact)
+calliope_oeo_shapes.ttl  — SHACL shapes for runtime validation (generated artifact)
+calliomapper/generated/  — Pydantic classes for the mapper (generated artifact)
+```
+
+**Alternative (TTL-first, for ontologists using Protégé):** Edit the TTL, then manually sync the YAML.
+```
+calliope_oeo.ttl   ← edit in Protégé
+      ↓ manual sync (no automated TTL→YAML tool exists)
+calliope_oeo.yaml  ← update by hand to reflect the TTL changes
+      ↓ make generate
+(same generated artifacts as above)
+```
+
+The manual sync is a deliberate constraint: LinkML YAML is more restricted than OWL, so not all OWL constructs translate, and the sync step forces a conscious decision about what the tool needs to represent.
+
+The dummy schema follows the exact same pipeline. All pipeline code is schema-agnostic; only the generated artifacts differ.
 
 ---
 
@@ -110,7 +147,9 @@ Not part of the Python package. For agent and developer orientation only.
 .agent/
 ├── manifesto.md          # Project mission, core pillars, impact goal
 ├── development_plan.md   # Technical stack, feature priority table, MVT milestones, dev guidelines
-└── project_structure.md  # This file
+├── project_structure.md  # This file — repository layout reference
+├── workflow.md           # Data flow, user entry points, and extension points (how the pipeline works)
+└── handoff.md            # Current implementation state + next steps (for incoming agent instances)
 ```
 
 ---
@@ -129,10 +168,12 @@ Every `.nq` output partitions triples into named graphs by run ID:
 
 ## Namespace Prefixes
 
-| Prefix | Usage |
-| :--- | :--- |
-| `oeo:` | Open Energy Ontology — core energy concepts |
-| `prov:` | W3C PROV-O — data lineage and provenance |
-| `semcal:` | Internal tool-specific predicates |
+| Prefix | IRI | Usage |
+| :--- | :--- | :--- |
+| `bfo:` | `http://purl.obolibrary.org/obo/BFO_` | Basic Formal Ontology — top-level classes |
+| `oeo:` | TBD (pending ontologist input) | Open Energy Ontology — core energy concepts |
+| `prov:` | `http://www.w3.org/ns/prov#` | W3C PROV-O — data lineage and provenance |
+| `ontocal:` | `https://w3id.org/ontocal/` | CallioMapper default — tool-specific classes and predicates |
 
-All namespace bindings are defined in `calliomapper/ontology/namespaces.py`.
+Default namespace bindings are defined in `calliomapper/ontology/namespaces.py` for internal use.
+When a user provides a custom schema via `Translator(schema=...)`, namespaces are resolved from that schema at runtime.
