@@ -19,10 +19,21 @@
 | `ontocal:` | Internal (TBD) | Tool-specific predicates and extensions |
 
 ### Named Graph Partitioning Strategy (N-Quads)
-Each model run produces a `.nq` file with distinct named graphs:
-- `<model-run-id>/structural>` — nodes, technologies, parameters
-- `<model-run-id>/provenance>` — epistemic sidecar triples
-- `<model-run-id>/results>` — aggregate simulation outputs
+Each model run produces a `.nq` file with distinct named graphs (only graphs for enabled modules are emitted):
+- `<model-run-id>/structural` — nodes, technologies, parameters (always present)
+- `<model-run-id>/provenance` — epistemic sidecar triples (requires `epistemic` module)
+- `<model-run-id>/results` — simulation observations (requires `results_aggregated` or `results_detailed` module)
+
+### Profile System
+The ontology is split into **module sub-schemas** (one per knowledge domain) and **profile master schemas** (fixed combinations of modules). Profiles are selected at runtime via `Translator(profile=...)`.
+
+| Profile | Modules included | Use case |
+| :--- | :--- | :--- |
+| `minimal` | structural | Quick structural inspection; no solve needed |
+| `standard` | structural + epistemic + results_aggregated | Default recommended profile |
+| `full` | all four modules | Full detail including per-timestep results |
+
+`make generate` regenerates Pydantic classes, SHACL shapes, and OWL/Turtle for all profiles.
 
 ---
 
@@ -56,12 +67,13 @@ The `.ttl` file is the domain authority. The LinkML YAML is the tool's entry poi
 | **Default Ontology** | **MVT** | `.ttl` + LinkML YAML curated mapping of the Calliope framework to OEO. Generates Pydantic classes and SHACL shapes. |
 | **Graph Validator** | **MVT** | Runs `pyshacl` against produced KG using generated SHACL shapes before any output is returned to the user. |
 | **Epistemic Engine** | **MVT** | Ingests a user-filled YAML sidecar template. Attaches provenance and rationale triples (using PROV-O) to model entities. Supports both model-level and entity-level annotations. |
-| **Results Mapper** | **MVT (scoped)** | Converts `results.nc` (Xarray/NetCDF) into **aggregate** RDF observations (totals per carrier/technology over simulated timespan). No timeseries representation in MVT. |
+| **Results Mapper (aggregated)** | **MVT (scoped)** | Converts `results.nc` (Xarray/NetCDF) into **aggregate** RDF observations (totals per carrier/technology over simulated timespan). Included in `standard` and `full` profiles. |
+| **Results Mapper (detailed)** | **OPTIONAL** | Extends Results Mapper to represent per-timestep observations. Included in `full` profile only. |
 | **SPARQL Endpoint Upload** | **OPTIONAL** | Uses `rdflib.SPARQLUpdateStore` to push the produced `.nq` to a configurable endpoint. Thin layer over file output. |
 | **Logic Parser** | **OPTIONAL** | Parses Calliope v0.7 YAML-based math strings into semantic expressions. |
 | **Query Engine** | **OPTIONAL** | Pre-set SPARQL queries for common model interrogations. |
 | **Custom Mapping** | **OPTIONAL** | Allows users to supply alternative LinkML schemas to map to ontologies other than OEO. |
-| **Full Timeseries Results** | **OPTIONAL** | Extend Results Mapper to represent per-timestep observations. |
+| **Full Timeseries Results** | **OPTIONAL** | Already scoped as `results_detailed` module in the `full` profile. |
 | **Model Downloader** | **OPTIONAL** | Reconstruct a runnable Calliope model from a KG. |
 
 ---
@@ -72,10 +84,11 @@ The `.ttl` file is the domain authority. The LinkML YAML is the tool's entry poi
 **Goal:** Given a valid Calliope v0.7 model directory, produce a valid `.nq` file representing the model's structure.
 
 **Deliverables:**
-- Default ontology: initial `.ttl` + LinkML YAML covering `nodes`, `techs`, and core parameters
-- Auto-generated Pydantic classes from LinkML
+- `ontology/structural.yaml` — LinkML sub-schema covering `nodes`, `techs`, and core parameters
+- `ontology/profiles/minimal.yaml` — profile master schema importing `structural.yaml`
+- Auto-generated Pydantic classes and SHACL shapes for the `minimal` profile
 - `StructuralMapper` class: parses `nodes.yaml` + `techs.yaml`, instantiates Pydantic objects, serializes to rdflib graph
-- SHACL shapes generated from LinkML; `pyshacl` validation gate before output
+- SHACL validation gate before output
 - Output: `.nq` file with structural named graph
 
 **Test:** Run against Calliope's built-in `national_scale` example. Validate the output `.nq` loads cleanly and passes SHACL.
@@ -86,6 +99,9 @@ The `.ttl` file is the domain authority. The LinkML YAML is the tool's entry poi
 **Goal:** Users can annotate the model with epistemic metadata; annotations appear as provenance triples in the output.
 
 **Deliverables:**
+- `ontology/epistemic.yaml` — LinkML sub-schema for provenance and rationale
+- `ontology/profiles/standard.yaml` — profile master schema importing structural + epistemic + results_aggregated
+- Auto-generated Pydantic classes and SHACL shapes for the `standard` profile
 - YAML sidecar template (model-level + entity-level annotation support)
 - `EpistemicEngine` class: parses sidecar, emits PROV-O triples linked to structural entities from M1
 - Output: `.nq` file now includes `<.../provenance>` named graph alongside structural graph
@@ -98,6 +114,7 @@ The `.ttl` file is the domain authority. The LinkML YAML is the tool's entry poi
 **Goal:** Simulation outputs are represented as aggregate observations in the KG.
 
 **Deliverables:**
+- `ontology/results_aggregated.yaml` — LinkML sub-schema for aggregate observations
 - `ResultsMapper` class: reads `results.nc` via Xarray, computes totals per carrier/technology, emits observation triples
 - Curated list of represented result variables (e.g. `energy_cap`, `carrier_prod`, `carrier_con` — totals only)
 - Output: `.nq` file includes `<.../results>` named graph

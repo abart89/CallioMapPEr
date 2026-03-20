@@ -1,14 +1,45 @@
 # 1. Mission Statement
-CallioMapper is an open-source Python library that transforms Calliope (v0.7+) models into standardized, linked-data representations. It addresses the  interpretability and interoperability problem in energy modeling by providing an automated pipeline to map simulation inputs and outputs, and model epistemic context to a pre-defined schema based on the Open Energy Ontology (OEO).
 
-# 2. Core Pillars
-* Input/Output data representation: CallioMapper will provide a standardized way to represent Calliope model inputs and outputs in a way that is both human-readable and machine-readable. This will be achieved by leveraging a default ontology of the Calliope framework mostly based on the Open Energy Ontology (OEO) to provide a standardized way to represent entities from Calliope models.
+CallioMapper is an open-source Python library that generates structured, linked-data representations of Calliope v0.7 energy system models — their topology, technology mix, parameters, and results — and exposes them as queryable RDF using a purpose-built ontology (`ontocal:`) that extends the Open Energy Ontology (OEO).
 
-* Epistemic Transparency: Energy models are built on assumptions. CallioMapper treats "Rationale" as a high-priority data field which users can opt-in to include in the produced data models. It will capture why a parameter was chosen, who provided the data, and the epistemic context of the modeling decisions.
+The field has reached a consensus (Lombardi et al., 2025) that open models are necessary but not sufficient: what matters is *practical usefulness*, which requires transparency about modeling assumptions and reproducibility of results. CallioMapper operationalizes that transparency for Calliope users — without requiring them to restructure their models or learn ontology engineering.
 
-* Version 0.7 Native: Architected specifically for the flat-parameter and node-based structure of Calliope v0.7. It will be able to represent several domains of information related to models.
+# 2. Primary Value Propositions
 
-* Linked-Data Ecosystem: By outputting RDF-compatible data models, CallioMapper allows energy models to be more interpretable and interoperable, hence integrated into broader Urban System knowledge graphs.
+**1. Archive and compare across runs.** Research groups running sensitivity studies have no structured way to query across runs today. Results live in NetCDF files, configs in YAML directories, cross-run comparisons require custom scripts per study. After CallioMapper: "find all runs where installed gas capacity exceeded 5 GW" is one SPARQL query over the run archive. M1+M3 alone enables this.
 
-# 3. Impact Goal
-The goal is to have a tool that can bridge the gap between Calliope models and the broader energy modeling community, allowing for greater interpretability and interoperability of energy models by also being the gateway to scalable and automatable high-level verifications on model quality and consistency. 
+**2. Provenance for publication.** Machine-readable PROV-O attribution, data sourcing, and scenario derivation chains directly answer the reviewer question: "where did these parameter values come from?" The output is a structured supplement — not a PDF — that can accompany journal submissions or Zenodo deposits. The provenance module (ships at launch) enables this.
+
+**3. OEP/OEKG contribution pathway.** The Open Energy Knowledge Graph is the community infrastructure for structured energy model metadata, but every entry requires manual form-filling today. CallioMapper auto-generates OEO-aligned RDF compatible with the OEKG ingest format — removing the single largest friction point for modelers who want to contribute to the platform.
+
+# 3. What CallioMapper Is NOT (at launch)
+
+- It is **not** a semantic enrichment tool out of the box. The base layer does not guess that `ccgt_plant` is a combined-cycle gas turbine — it only maps what Calliope actually writes. Semantic enrichment (linking technologies to OEO concrete classes, physical system entities, etc.) is encouraged and architecturally supported, but happens through **extensions**, not the core.
+- It is **not** a cross-framework interoperability layer. It speaks Calliope v0.7. Cross-framework alignment (PyPSA, OSeMOSYS, TIMES) is a different, much larger project.
+- It is **not** an automated OEP submission tool at launch. The RDF output is OEKG-compatible by design, but automated upload/factsheet generation is deferred to a later extension.
+
+The extension architecture means that semantic depth is opt-in and additive. The base layer gives you a sound, queryable RDF skeleton. Extensions — including the provenance module shipped at launch — progressively layer meaning on top of it.
+
+# 4. Target Audience
+
+**Primary:** Research groups that (a) use Calliope, (b) run many model variants (sensitivity studies, scenario families), and (c) want structured querying across runs or need to satisfy reproducibility requirements for journal submission.
+
+**Secondary:** Projects contributing Calliope model metadata to the Open Energy Platform or other OEO-aligned initiatives (e.g., openmod community, German/European energy modeling projects).
+
+**Not the audience:** Anyone expecting automated semantic enrichment, cross-framework interoperability, or time-series data management.
+
+# 5. Core Design Principles
+
+* **Map what exists, enrich through extensions.** The base layer is deterministic and requires no user effort. Semantic enrichment is encouraged but always opt-in: three fields in the provenance module produce a valid attribution graph; additional extensions progressively deepen the representation. The base layer is never wrong; extensions are never required.
+
+* **Calliope v0.7 native.** Architected specifically for the flat-parameter, node-based structure of Calliope v0.7. No support for earlier versions, no aspirations to be framework-agnostic.
+
+* **ontocal: as a proper OEO extension.** The `ontocal:` namespace defines Calliope-specific classes as OWL subclasses of OEO abstract classes. This is not loose annotation — OWL reasoners infer OEO types automatically. The output is OEO-compatible without requiring OEO knowledge from the user.
+
+* **Linked-data output, local-first consumption.** The primary consumer is a local triple store (Fuseki, Oxigraph) running alongside the model archive. OEKG upload is architecturally planned but not required to get value from the tool.
+
+* **FAIR4RS alignment.** CallioMapper is a practical implementation of FAIR principles (FAIR4RS, 2022) for energy optimization models — making Calliope model artifacts Findable, Accessible, Interoperable, and Reusable without requiring the modeler to become an ontology engineer.
+
+# 6. Impact Goal
+
+A research group using CallioMapper across a 50-run sensitivity study can answer cross-run structural and results queries in minutes rather than days, produce a machine-readable provenance supplement for their journal submission, and — if they choose — contribute a structured model description to the Open Energy Platform with no additional manual effort. That is the concrete impact: reducing the overhead of rigorous modeling practice, not adding to it.

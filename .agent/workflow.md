@@ -14,10 +14,11 @@ There are two ways to run CallioMapper:
 from calliomapper import Translator
 
 t = Translator(
-    model_dir="path/to/calliope_model/",   # required
-    sidecar="path/to/epistemic_sidecar.yaml",  # optional — enables provenance graph
-    results="path/to/results.nc",              # optional — enables results graph
-    schema="path/to/my_schema.yaml",           # optional — custom LinkML schema
+    model_dir="path/to/calliope_model/",       # required
+    sidecar="path/to/epistemic_sidecar.yaml",  # optional — enables provenance graph (epistemic module)
+    results="path/to/results.nc",              # optional — enables results graph (results_aggregated module)
+    profile="standard",                        # optional — "minimal" | "standard" | "full"; default: "standard"
+    schema="path/to/my_schema.yaml",           # optional — custom LinkML schema (overrides profile)
     run_id="my-run-001",                       # optional — defaults to auto UUID
 )
 graph = t.translate()   # returns rdflib.ConjunctiveGraph; raises on SHACL failure
@@ -29,7 +30,7 @@ The `Translator` accepts in-memory objects directly (dicts, xarray datasets), so
 ### 2. CLI (M4, wraps the Python interface)
 
 ```bash
-calliomapper translate path/to/model/ --sidecar sidecar.yaml --results results.nc --out my_model.nq
+calliomapper translate path/to/model/ --sidecar sidecar.yaml --results results.nc --profile standard --out my_model.nq
 ```
 
 The CLI is a thin wrapper over `Translator`; it adds no logic.
@@ -38,13 +39,21 @@ The CLI is a thin wrapper over `Translator`; it adds no logic.
 
 ## What each input enables
 
-| Input | Named graph produced | Required |
-| :--- | :--- | :--- |
-| `model_dir` (nodes.yaml + techs.yaml) | `<run_id>/structural` | Yes |
-| `sidecar` (epistemic_sidecar.yaml) | `<run_id>/provenance` | No |
-| `results` (results.nc) | `<run_id>/results` | No |
+| Input | Module required in profile | Named graph produced | Required |
+| :--- | :--- | :--- | :--- |
+| `model_dir` (nodes.yaml + techs.yaml) | `structural` (always) | `<run_id>/structural` | Yes |
+| `sidecar` (epistemic_sidecar.yaml) | `epistemic` | `<run_id>/provenance` | No |
+| `results` (results.nc) | `results_aggregated` or `results_detailed` | `<run_id>/results` | No |
 
-Running with only `model_dir` produces a structural-only `.nq`. Each additional input adds a named graph.
+Running with only `model_dir` and `profile="minimal"` produces a structural-only `.nq`. Each additional input adds a named graph; the selected profile must include the corresponding module or a `ValueError` is raised at startup.
+
+### Profile summary
+
+| Profile | Modules | Suitable when |
+| :--- | :--- | :--- |
+| `minimal` | structural | Structural inspection only; no solve or sidecar needed |
+| `standard` | structural + epistemic + results_aggregated | Default for most users |
+| `full` | all four modules | Full detail with per-timestep results |
 
 ---
 
@@ -92,16 +101,18 @@ The pipeline is schema-agnostic. The schema determines:
 - what RDF class and property URIs are emitted as triples
 - what SHACL shapes are used for validation
 
-### Default schema path
+### Default schema path (profile-based)
+
+Each profile has a pre-baked master schema that imports its modules:
 
 ```
-ontology/calliope_oeo.yaml
+ontology/profiles/standard.yaml   (imports structural + epistemic + results_aggregated)
     ↓ make generate
-calliomapper/generated/calliope_oeo.py   (Pydantic classes)
-ontology/calliope_oeo_shapes.ttl         (SHACL shapes)
+calliomapper/generated/standard.py          (Pydantic classes)
+ontology/profiles/standard_shapes.ttl      (SHACL shapes)
 ```
 
-Namespace objects for the default schema are defined in `calliomapper/ontology/namespaces.py` and imported by the mappers directly.
+`Translator(profile="standard")` loads `standard.py` and `standard_shapes.ttl` automatically. Namespace objects for the default schema are defined in `calliomapper/ontology/namespaces.py` and imported by the mappers directly.
 
 ### Custom schema path (optional feature)
 

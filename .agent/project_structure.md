@@ -68,39 +68,56 @@ calliomapper/
 
 ## `ontology/` — Ontology Source Files
 
+The ontology is split into **module sub-schemas** (one per knowledge domain) and **profile master schemas** (fixed combinations of modules). Profiles are the entry points for `make generate` and for `Translator(profile=...)`.
+
 ```
 ontology/
-├── calliope_oeo.yaml          # SOURCE OF TRUTH — LinkML schema (preferred authoring entry point)
-├── calliope_oeo.ttl           # AUTO-GENERATED OWL/Turtle from calliope_oeo.yaml (`make generate`)
-│                              # Also serves as the Protégé entry point for ontologist collaborators.
-├── calliope_oeo_shapes.ttl    # AUTO-GENERATED SHACL shapes from calliope_oeo.yaml
+│   # Module sub-schemas — authoring units, one per knowledge domain
+├── structural.yaml            # M1: nodes, technologies, carriers, parameters
+├── epistemic.yaml             # M2: scenarios, rationale, data provenance (PROV-O)
+├── results_aggregated.yaml    # M3a: aggregate observations (totals per carrier/tech)
+├── results_detailed.yaml      # M3b: per-timestep observations (OPTIONAL module)
+│
+│   # Profile master schemas — each imports a fixed set of sub-schemas.
+│   # These are the `make generate` entry points and the `Translator(profile=...)` targets.
+├── profiles/
+│   ├── minimal.yaml           # imports: structural only
+│   ├── standard.yaml          # imports: structural + epistemic + results_aggregated
+│   └── full.yaml              # imports: structural + epistemic + results_aggregated + results_detailed
 │
 │   # Dummy schema — used during development while the real OEO mapping is being curated.
 │   # Mirrors the same pipeline as the real schema; contains only CalliopeThing (BFO:entity subclass).
 ├── dummy_schema.yaml          # Dummy LinkML schema — authoring entry point for dev/testing
 ├── dummy.ttl                  # AUTO-GENERATED OWL/Turtle from dummy_schema.yaml
 └── dummy_shapes.ttl           # SHACL shapes for the dummy schema
-│                              # NOTE: currently hand-authored because gen-shacl requires network
-│                              # access to resolve linkml:types. Replace with generated output
-│                              # once the network issue is resolved or a workaround is found.
+                               # NOTE: currently hand-authored because gen-shacl requires network
+                               # access to resolve linkml:types.
 ```
+
+### Profile → module mapping
+
+| Profile | structural | epistemic | results_aggregated | results_detailed |
+| :--- | :---: | :---: | :---: | :---: |
+| `minimal` | ✓ | | | |
+| `standard` | ✓ | ✓ | ✓ | |
+| `full` | ✓ | ✓ | ✓ | ✓ |
 
 ### Ontology pipeline — two authoring workflows
 
-**Preferred (YAML-first):** Edit the LinkML YAML; generate everything else.
+**Preferred (YAML-first):** Edit a module sub-schema; regenerate all profiles that include it.
 ```
-calliope_oeo.yaml   ← author this (text editor, AI-assisted)
+structural.yaml / epistemic.yaml / results_*.yaml   ← author these (text editor, AI-assisted)
       ↓ make generate
-calliope_oeo.ttl         — OWL/Turtle for Protégé / ontologist review (generated artifact)
-calliope_oeo_shapes.ttl  — SHACL shapes for runtime validation (generated artifact)
-calliomapper/generated/  — Pydantic classes for the mapper (generated artifact)
+calliomapper/generated/<profile>.py    — Pydantic classes per profile (generated artifact)
+ontology/profiles/<profile>_shapes.ttl — SHACL shapes per profile (generated artifact)
+ontology/profiles/<profile>.ttl        — OWL/Turtle per profile, for Protégé (generated artifact)
 ```
 
-**Alternative (TTL-first, for ontologists using Protégé):** Edit the TTL, then manually sync the YAML.
+**Alternative (TTL-first, for ontologists using Protégé):** Edit a profile TTL, then manually sync the relevant sub-schema YAML.
 ```
-calliope_oeo.ttl   ← edit in Protégé
+ontology/profiles/<profile>.ttl   ← edit in Protégé
       ↓ manual sync (no automated TTL→YAML tool exists)
-calliope_oeo.yaml  ← update by hand to reflect the TTL changes
+relevant sub-schema .yaml         ← update by hand to reflect the TTL changes
       ↓ make generate
 (same generated artifacts as above)
 ```

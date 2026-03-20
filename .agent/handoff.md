@@ -62,18 +62,59 @@ All files below exist and pass `make test` (14 tests, 0 failures):
 
 ---
 
+## Calliope v0.7 model directory structure
+
+This is the canonical layout a user's Calliope model directory is expected to follow,
+as defined by the Calliope creators. `Translator(model_dir=...)` must be able to
+navigate this structure. Relevant when implementing file loading in `io.py` and
+when extending `StructuralMapper` to parse real model content.
+
+```
+example_model/
+├── data_tables/
+│   ├── electricity_demand.csv    # timeseries demand data
+│   └── solar_resource.csv        # timeseries resource data
+├── model_definition/
+│   ├── nodes.yaml                # spatial nodes (regions, locations)
+│   └── techs.yaml                # technology definitions
+├── model.yaml                    # top-level model config (imports, time settings, etc.)
+└── scenarios.yaml                # scenario overrides
+```
+
+**Implications for the codebase:**
+
+- `Translator(model_dir=...)` currently loads `model_dir/nodes.yaml` and `model_dir/techs.yaml`
+  directly. This assumes a flat layout. The real layout nests them under `model_definition/`.
+  **`io.py` and `Translator.__init__` need to be updated** to look under `model_definition/`
+  (or to accept an explicit sub-path, or to auto-detect the layout).
+
+- `model.yaml` is the entry point that ties everything together and imports the sub-files.
+  A more robust loader would parse `model.yaml` first and follow its imports, rather than
+  hardcoding paths to `nodes.yaml` and `techs.yaml`.
+
+- `data_tables/` contains timeseries CSVs referenced from `techs.yaml` or `nodes.yaml`.
+  The `StructuralMapper` does not need these for M1 (structural mapping only), but
+  `ResultsMapper` (M3) may need to be aware of them.
+
+- `scenarios.yaml` defines parameter overrides per scenario. This maps naturally to
+  the `graph_id` mechanism: each scenario can be a separate named graph in the output `.nq`.
+
+---
+
 ## Next planned work
 
 ### Immediate: build the real ontology (owner: human + AI)
 
-The user will author `ontology/calliope_oeo.yaml` incrementally, mapping Calliope v0.7
-concepts to OEO/BFO classes. The iteration loop is:
+The ontology is split into **module sub-schemas** and **profile master schemas** (see `project_structure.md`).
+Author module sub-schemas incrementally, starting with `ontology/structural.yaml`.
+
+The iteration loop for each module:
 
 1. Consult Calliope v0.7 docs + OEO to identify the right class URI for a concept
-2. Add the class to `calliope_oeo.yaml` (text editor or AI-assisted)
-3. Run `make generate` → regenerates Pydantic classes + SHACL shapes + TTL
-4. Extend `StructuralMapper._add_entity()` to dispatch to the new Pydantic class
-5. Add/update tests in `test_structural.py`
+2. Add the class to the relevant sub-schema YAML (e.g. `structural.yaml`)
+3. Run `make generate` → regenerates Pydantic classes + SHACL shapes + TTL for all profiles that include this module
+4. Extend the relevant mapper's `_add_entity()` to dispatch to the new Pydantic class
+5. Add/update tests
 6. `make test` — green, commit
 
 **Step 4 is the key code change** as the schema grows: `_add_entity()` currently always
@@ -81,9 +122,20 @@ emits `rdf:type ontocal:CalliopeThing`. It needs to dispatch based on entity typ
 (e.g. carrier, tech_group, or other Calliope config fields) to the appropriate OEO class.
 This dispatch logic is the core intellectual work of the mapping.
 
-When `calliope_oeo.yaml` is ready to replace the dummy:
-- Point `Translator._DEFAULT_SHAPES` at `ontology/calliope_oeo_shapes.ttl`
-- Update `StructuralMapper` import from `dummy_schema` to `calliope_oeo`
+**Module sub-schemas to create** (currently empty placeholders):
+- `ontology/structural.yaml` — replaces the old `calliope_oeo.yaml` for M1 concepts
+- `ontology/epistemic.yaml` — M2 provenance concepts
+- `ontology/results_aggregated.yaml` — M3a aggregate observation concepts
+- `ontology/results_detailed.yaml` — M3b per-timestep concepts (OPTIONAL / `full` profile only)
+
+**Profile master schemas to create:**
+- `ontology/profiles/minimal.yaml` — imports structural only
+- `ontology/profiles/standard.yaml` — imports structural + epistemic + results_aggregated
+- `ontology/profiles/full.yaml` — imports all four modules
+
+When `structural.yaml` is ready to replace the dummy:
+- Update `Translator._DEFAULT_SHAPES` to point at the profile shapes file
+- Update `StructuralMapper` import from `dummy_schema` to the generated profile module
 - Update `namespaces.py` if new namespaces are needed
 - All tests should still pass (they test pipeline behaviour, not class names)
 
