@@ -59,7 +59,7 @@ calliomapper/
       ↓ StructuralMapper → rdflib.Graph  (structural named graph)
       ↓ EpistemicEngine  → rdflib.Graph  (provenance named graph)
       ↓ ResultsMapper    → rdflib.Graph  (results named graph)
-      ↓ Translator merges all into rdflib.ConjunctiveGraph
+      ↓ Translator merges all into rdflib.Dataset
       ↓ validation.py (pyshacl) — raises on failure
       ↓ io.py → .nq file (or SPARQL endpoint)
 ```
@@ -162,11 +162,14 @@ Not part of the Python package. For agent and developer orientation only.
 
 ```
 .agent/
-├── manifesto.md          # Project mission, core pillars, impact goal
-├── development_plan.md   # Technical stack, feature priority table, MVT milestones, dev guidelines
-├── project_structure.md  # This file — repository layout reference
-├── workflow.md           # Data flow, user entry points, and extension points (how the pipeline works)
-└── handoff.md            # Current implementation state + next steps (for incoming agent instances)
+├── manifesto.md              # Project mission, core pillars, impact goal
+├── development_plan.md       # Technical stack, feature priority table, MVT milestones, dev guidelines
+├── project_structure.md      # This file — repository layout reference
+├── workflow.md               # Logical pipeline description (what and why, no implementation details)
+├── workflow_implementation.md # Technical pipeline: current state, design decisions, next steps
+├── ontology_rationale.md     # Ontology scope, OEO fitness, ontocal: hierarchy, namespace policy
+├── ontologynotes.md          # Working ontology drafting notes (in-progress, informal)
+└── contexts_index.md         # Index of all files in this folder with status notes
 ```
 
 ---

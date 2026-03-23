@@ -1,175 +1,86 @@
-# Workflow & User Entry Points
+# Workflow — CallioMapper (Logical)
 
-This document explains how the CallioMapper pipeline works end-to-end, from the user's perspective and from the inside. It is the companion to `project_structure.md` (which describes *where* things live) and the README (which describes *what* the tool does). This document describes *how* things connect.
-
----
-
-## User entry points
-
-There are two ways to run CallioMapper:
-
-### 1. Python / Jupyter (primary)
-
-```python
-from calliomapper import Translator
-
-t = Translator(
-    model_dir="path/to/calliope_model/",       # required
-    sidecar="path/to/epistemic_sidecar.yaml",  # optional — enables provenance graph (epistemic module)
-    results="path/to/results.nc",              # optional — enables results graph (results_aggregated module)
-    profile="standard",                        # optional — "minimal" | "standard" | "full"; default: "standard"
-    schema="path/to/my_schema.yaml",           # optional — custom LinkML schema (overrides profile)
-    run_id="my-run-001",                       # optional — defaults to auto UUID
-)
-graph = t.translate()   # returns rdflib.ConjunctiveGraph; raises on SHACL failure
-t.save("output/my_model.nq")
-```
-
-The `Translator` accepts in-memory objects directly (dicts, xarray datasets), so it can be called from a notebook without touching the filesystem at all. File loading is only triggered when path strings are passed.
-
-### 2. CLI (M4, wraps the Python interface)
-
-```bash
-calliomapper translate path/to/model/ --sidecar sidecar.yaml --results results.nc --profile standard --out my_model.nq
-```
-
-The CLI is a thin wrapper over `Translator`; it adds no logic.
+This document describes *what* CallioMapper does and *why*, without reference to implementation details (class names, file paths, code). For the technical counterpart see `workflow_implementation.md`.
 
 ---
 
-## What each input enables
+## Prerequisite: the model must have been run
 
-| Input | Module required in profile | Named graph produced | Required |
-| :--- | :--- | :--- | :--- |
-| `model_dir` (nodes.yaml + techs.yaml) | `structural` (always) | `<run_id>/structural` | Yes |
-| `sidecar` (epistemic_sidecar.yaml) | `epistemic` | `<run_id>/provenance` | No |
-| `results` (results.nc) | `results_aggregated` or `results_detailed` | `<run_id>/results` | No |
+CallioMapper requires a Calliope model that has already been solved. The solve step produces a standardised output directory (`results_directory/`) and optionally a consolidated binary output (`results.nc`). These outputs are the entry point for CallioMapper.
 
-Running with only `model_dir` and `profile="minimal"` produces a structural-only `.nq`. Each additional input adds a named graph; the selected profile must include the corresponding module or a `ValueError` is raised at startup.
+This is a deliberate design choice: Calliope's input files can be organised in a highly flexible, creative way (scattered YAML, multiple CSV data tables, inline parameters, scenario overrides). The solve step normalises all of that into a predictable, uniform structure. Parsing the inputs directly would require handling arbitrary user organisation — parsing the solve outputs does not.
 
-### Profile summary
+The two key artefacts after a solve:
+- **`attrs.yaml`** — a single, fully-resolved model definition: nodes, technologies, parameters, carrier assignments. Everything Calliope expanded and merged before solving, in one canonical document.
+- **`results_<variable>.csv` / `inputs_<parameter>.csv`** — one file per variable, with consistent index dimensions (nodes, techs, carriers, costs, timesteps).
 
-| Profile | Modules | Suitable when |
+---
+
+## Inputs and what they enable
+
+| Input | What it provides | Required |
 | :--- | :--- | :--- |
-| `minimal` | structural | Structural inspection only; no solve or sidecar needed |
-| `standard` | structural + epistemic + results_aggregated | Default for most users |
-| `full` | all four modules | Full detail with per-timestep results |
+| Path to the solve output (results directory or `.nc` file) | Everything below | Yes |
+| Provenance sidecar YAML | Author/institution/data sourcing metadata | No |
+
+Running with only the solve output produces a structural + results graph. Adding the provenance sidecar also produces a provenance graph.
 
 ---
 
-## Internal pipeline
+## Processing stages
 
-```
-Translator.__init__()
-    │
-    ├─ io.load_yaml(model_dir/nodes.yaml)
-    ├─ io.load_yaml(model_dir/techs.yaml)
-    ├─ io.load_yaml(sidecar)              # if provided
-    └─ io.load_netcdf(results)            # if provided
+The pipeline has three logically distinct stages, each producing a separate named partition of the output graph:
 
-Translator.translate()
-    │
-    ├─ StructuralMapper(nodes, techs, schema)
-    │       → rdflib.Graph  tagged as  <run_id/structural>
-    │
-    ├─ EpistemicEngine(sidecar, structural_graph)   # if sidecar provided
-    │       → rdflib.Graph  tagged as  <run_id/provenance>
-    │
-    ├─ ResultsMapper(dataset, structural_graph)     # if results provided
-    │       → rdflib.Graph  tagged as  <run_id/results>
-    │
-    ├─ Translator merges all graphs into rdflib.ConjunctiveGraph
-    │
-    └─ validation.validate(graph, shapes_path)
-            → raises ValidationError with SHACL report on failure
-            → returns graph on success
+### Stage 1 — Structural mapping (M1)
 
-Translator.save(path)
-    └─ io.serialize_nq(graph, path)
-```
+Reads the resolved model definition from `attrs.yaml`. Extracts:
+- All nodes (spatial/system regions) and their geographic coordinates if present
+- All technologies deployed at each node, classified by their Calliope archetype (supply, demand, storage, transmission, conversion)
+- All energy carriers referenced in the model
+- Scalar parameters (capacities, efficiencies, lifetimes, costs)
+- Transmission links between nodes
 
-### Why EpistemicEngine and ResultsMapper receive the structural graph
+Produces the topology graph: entities, their types, and the relationships between them. This is the backbone that all other stages reference.
 
-Both need to link their triples to entities minted by `StructuralMapper`. For example, a provenance triple `ontocal:wind_onshore prov:wasAttributedTo :Author` must reference the URI that `StructuralMapper` assigned to the wind technology. Passing the structural graph (read-only) makes those URIs available without re-parsing the model.
+### Stage 2 — Provenance mapping (M2, optional)
 
----
+Reads the user-supplied provenance sidecar. Produces attribution triples: who authored the model, what data sources were used, what run this graph describes. Uses the entity URIs minted in Stage 1 as anchor points.
 
-## Schema and namespace resolution
+Requires a minimal sidecar with three fields (model name, authors, scenario description). Additional fields (data sources, derived-from references, funding) are optional and additive.
 
-The pipeline is schema-agnostic. The schema determines:
-- what Pydantic classes are used to validate parsed Calliope entities
-- what RDF class and property URIs are emitted as triples
-- what SHACL shapes are used for validation
+### Stage 3 — Results mapping (M3)
 
-### Default schema path (profile-based)
+Reads the solved output variables from `results_<variable>.csv` files. Attaches result values (installed capacity, energy flows, system costs, capacity factors) to the technology and node entities from Stage 1.
 
-Each profile has a pre-baked master schema that imports its modules:
-
-```
-ontology/profiles/standard.yaml   (imports structural + epistemic + results_aggregated)
-    ↓ make generate
-calliomapper/generated/standard.py          (Pydantic classes)
-ontology/profiles/standard_shapes.ttl      (SHACL shapes)
-```
-
-`Translator(profile="standard")` loads `standard.py` and `standard_shapes.ttl` automatically. Namespace objects for the default schema are defined in `calliomapper/ontology/namespaces.py` and imported by the mappers directly.
-
-### Custom schema path (optional feature)
-
-When the user passes `schema="path/to/my_schema.yaml"`:
-- The `Translator` loads the schema via `linkml-runtime` at startup.
-- Namespace bindings are read from the schema's `prefixes` block at runtime.
-- No `namespaces.py` is consulted — the schema is the single source of truth for IRIs.
-- The user must supply SHACL shapes alongside their schema (or disable validation).
-
-`namespaces.py` is **not** a user-facing extension point. It exists only to avoid duplicating IRI strings across the default-schema mappers.
-
----
-
-## Dummy schema (development mode)
-
-While the real `calliope_oeo.yaml` mapping is being curated, the pipeline is developed and tested against a minimal dummy schema containing a single class: `CalliopeThing` (subclass of `bfo:entity`). This lives in:
-
-```
-ontology/dummy.ttl
-ontology/dummy_schema.yaml
-ontology/dummy_shapes.ttl     (generated)
-calliomapper/generated/dummy_schema.py  (generated)
-```
-
-The dummy schema exercises the full pipeline — LinkML → Pydantic → StructuralMapper → SHACL validation → `.nq` output — with a trivial domain model. All pipeline code written against the dummy schema will work unchanged once the real schema is substituted, because the mappers interact with the schema only through generated Pydantic classes and namespace objects, not by name.
-
-To run tests against the dummy schema:
-```bash
-pytest tests/test_structural.py   # uses dummy schema by default during M1 development
-```
+At launch: aggregate results only (totals per technology per carrier). Per-timestep results are deferred to a future extension.
 
 ---
 
 ## Validation gate
 
-Every `Translator.translate()` call ends with a SHACL validation pass before returning. This is not optional. The shapes file used is:
-
-- default schema: `ontology/calliope_oeo_shapes.ttl` (or `dummy_shapes.ttl` during development)
-- custom schema: path supplied alongside the custom schema
-
-On failure, `validation.validate()` raises `calliomapper.utils.validation.ValidationError` with the full SHACL report included in the message. No `.nq` file is written.
+After all stages complete, the full graph is validated against a set of structural rules (SHACL shapes) before any output is written. If validation fails, no output is produced and the full validation report is returned to the user. This is not optional — the gate ensures the output is always internally consistent.
 
 ---
 
-## Output format
+## Output
 
-The output is an N-Quads (`.nq`) file. Each quad is:
+The output is a single file in N-Quads format. It contains multiple named graphs, one per stage:
 
-```
-<subject> <predicate> <object> <named-graph> .
-```
+| Named graph | Contents |
+| :--- | :--- |
+| `<run-id>/structural` | Nodes, technologies, carriers, parameters (M1) |
+| `<run-id>/provenance` | Attribution and data sourcing (M2, if sidecar provided) |
+| `<run-id>/results` | Solved output values (M3) |
 
-Named graphs partition the data by concern and make it trivial to load only structural, provenance, or results triples into a triplestore:
+Named graphs allow a consuming triple store to load only the parts it needs (e.g., structural-only for topology inspection, or all three for a full run archive query).
 
-```sparql
--- load only structural triples for a given run
-LOAD <file:///path/to/my_model.nq> INTO GRAPH <my-run-001/structural>
-```
+---
 
-The `.nq` format is also directly importable into Fuseki, GraphDB, Oxigraph, or any other SPARQL 1.1 endpoint.
+## What is explicitly not done
+
+- Automated technology classification from names (no guessing `ccgt_plant` → gas turbine)
+- Parameter unit inference (Calliope parameters are unitless in the YAML; unit annotation is a planned extension)
+- OEO concrete class type assertions (planned extension, not base layer)
+- Per-timestep results (planned extension, not launch scope)
+- Cross-run comparison or aggregation (the output is per-run; comparison is a SPARQL query concern)
+- Model reconstruction from the graph (round-trip fidelity is not a goal)

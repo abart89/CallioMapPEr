@@ -1,3 +1,7 @@
+> **Partially superseded.** For current implementation state, design decisions, and next planned work see `workflow_implementation.md`. The sections most likely to mislead: Section 2 (TTL-as-source-of-truth — YAML-first is the actual decision) and M3 deliverables (CSV directory is primary, not `results.nc`). Sections still useful as reference: tech stack table (Section 1), feature priority tiers (Section 3), M1–M4 milestone checklists (Section 4).
+
+---
+
 ## 1. Technical Stack & Environment
 
 | Component | Choice | Rationale |

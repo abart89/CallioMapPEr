@@ -1,0 +1,193 @@
+# CallioMapper Taxonomy
+#
+# A human-readable class hierarchy sketch.
+# Format: nested YAML. Each class entry has:
+#   parent:      OEO/BFO/PROV parent class (URI or prefixed name)
+#   definition:  one-sentence definition
+#   slots:       parameters/attributes that belong to this class (from parameter_catalog.yaml)
+#   status:      draft | review | confirmed
+#   notes:       open questions or rationale
+#
+# Prefixes used:
+#   oeo:   http://openenergy-platform.org/ontology/oeo/
+#   bfo:   http://purl.obolibrary.org/obo/
+#   ocal:  https://w3id.org/ontocal/   (our namespace)
+
+# ═══════════════════════════════════════════════════════════════
+# TOP-LEVEL PLACEMENT IN OEO
+# ═══════════════════════════════════════════════════════════════
+#
+#  oeo:EnergySystemModel
+#    └── ocal:CalliopeModel
+#
+#  oeo:EnergySystem (or oeo:PowerGridRegion ?)
+#    └── ocal:CalliopeNode
+#
+#  oeo:EnergyCarrier (abstract)
+#    └── ocal:EnergyCarrier
+#
+#  ??? (TBD — see CalliopeTechnology notes)
+#    └── ocal:CalliopeTechnology
+#          ├── ocal:SupplyTechnology
+#          ├── ocal:DemandTechnology
+#          ├── ocal:StorageTechnology
+#          ├── ocal:TransmissionTechnology
+#          └── ocal:ConversionTechnology
+
+# ═══════════════════════════════════════════════════════════════
+# CLASSES
+# ═══════════════════════════════════════════════════════════════
+
+classes:
+
+  ocal:CalliopeModel:
+    parent: oeo:EnergySystemModel
+    definition: A single solved instance of a Calliope v0.7 energy system model (one optimization run).
+    slots:
+      - run_id          # our own — URI anchoring all entities in this run
+      - calliope_version
+      - bigM
+      - objective_cost_weights
+      - min_cost_optimisation
+    status: confirmed
+    notes: >
+      One individual per Translator.translate() call.
+      All other entities in the run link back to this via their URI base.
+
+  ocal:CalliopeNode:
+    parent: oeo:EnergySystem
+    definition: A spatial or system node that hosts technologies and participates in carrier flows.
+    slots:
+      - latitude
+      - longitude
+    status: review
+    notes: >
+      oeo:EnergySystem may be too broad — could also be oeo:PowerGridRegion or a BFO spatial region.
+      Check whether OEO has a class specifically for "region in a model" vs "real-world region".
+
+  ocal:EnergyCarrier:
+    parent: oeo:EnergyCarrier
+    definition: >
+      An energy carrier label used in a Calliope model (e.g. "power", "gas").
+      Represented with rdfs:label only — no physical commodity mapping inferred.
+    slots:
+      - carrier_label   # rdfs:label
+    status: review
+    notes: >
+      Calliope carriers are untyped strings. We do NOT subclass to oeo:ElectricEnergy etc.
+      (that would be fabrication). Carrier individuals are minted from unique carrier strings.
+      OEO concrete carrier alignment is a future extension.
+
+  ocal:CalliopeTechnology:
+    parent: ???
+    definition: Abstract base for all Calliope technology archetypes. Never instantiated directly.
+    slots:
+      - tech_name       # rdfs:label
+      - base_tech       # literal, drives subclass dispatch
+      - lifetime
+      - flow_cap_max
+      - flow_cap_max_systemwide
+      - flow_out_eff
+      - flow_ramping
+      - include_storage
+      - cost_flow_cap
+      - cost_flow_out
+      - cost_interest_rate
+      - locatedAt       # → ocal:CalliopeNode
+    status: review
+    notes: >
+      OEO parent is the main open question. Candidates:
+        - oeo:EnergyTransformationObject  (seems closest — covers generation, conversion, storage)
+        - oeo:ModelComponent              (more generic, but fits "component of a model")
+        - bfo:object                      (fallback if no OEO class fits well enough)
+      The parent must be abstract enough to subsume demand (pure consumer) AND supply (pure producer).
+      oeo:EnergyTransformationObject may not include demand cleanly.
+      ACTION: check oeo-full.yaml for oeo:EnergyConsumer and whether a common ancestor exists.
+
+  ocal:SupplyTechnology:
+    parent: ocal:CalliopeTechnology
+    definition: >
+      Introduces energy into the system from an external resource
+      (e.g. wind turbine, gas turbine, solar PV). base_tech = supply.
+    slots:
+      - carrier_out
+      - source_unit
+      - source_use_max  # timeseries (capacity factor profile etc.)
+      - area_use_max
+      - flow_out_parasitic_eff
+      - cost_source_cap
+      - cost_area_use
+    status: draft
+    notes: >
+      If include_storage=true, the tech also has storage-like intertemporal behaviour
+      (e.g. CSP with thermal storage). May need a composite annotation or subclass.
+
+  ocal:DemandTechnology:
+    parent: ocal:CalliopeTechnology
+    definition: >
+      Removes energy from the system to satisfy a demand profile
+      (e.g. electricity demand node). base_tech = demand.
+    slots:
+      - carrier_in
+      - sink_use_equals  # timeseries (demand profile)
+      - cost_flow_in
+    status: draft
+    notes: >
+      If oeo:EnergyTransformationObject does not subsume demand,
+      consider splitting CalliopeTechnology into two abstract branches:
+        - ocal:EnergySourceTechnology (supply, conversion, storage, transmission)
+        - ocal:EnergyDemandTechnology (demand)
+      and finding separate OEO parents. Hold until parent resolution.
+
+  ocal:StorageTechnology:
+    parent: ocal:CalliopeTechnology
+    definition: >
+      Stores energy across timesteps (e.g. battery, pumped hydro, hydrogen tank).
+      base_tech = storage.
+    slots:
+      - carrier_in
+      - carrier_out
+      - flow_in_eff
+      - storage_cap_max
+      - flow_cap_per_storage_cap_max
+      - storage_loss
+      - cost_storage_cap
+      - cost_flow_in
+    status: draft
+    notes: >
+      Round-trip efficiency = flow_in_eff × flow_out_eff.
+      OEO likely has oeo:EnergyStorageObject — check if it sits under the same ancestor
+      as the parent we choose for CalliopeTechnology.
+
+  ocal:TransmissionTechnology:
+    parent: ocal:CalliopeTechnology
+    definition: >
+      Transfers energy between two nodes with optional losses
+      (e.g. power line, gas pipeline). base_tech = transmission.
+    slots:
+      - carrier_in
+      - carrier_out
+      - linkFrom   # → ocal:CalliopeNode
+      - linkTo     # → ocal:CalliopeNode
+      - distance
+    status: draft
+    notes: >
+      Calliope transmission is bidirectional. linkFrom/linkTo are model-level topology,
+      not real-world directionality. OEO candidate: oeo:PowerLine or oeo:EnergyTransmissionLine.
+
+  ocal:ConversionTechnology:
+    parent: ocal:CalliopeTechnology
+    definition: >
+      Converts one energy carrier to another
+      (e.g. CHP unit, heat pump, electrolyser). base_tech = conversion.
+    slots:
+      - carrier_in
+      - carrier_out
+      - flow_in_eff
+      - cost_flow_in
+    status: draft
+    notes: >
+      carrier_in and carrier_out may each be lists (multi-input / multi-output).
+      definition_matrix is auto-generated from these — skip in mapping.
+      OEO candidate: oeo:EnergyTransformationObject (same as base class candidate —
+      may need a more specific subclass if one exists).
