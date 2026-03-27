@@ -27,6 +27,26 @@ slots:
     slot_uri: bfo:0000050
     description: "Links a part to its whole."
 
+  link_from:
+    slot_uri: ontocal:linkFrom
+    description: "The node from which a transmission technology originates."
+
+  link_to:
+    slot_uri: ontocal:linkTo
+    description: "The node to which a transmission technology connects."
+
+  carrier_in:
+    slot_uri: ontocal:carrierIn
+    description: "The energy carrier consumed as input by a technology."
+
+  carrier_out:
+    slot_uri: ontocal:carrierOut
+    description: "The energy carrier produced as output by a technology."
+
+  is_about:
+    slot_uri: iao:0000136
+    description: "Relates an information artifact to the entity it is about."
+
 
 # 3. CLASSES (Taxonomy): This is where you build your hierarchy.
 classes:
@@ -48,10 +68,49 @@ classes:
   Optimisation:
     class_uri: oeo:OEO_00000313
     description: "OEO class for the core solver/optimisation process."
-    # slot_usage for part_of (→ ScenarioProjection) will be added once that class is defined.
+    # slot_usage for part_of (→ CalliopeScenario) will be added once that class is defined.
+
+  Scenario:
+    class_uri: oeo:OEO_00000364
+    description: "OEO class for scenarios."
+
+  ExogenousData:
+    class_uri: oeo:OEO_00030029
+    description: "OEO class for exogenous data (input parameters defined outside the model)."
 
 
   # --- Calliope Extensions (ontocal) ---
+  CalliopeOptimisationRun:
+    is_a: Optimisation
+    description: "A single execution of the Calliope solver against a fully parametrised model."
+
+  CalliopeScenario:
+    is_a: Scenario
+    description: "A specific set of assumptions and parameters defining one Calliope model configuration."
+
+  CalliopeModelParameter:
+    is_a: ExogenousData
+    description: "An input parameter supplied to a Calliope model from outside the optimisation (e.g. costs, capacities, time series)."
+    slot_usage:
+      part_of:
+        range: CalliopeScenario
+
+  TechParameter:
+    is_a: CalliopeModelParameter
+    description: "A model parameter that applies to a specific technology."
+    slot_usage:
+      is_about:
+        range: CalliopeTechnology
+        required: true
+
+  NodeParameter:
+    is_a: CalliopeModelParameter
+    description: "A model parameter that applies to a specific node."
+    slot_usage:
+      is_about:
+        range: CalliopeNetworkNode
+        required: true
+
   CalliopeModel:
     is_a: EnergySystemModel
     description: "The overarching informational representation of a Calliope v0.7 model."
@@ -64,28 +123,34 @@ classes:
         range: ModelComponent
         description: "Links the model to its internal informational building blocks (Nodes, Techs, Links)."
 
-  CalliopeTopologicalElement:
+
+  CalliopeEnergyCarrier:
     is_a: ModelComponent
-    description: "Base class for spatial and network elements in Calliope."
+    description: "An energy carrier that can be used by technologies."
     attributes:
       name:
         range: string
-        description: "Human-readable name of the topological element (node or link)."
+        description: "Human-readable name of the energy carrier."
 
   CalliopeNetworkNode:
-    is_a: CalliopeTopologicalElement
+    is_a: ModelComponent
     description: "A spatial node in Calliope."
     attributes:
+      name:
+        range: string
+        description: "Human-readable name of the node."
       latitude:
         range: float
         description: "WGS84 latitude of the node in decimal degrees."
       longitude:
         range: float
         description: "WGS84 longitude of the node in decimal degrees."
-
-  CalliopeNetworkLink:
-    is_a: CalliopeTopologicalElement
-    description: "A spatial link between nodes in Calliope."
+      has_assigned_technology:
+        range: CalliopeTechnology
+        multivalued: true
+        description: >-
+          Technologies located at this node. Covers Supply, Demand, Storage, and Conversion.
+          Transmission technologies are excluded — their node assignment is handled via link_from/link_to.
 
   CalliopeTechnology:
     is_a: ModelComponent
@@ -97,7 +162,58 @@ classes:
 
   CalliopeSupplyTechnology:
     is_a: CalliopeTechnology
-    description: "A technology that supplies energy."
+    description: "A technology that draws from a source to produce a carrier."
+    slot_usage:
+      carrier_out:
+        range: CalliopeEnergyCarrier
+        required: true
+
+  CalliopeDemandTechnology:
+    is_a: CalliopeTechnology
+    description: "A technology that consumes a carrier for an external sink."
+    slot_usage:
+      carrier_in:
+        range: CalliopeEnergyCarrier
+        required: true
+
+  CalliopeStorageTechnology:
+    is_a: CalliopeTechnology
+    description: "A technology that stores a carrier."
+    slot_usage:
+      carrier_in:
+        range: CalliopeEnergyCarrier
+        required: true
+      carrier_out:
+        range: CalliopeEnergyCarrier
+        required: true
+
+  CalliopeTransmissionTechnology:
+    is_a: CalliopeTechnology
+    description: "A technology that transmits a carrier between nodes."
+    slot_usage:
+      carrier_in:
+        range: CalliopeEnergyCarrier
+        required: true
+      carrier_out:
+        range: CalliopeEnergyCarrier
+        required: true
+      link_from:
+        range: CalliopeNetworkNode
+        required: true
+      link_to:
+        range: CalliopeNetworkNode
+        required: true
+
+  CalliopeConversionTechnology:
+    is_a: CalliopeTechnology
+    description: "A technology that converts between different carriers."
+    slot_usage:
+      carrier_in:
+        range: CalliopeEnergyCarrier
+        required: true
+      carrier_out:
+        range: CalliopeEnergyCarrier
+        required: true
 
 
 # 4. INDIVIDUALS:

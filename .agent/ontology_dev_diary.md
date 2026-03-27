@@ -5,6 +5,17 @@ Add entries at the top (newest first). Each entry has a date and a short tag.
 
 ---
 
+
+## 2026-03-27 - Drafitng base calliope ontology
+* There will be a function to process overrides before writing the knowledge graph, since they can overwrite 
+* Handling of overrides and labelling of scenarios. 
+  * if the user runs the model with no overrides, the model name is set to the model name inside the config files
+  * if the user runs an override:
+    * if the user also sets a new model.name as override such model.name will be set as the new model name in the KG
+    * if the user does not set it as override, the model name will be set to original_model_name""+"_override_name" the model name inside the config files
+* scenarios 
+
+
 ## 2026-03-25 — Ontology Modeling Decisions: Calliope v0.7 to OEO/BFO Mapping
 
 ## **1\. Taxonomy and Namespace Conventions**
