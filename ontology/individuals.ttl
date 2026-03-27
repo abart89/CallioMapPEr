@@ -1,0 +1,12 @@
+@prefix ontocal: <https://w3id.org/ontocal/> .
+@prefix oeo:     <http://openenergy-platform.org/ontology/oeo/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Named individuals that are fixed parts of the ontocal vocabulary.
+# These cannot live in the LinkML 1.x schema (no 'individuals:' block) so they are
+# declared here as plain RDF and loaded alongside the generated schema artefacts.
+
+ontocal:Calliope
+    a oeo:OEO_00000382 ;                          # rdf:type oeo:SoftwareFramework
+    rdfs:label "Calliope" ;
+    rdfs:comment "The Calliope v0.7 energy system modeling framework." .

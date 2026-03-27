@@ -24,6 +24,11 @@ dependencies = [
 where = ["."]
 include = ["calliomapper*"]
 
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::Warning:requests",
+]
+
 [project.optional-dependencies]
 dev = [
     "pytest",

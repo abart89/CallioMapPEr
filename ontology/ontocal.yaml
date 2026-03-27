@@ -1,0 +1,106 @@
+id: https://w3id.org/ontocal
+name: ontocal
+description: An ontology extension mapping Calliope v0.7 to BFO and OEO.
+
+imports:
+  - linkml:types  # Required: makes built-in datatypes (string, float, uri, ...) available
+
+
+# 1. PREFIXES: This maps your shorthand namespaces to actual web URIs.
+prefixes:
+  linkml: https://w3id.org/linkml/
+  ontocal: https://w3id.org/ontocal/
+  oeo: http://openenergy-platform.org/ontology/oeo/
+  bfo: http://purl.obolibrary.org/obo/BFO_
+  iao: http://purl.obolibrary.org/obo/IAO_
+default_prefix: ontocal
+
+
+# 2. SLOTS (Attributes): Here you define your properties globally.
+# You define them once here, and then "use" them inside your classes.
+slots:
+  has_part:
+    slot_uri: bfo:0000051
+    description: "Links a whole to its parts."
+
+  part_of:
+    slot_uri: bfo:0000050
+    description: "Links a part to its whole."
+
+
+# 3. CLASSES (Taxonomy): This is where you build your hierarchy.
+classes:
+  # --- OEO Stub Classes ---
+  # External OEO classes referenced as parents. class_uri pins them to the real OEO IRI.
+  # No body beyond class_uri — these are anchors, not local definitions.
+  SoftwareFramework:
+    class_uri: oeo:OEO_00000382
+    description: "OEO class for software frameworks."
+
+  EnergySystemModel:
+    class_uri: oeo:OEO_00000339
+    description: "OEO class for energy system models."
+
+  ModelComponent:
+    class_uri: oeo:OEO_00000340
+    description: "OEO class for model building blocks."
+
+  Optimisation:
+    class_uri: oeo:OEO_00000313
+    description: "OEO class for the core solver/optimisation process."
+    # slot_usage for part_of (→ ScenarioProjection) will be added once that class is defined.
+
+
+  # --- Calliope Extensions (ontocal) ---
+  CalliopeModel:
+    is_a: EnergySystemModel
+    description: "The overarching informational representation of a Calliope v0.7 model."
+    attributes:
+      name:
+        range: string
+        description: "Human-readable name of the Calliope model."
+    slot_usage:
+      has_part:
+        range: ModelComponent
+        description: "Links the model to its internal informational building blocks (Nodes, Techs, Links)."
+
+  CalliopeTopologicalElement:
+    is_a: ModelComponent
+    description: "Base class for spatial and network elements in Calliope."
+    attributes:
+      name:
+        range: string
+        description: "Human-readable name of the topological element (node or link)."
+
+  CalliopeNetworkNode:
+    is_a: CalliopeTopologicalElement
+    description: "A spatial node in Calliope."
+    attributes:
+      latitude:
+        range: float
+        description: "WGS84 latitude of the node in decimal degrees."
+      longitude:
+        range: float
+        description: "WGS84 longitude of the node in decimal degrees."
+
+  CalliopeNetworkLink:
+    is_a: CalliopeTopologicalElement
+    description: "A spatial link between nodes in Calliope."
+
+  CalliopeTechnology:
+    is_a: ModelComponent
+    description: "Base class for Calliope technologies."
+    attributes:
+      name:
+        range: string
+        description: "Human-readable name of the technology."
+
+  CalliopeSupplyTechnology:
+    is_a: CalliopeTechnology
+    description: "A technology that supplies energy."
+
+
+# 4. INDIVIDUALS:
+# LinkML 1.x does not support an 'individuals:' block in the schema — named individuals live in
+# separate data files. The Calliope framework individual is declared in ontology/individuals.ttl
+# as:  ontocal:Calliope  rdf:type  oeo:OEO_00000382 (SoftwareFramework) .
