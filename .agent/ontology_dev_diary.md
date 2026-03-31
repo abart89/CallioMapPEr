@@ -6,6 +6,152 @@ Add entries at the top (newest first). Each entry has a date and a short tag.
 ---
 
 
+
+
+## 2026-03-31 — Decision: Macro Temporal Horizons and Aggregated Parameters
+
+**Decision:** Adopted a dual-timespan architecture using BFO one-dimensional temporal regions (`bfo:0000038`) to prevent graph bloat caused by granular timestep arrays. We introduced `CalliopeDataHorizon` (the absolute temporal bounds of the underlying model dataset) and `CalliopeExecutionHorizon` (the specific temporal slice simulated by a scenario). 
+
+**Decision:** Established a strict mereological relationship between the two temporal horizons. The `CalliopeExecutionHorizon` must be linked as a `temporal_part_of` (`bfo:0000139`) the `CalliopeDataHorizon`.
+
+**Decision:** Implemented a controlled vocabulary (`AggregationTypeEnum`) within the `ontocal` namespace to act as a mathematical modifier (sum, average, max, min) for Information Content Entities representing statistical summaries.
+
+**Decision:** Updated base parameter containers (e.g., `TechParameter`) to optionally accept `applies_to_time` and `aggregation_type` slots. 
+
+**Rationale:** Simulating an entire year at hourly resolution creates massive "data multiplier" bloat in standard triple stores. While granular `oeo:time step` links are still permitted for high-fidelity needs, providing a mechanism for aggregated macros is highly pragmatic. However, simply linking a scalar value to a broad timespan creates semantic ambiguity (is it a peak max or a cumulative sum?). By forcing the explicit declaration of the mathematical operation via the enum, and distinctly separating the base model's time boundaries from the scenario's time boundaries, we preserve exact ontological precision and BFO compliance without sacrificing query performance.
+
+
+## 2026-03-31 — Decision: Modeling Time-Dependent Parameters and Unit Metadata (The Pragmatic Extensions)
+
+Having adopted the pragmatic "Data Attribute" approach (Option B) for Calliope parameters, we needed a way to handle two major complexities inherent to Calliope:
+
+1. **Time-Series Data:** Parameters can be static scalars or dynamic arrays defined on a by-timestep basis.  
+2. **Unit Tracking:** By dropping the strict oeo:quantity value wrapper, we lost the dedicated BFO structure for storing physical units and provenance.
+
+To solve this, we extended our parameter container architecture using BFO relational hooks and LinkML inheritance, maintaining graph elegance without sacrificing queryability.
+
+### **1\. The Temporal Hook (iao:is about)**
+
+In BFO, an Information Content Entity (our parameter container) can be "about" multiple things. We already use iao:is about to link the parameter to the physical model component (e.g., the power plant). To handle time, we simply add a second, optional is about link pointing to a temporal region.
+
+* **The Time Entity:** We instantiate specific model intervals (e.g., "Hour 1") using **oeo:time step** (OEO\_00030033), a subclass of BFO's temporal region.  
+* **Static Parameters:** If a parameter lacks a temporal link, it is assumed to be static and applies to the overarching oeo:scenario.  
+* **Dynamic Parameters:** For time-series data, we generate a distinct parameter instance for each timestep and link it directly to the corresponding oeo:time step.
+
+### **2\. The Metadata Hooks (Units and Provenance)**
+
+To restore unit tracking and add data provenance, we utilize LinkML's class inheritance. Rather than redundantly defining unit data on all 50+ Calliope parameters, we attach metadata slots directly to the overarching parent classes (TechParameter and NodeParameter).
+
+* **Flexible Units (Carrier Agnostic):** For parameters like FlowCapMax (which could be MW, kg/s, or MWh depending on the user's carrier), the unit is left as a flexible string inherited from the parent class.  
+* **Strict Units (Semantic Safety):** For parameters with mathematically absolute units (e.g., FlowOutEff must be a fraction; Lifetime must be years), we use LinkML's slot\_usage to hardcode the unit at the class level. This provides built-in validation while keeping the schema lean.
+
+### **LinkML Implementation Summary**
+
+We introduced three global slots to the schema:
+
+1. applies\_to\_time (Mapped to IAO\_0000136, Range: TimeStep, Required: False)  
+2. unit (Range: string, Required: False)  
+3. source\_reference (Range: string, Required: False)
+
+These are assigned to the TechParameter base class, granting every Calliope parameter the optional ability to act as a time-series data point and carry its own physical context.
+
+### **Conceptual Graph Example: Time-Dependent Wind Profile**
+
+Representing the capacity factor of a wind plant specifically at Hour 1:
+
+Plaintext
+
+1. // 1\. Establish the Environment and Time  
+2. "Scenario\_Base"                    type          oeo:scenario  
+3. "Wind\_Plant\_XX"                    type          CalliopeSupplyTechnology  
+4. "TimeStep\_Hour\_1"                  type          oeo:time step  
+5.   
+6. // 2\. Instantiate the Parameter Container (Option B)  
+7. "Wind\_CapFactor\_H1"                type          ontocal:SourceUseEquals   
+8.   
+9. // 3\. Apply Relational Hooks  
+10. "Wind\_CapFactor\_H1"                bfo:part of      "Scenario\_Base"  
+11. "Wind\_CapFactor\_H1"                iao:is about     "Wind\_Plant\_XX"     // The spatial/component link  
+12. "Wind\_CapFactor\_H1"                iao:is about     "TimeStep\_Hour\_1"   // The temporal link  
+13.   
+14. // 4\. Apply Direct Data and Metadata  
+15. "Wind\_CapFactor\_H1"                ontocal:value    0.35  
+16. "Wind\_CapFactor\_H1"                ontocal:unit     "fraction"          // Enforced via slot\_usage  
+17. "Wind\_CapFactor\_H1"                ontocal:source   "User CSV Upload"
+
+18. 
+
+
+## 2026-03-31 — Architecture: Linking CalliopeModelParameter to oeo:quantity values
+**Decision:** Calliomapper strictly separates the software variable (the data "container") from the physical model component it describes, in accordance with BFO principles. This prevents category errors, such as asserting that a line of code physically possesses mass or energy.
+
+However, mapping Calliope’s highly abstracted, mathematical parameters directly to OEO’s strict physical quantity value classes introduces significant engineering friction. Therefore, we have adopted a pragmatic "Data Attribute" approach for the MVP, deferring strict OEO semantic bridging to future work.
+
+### **The Concerns with Strict OEO Mapping (Why we pivoted)**
+
+Initially, the architecture proposed a 3-part linkage (Component \-\> Parameter Container \-\> oeo:quantity value \-\> Number/Unit). This was paused due to three major hurdles:
+
+1. **Query Complexity:** Extracting a single numerical input (e.g., a capacity limit) required complex, multi-hop SPARQL queries, degrading user experience.  
+2. **The "Carrier Agnostic" Ambiguity:** Calliope parameters like flow\_cap\_max do not dictate physics; they could represent electrical power (MW), heat energy (MWh), or water mass (kg/s). Forcing these into rigid OEO physical classes (like oeo:power value) risks introducing semantic errors depending on the user's specific model.  
+3. **Non-Physical Parameters:** Calliope relies on booleans (e.g., cyclic\_storage) and enums, which violate the BFO definition of a quantity value (which mandates a numerical magnitude and unit).
+
+### **The Current Approach: Pragmatic Data Attributes ("Option B")**
+
+To maintain a clean graph shape while preserving BFO compliance, we retain the "Parameter Container" but drop the complex quantity value semantic bridge. Numerical values are attached directly to the parameter instance.
+
+#### **1\. The Contextual Container (The Variable)**
+
+The numerical feature is instantiated as a specific Information Content Entity based on our Calliope taxonomy.
+
+* **Classification:** Typed as a specific Calliope parameter class (e.g., ontocal:FlowCapMax, which subclasses oeo:exogenous data).  
+* **Targeting:** Linked to the specific model component it describes (e.g., a CalliopeSupplyTechnology) via **iao:is about**.  
+* **Context:** Linked to the overarching simulation via **bfo:part of** pointing to an oeo:scenario.
+
+#### **2\. The Direct Data Attribute**
+
+Instead of bridging to a separate semantic magnitude, the values are stored directly on the container instance.
+
+* **The Number:** Attached via a simple data attribute (e.g., ontocal:value \[float\]).  
+* **Metadata Hooks:** This container architecture allows us to easily append arbitrary strings for unit or source directly to the parameter without breaking OEO physics rules.
+
+### **Future Work: Strict Semantic Bridging**
+
+A full implementation of the oeo:has quantity value bridge (mapping parameters to exact OEO classes like oeo:cost or oeo:efficiency) is flagged as future work. This can be implemented later as an optional "semantic inflation" script for users requiring strict interoperability with the wider Open Energy Ontology ecosystem.
+
+### **Example: Mapping a Power Plant's Efficiency Limit (Current Approach)**
+
+Plaintext
+
+1. // 1\. Establish the Environment  
+2. "Scenario\_Base"                    type  oeo:scenario  
+3. "Plant\_XX"                         type  CalliopeSupplyTechnology  
+4.   
+5. // 2\. Instantiate and Contextualize the Data Container  
+6. "Plant\_XX\_Efficiency\_Parameter"    type  ontocal:FlowOutEff  // (Subclass of oeo:exogenous data)  
+7. "Plant\_XX\_Efficiency\_Parameter"    bfo:part of      "Scenario\_Base"  
+8. "Plant\_XX\_Efficiency\_Parameter"    iao:is about     "Plant\_XX"  
+9.   
+10. // 3\. Assign the Value Directly (Pragmatic Approach)  
+11. "Plant\_XX\_Efficiency\_Parameter"    ontocal:value    0.45  
+12. "Plant\_XX\_Efficiency\_Parameter"    ontocal:unit     "fraction" // (Optional metadata hook)
+
+13. 
+
+
+
+## 2026-03-31 — Storage parameter scope: deferred
+
+**Decision:** Storage parameters (`StorageCapMax`, `StorageCapMin`, `FlowCapPerStorageCapMax/Min`, `StorageLoss`, `StorageInitial`, `StorageDischargeDepth`, `CyclicStorage`, `CostStorageCap`) are modelled strictly as subclasses of `StorageTechParameter` in `ontocal_params.yaml`.
+
+**Known limitation:** In Calliope v0.7, setting `include_storage: true` on a non-storage technology (e.g. a CSP supply tech with thermal storage buffer) makes all storage parameters valid for that technology too. The current schema does not capture this — a `StorageCapMax` instance cannot point at a `CalliopeSupplyTechnology` via `is_about` without violating the range constraint.
+
+**Why deferred:** `include_storage: true` is an edge case (affects a small minority of supply techs) and the mapper handles it as a special-case flag in code. Over-engineering the schema for this now would add a mixin layer (`StorageCapableTechParameter`) with no immediate payoff.
+
+**Future work:** If `include_storage` becomes common or a reasoner needs to enforce the constraint, introduce a `StorageCapableTechParameter` mixin that both `StorageTechParameter` and the special-case supply/conversion techs inherit from. See also the original deferral note in the 2026-03-20 entry below.
+
+---
+
+
 ## 2026-03-27 - Drafitng base calliope ontology
 * There will be a function to process overrides before writing the knowledge graph, since they can overwrite 
 * Handling of overrides and labelling of scenarios. 

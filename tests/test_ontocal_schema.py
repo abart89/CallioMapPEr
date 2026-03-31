@@ -20,7 +20,7 @@ import yaml
 from linkml_runtime.loaders import yaml_loader
 from linkml_runtime.linkml_model import SchemaDefinition
 
-SCHEMA_PATH = Path(__file__).parent.parent / "ontology" / "ontocal.yaml"
+SCHEMA_PATH = Path(__file__).parent.parent / "ontology" / "ontocal_core.yaml"
 OEO_STUBS = {"SoftwareFramework", "EnergySystemModel", "ModelComponent", "Optimisation"}
 EXTERNAL_SLOTS = {"has_part", "part_of"}
 

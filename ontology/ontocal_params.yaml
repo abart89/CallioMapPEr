@@ -1,0 +1,467 @@
+id: https://w3id.org/ontocal/params
+name: ontocal_params
+description: Calliope technology and node parameter classes, extending ontocal_core.
+
+imports:
+  - linkml:types
+  - ontocal_core  # brings in all tech/node classes and the *TechParameter/*NodeParameter hierarchy
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  ontocal: https://w3id.org/ontocal/
+default_prefix: ontocal
+
+enums:
+
+  SourceUnitEnum:
+    description: "Controls how the external resource flow is scaled relative to capacity."
+    permissible_values:
+      absolute:
+        description: "Source is specified as an absolute quantity, independent of installed capacity."
+      per_area:
+        description: "Source is scaled per unit of area used by the technology."
+      per_cap:
+        description: "Source is scaled per unit of installed flow capacity."
+
+  SinkUnitEnum:
+    description: "Controls how the sink demand profile is scaled relative to capacity."
+    permissible_values:
+      absolute:
+        description: "Sink demand is specified as an absolute quantity, independent of installed capacity."
+      per_area:
+        description: "Sink demand is scaled per unit of area used by the technology."
+      per_cap:
+        description: "Sink demand is scaled per unit of installed flow capacity."
+
+
+classes:
+
+  # --- Base tech parameters (apply to any CalliopeTechnology) ---
+
+  # Flow capacity bounds (Carrier agnostic: unit inherited)
+  FlowCapMax:
+    is_a: TechParameter
+    description: "Absolute upper bound on the rated flow capacity of the technology."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  FlowCapMin:
+    is_a: TechParameter
+    description: "Absolute lower bound on the rated flow capacity of the technology."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  # System-wide flow capacity bounds (Carrier agnostic: unit inherited)
+  FlowCapMaxSystemwide:
+    is_a: TechParameter
+    description: "Aggregate upper capacity limit across all nodes where the technology exists."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  FlowCapMinSystemwide:
+    is_a: TechParameter
+    description: "Aggregate lower capacity limit across all nodes where the technology exists."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  # Primary conversion efficiencies (Strict unit applied)
+  FlowOutEff:
+    is_a: TechParameter
+    description: "Primary conversion efficiency from source to outflow carrier (0 to 1)."
+    slot_usage:
+      unit:
+        equals_string: "fraction"
+    attributes:
+      value:
+        range: float
+        required: true
+
+  FlowInEff:
+    is_a: TechParameter
+    description: "Primary conversion efficiency from inflow carrier to sink (0 to 1)."
+    slot_usage:
+      unit:
+        equals_string: "fraction"
+    attributes:
+      value:
+        range: float
+        required: true
+
+  # Parasitic efficiency loss (Strict unit applied)
+  FlowOutParasiticEff:
+    is_a: TechParameter
+    description: "Additional efficiency loss as flow is transferred from the plant to the carrier (0 to 1)."
+    slot_usage:
+      unit:
+        equals_string: "fraction"
+    attributes:
+      value:
+        range: float
+        required: true
+
+  # Ramping constraint (Carrier agnostic: unit inherited)
+  FlowRamping:
+    is_a: TechParameter
+    description: "Maximum rate of change in outflow or inflow between consecutive timesteps."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  # Minimum operating level (Strict unit applied)
+  FlowOutMinRelative:
+    is_a: TechParameter
+    description: "Fractional minimum operating level as a share of rated capacity (0 to 1)."
+    slot_usage:
+      unit:
+        equals_string: "fraction"
+    attributes:
+      value:
+        range: float
+        required: true
+
+  # Area use bounds (Unit inherited)
+  AreaUseMax:
+    is_a: TechParameter
+    description: "Upper spatial limit for land or area utilised by the technology."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  AreaUseMin:
+    is_a: TechParameter
+    description: "Lower spatial limit for land or area utilised by the technology."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  # Area-to-capacity ratio (Unit inherited)
+  AreaUsePerFlowCap:
+    is_a: TechParameter
+    description: "Fixed ratio of required physical area to installed flow capacity."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  # Lifetime (Strict unit applied)
+  Lifetime:
+    is_a: TechParameter
+    description: "Operational lifespan in years, used for annualised investment cost calculations."
+    slot_usage:
+      unit:
+        equals_string: "year"
+    attributes:
+      value:
+        range: float
+        required: true
+
+  # Storage activation switch (Boolean: no unit needed)
+  IncludeStorage:
+    is_a: TechParameter
+    description: "Boolean switch that activates intertemporal storage buffers for non-storage technologies."
+    attributes:
+      value:
+        range: boolean
+        required: true
+
+  # Cost parameters (Unit inherited, depends on user currency/carrier)
+  CostFlowCap:
+    is_a: TechParameter
+    description: "Capital investment cost per unit of installed flow capacity."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostFlowOut:
+    is_a: TechParameter
+    description: "Variable operational cost per unit of carrier outflow per timestep."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostFlowIn:
+    is_a: TechParameter
+    description: "Variable operational cost per unit of carrier inflow per timestep."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostOmAnnual:
+    is_a: TechParameter
+    description: "Fixed annual operation and maintenance cost per unit of installed capacity."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostInterestRate:
+    is_a: TechParameter
+    description: "Interest rate applied to compute levelised costs and depreciation."
+    slot_usage:
+      unit:
+        equals_string: "fraction"
+    attributes:
+      value:
+        range: float
+        required: true
+
+
+  # --- Supply technology parameters ---
+
+  SourceUseMax:
+    is_a: SupplyTechParameter
+    description: "Upper bound on the external resource flow consumed by the supply technology."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SourceUseMin:
+    is_a: SupplyTechParameter
+    description: "Lower bound on the external resource flow consumed by the supply technology."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SourceUseEquals:
+    is_a: SupplyTechParameter
+    description: "Fixed requirement for the external resource flow consumed by the supply technology."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SourceCapMax:
+    is_a: SupplyTechParameter
+    description: "Upper limit on the installed infrastructure capacity to capture the source."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SourceCapMin:
+    is_a: SupplyTechParameter
+    description: "Lower limit on the installed infrastructure capacity to capture the source."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SourceUnit:
+    is_a: SupplyTechParameter
+    description: "Scaling mode for the external resource flow: absolute, per unit area, or per unit flow capacity."
+    attributes:
+      value:
+        range: SourceUnitEnum
+        required: true
+
+  # Source Efficiency (Strict unit applied)
+  SourceEff:
+    is_a: SupplyTechParameter
+    description: "Base conversion efficiency capturing losses from the external environment into the technology (0 to 1)."
+    slot_usage:
+      unit:
+        equals_string: "fraction"
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SourceCapEqualsFlowCap:
+    is_a: SupplyTechParameter
+    description: "Boolean flag forcing source extraction capacity to equal system flow capacity exactly."
+    attributes:
+      value:
+        range: boolean
+        required: true
+
+  CostSourceCap:
+    is_a: SupplyTechParameter
+    description: "Capital investment cost per unit of installed source capacity."
+    attributes:
+      value:
+        range: float
+        required: true
+
+
+  # --- Demand technology parameters ---
+
+  SinkUseMax:
+    is_a: DemandTechParameter
+    description: "Upper bound on the carrier flow that can be removed from the system by the demand technology."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SinkUseMin:
+    is_a: DemandTechParameter
+    description: "Lower bound on the carrier flow that must be removed from the system by the demand technology."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SinkUseEquals:
+    is_a: DemandTechParameter
+    description: "Fixed profile for the carrier flow removed from the system by the demand technology."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SinkUnit:
+    is_a: DemandTechParameter
+    description: "Scaling mode for the sink demand profile: absolute, per unit area, or per unit flow capacity."
+    attributes:
+      value:
+        range: SinkUnitEnum
+        required: true
+
+
+  # --- Storage technology parameters ---
+
+  StorageCapMax:
+    is_a: StorageTechParameter
+    description: "Maximum allowable volume of the energy reservoir."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  StorageCapMin:
+    is_a: StorageTechParameter
+    description: "Minimum allowable volume of the energy reservoir."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  FlowCapPerStorageCapMax:
+    is_a: StorageTechParameter
+    description: "Maximum ratio of charge/discharge flow rate to total reservoir volume."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  FlowCapPerStorageCapMin:
+    is_a: StorageTechParameter
+    description: "Minimum ratio of charge/discharge flow rate to total reservoir volume."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  StorageLoss:
+    is_a: StorageTechParameter
+    description: "Hourly decay rate representing energy lost from the reservoir over time."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  # Storage states (Strict unit applied)
+  StorageInitial:
+    is_a: StorageTechParameter
+    description: "Fractional initial state of charge at the first model timestep (0 to 1)."
+    slot_usage:
+      unit:
+        equals_string: "fraction"
+    attributes:
+      value:
+        range: float
+        required: true
+
+  StorageDischargeDepth:
+    is_a: StorageTechParameter
+    description: "Fractional minimum state of charge that must be held in reserve at all times (0 to 1)."
+    slot_usage:
+      unit:
+        equals_string: "fraction"
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CyclicStorage:
+    is_a: StorageTechParameter
+    description: "Boolean linking storage level at the final timestep back to the first, enabling continuous yearly operation."
+    attributes:
+      value:
+        range: boolean
+        required: true
+
+  CostStorageCap:
+    is_a: StorageTechParameter
+    description: "Capital investment cost per unit of total storage capacity."
+    attributes:
+      value:
+        range: float
+        required: true
+
+
+  # --- Transmission technology parameters ---
+
+  Distance:
+    is_a: TransmissionTechParameter
+    description: "Physical span of the transmission link. Calliope can compute this automatically if both nodes have coordinates."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  FlowInEffPerDistance:
+    is_a: TransmissionTechParameter
+    description: "Efficiency decay applied exponentially per unit of distance to the inflow."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  FlowOutEffPerDistance:
+    is_a: TransmissionTechParameter
+    description: "Efficiency decay applied exponentially per unit of distance to the outflow."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostFlowCapPerDistance:
+    is_a: TransmissionTechParameter
+    description: "Investment cost per unit of installed flow capacity and per unit of distance."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostPurchasePerDistance:
+    is_a: TransmissionTechParameter
+    description: "Discrete investment cost per unit of distance, used in integer programming formulations."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  OneWay:
+    is_a: TransmissionTechParameter
+    description: "Boolean restriction forcing the link to operate exclusively from link_from to link_to."
+    attributes:
+      value:
+        range: boolean
+        required: true

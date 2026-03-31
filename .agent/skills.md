@@ -26,10 +26,10 @@ Skills to be created once M1 is functional. Add them to `.claude/commands/` as s
 
 ## `/generate-ontology-artifacts`
 
-**Trigger:** any time `ontology/calliope_oeo.linkml.yaml` is edited.
+**Trigger:** any time `ontology/ontocal.yaml` is edited.
 
 **What it does:**
-1. Runs `make generate` to regenerate `calliomapper/generated/model.py` and `ontology/shapes.shacl.ttl`
+1. Runs `make generate` to regenerate `calliomapper/generated/ontocal.py` and `ontology/ontocal_shapes.ttl`
 2. Verifies the generated Pydantic module imports cleanly (`python -c "from calliomapper.generated import *"`)
 3. Verifies `pyshacl` loads the new SHACL shapes without errors
 4. Reports success or surfaces the first failure with context

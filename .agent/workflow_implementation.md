@@ -4,31 +4,33 @@ Technical counterpart to `workflow.md`. Contains class names, file paths, design
 
 ---
 
-## Current implementation state (as of 2026-03-20)
+## Current implementation state (as of 2026-03-27)
 
-**M1 pipeline is fully functional with the dummy schema.**
+**M1 pipeline is functional with the dummy schema. Real ontology (`ontocal.yaml`) is now authored — Pydantic generation not yet run.**
 
 | File | Status |
 | :--- | :--- |
-| `ontology/dummy_schema.yaml` | Dummy LinkML schema — `CalliopeThing` subclass of `BFO:entity` |
-| `ontology/dummy.ttl` | Hand-authored Turtle (see known issues) |
-| `ontology/dummy_shapes.ttl` | Hand-authored SHACL shapes (see known issues) |
-| `calliomapper/generated/dummy_schema.py` | Generated Pydantic classes from dummy schema |
+| `ontology/ontocal.yaml` | **Real** LinkML schema — full class hierarchy (CalliopeModel, 5 tech subtypes, NetworkNode, EnergyCarrier, Scenario, OptimisationRun, parameters). Committed 2026-03-27. |
+| `ontology/individuals.ttl` | Named individuals (Calliope framework instance as `oeo:SoftwareFramework`). |
+| `ontology/calliope_oeo_shapes.ttl` | Placeholder — contains only a comment. SHACL shapes must be generated from `ontocal.yaml` via `make generate`. |
+| `calliomapper/generated/dummy_schema.py` | Generated Pydantic classes from old dummy schema — still the active import in `StructuralMapper`. Will be replaced once `make generate` is run against `ontocal.yaml`. |
 | `calliomapper/ontology/namespaces.py` | `BFO`, `OEO`, `PROV`, `ONTOCAL` rdflib Namespace objects |
 | `calliomapper/utils/io.py` | `load_yaml`, `load_netcdf`, `serialize_nq` |
 | `calliomapper/utils/validation.py` | `validate()` + `ValidationError` wrapping pyshacl |
-| `calliomapper/mapper/structural.py` | `StructuralMapper` — dicts → Pydantic → rdflib named Graph |
+| `calliomapper/mapper/structural.py` | `StructuralMapper` — dicts → Pydantic → rdflib named Graph (currently still using dummy Pydantic classes) |
 | `calliomapper/translator.py` | `Translator` — orchestrates M1 + SHACL gate + `.nq` output |
 | `calliomapper/__init__.py` | Exports `Translator` |
 | `tests/test_structural.py` | 14 tests: unit, SHACL, round-trip, named graph, custom graph_id |
+| `tests/test_ontocal_schema.py` | Tests for ontocal schema validation |
 
-**Real schema files are empty placeholders:**
-- `ontology/calliope_oeo.yaml` — empty placeholder
-- `ontology/calliope_oeo.ttl` — empty placeholder
-- `ontology/calliope_oeo_shapes.ttl` — empty placeholder
-- `calliomapper/generated/calliope_oeo.py` — does not exist yet
+**Pending to complete M1 with real schema:**
+1. Run `make generate` against `ontocal.yaml` → produces `calliomapper/generated/ontocal.py` + `ontology/ontocal_shapes.ttl`
+2. Update `StructuralMapper` to import from `ontocal.py` and dispatch on `base_tech` to the appropriate subclass
+3. Update `Translator._DEFAULT_SHAPES` to point at `ontocal_shapes.ttl`
 
 **M2, M3, M4 are stubs only** (`epistemic.py`, `results.py`, `translator.py` M2/M3 blocks).
+
+**Note on ontology module sub-schema structure:** `workflow_implementation.md` and `project_structure.md` originally described a modular sub-schema layout (`structural.yaml`, `epistemic.yaml`, `results_aggregated.yaml`, profiles/). This has been superseded: the current approach is a single `ontocal.yaml` that will grow to cover all modules, rather than separate files per module. The profile system concept is still valid but its implementation structure may differ from original plans.
 
 ---
 
@@ -159,41 +161,33 @@ When `schema="path/to/my_schema.yaml"` is passed:
 
 ---
 
-## Ontology module sub-schemas to create
+## Ontology schema structure
 
-- `ontology/structural.yaml` — M1 concepts (replaces dummy)
-- `ontology/epistemic.yaml` — M2 provenance concepts
-- `ontology/results_aggregated.yaml` — M3a aggregate observation concepts
-- `ontology/results_detailed.yaml` — M3b per-timestep (optional, `full` profile only)
+**Current approach:** single `ontocal.yaml` covering all modules, rather than separate files per module. The profile/module architecture described in `development_plan.md` and `project_structure.md` is still the *intended* long-term structure but has not been implemented — `ontocal.yaml` is the working schema for now.
 
-**Profile master schemas:**
-- `ontology/profiles/minimal.yaml` — imports structural only
-- `ontology/profiles/standard.yaml` — imports structural + epistemic + results_aggregated
-- `ontology/profiles/full.yaml` — imports all four modules
-
-**Iteration loop for each module:**
+**Iteration loop for adding new concepts:**
 1. Consult Calliope v0.7 docs + OEO to identify right class URI for a concept
-2. Add class to relevant sub-schema YAML
-3. `make generate` → regenerates Pydantic + SHACL + TTL for all profiles that include the module
-4. Extend relevant mapper's `_add_entity()` to dispatch to the new Pydantic class
+2. Add class/slot to `ontology/ontocal.yaml`
+3. `make generate` → regenerates Pydantic + SHACL + TTL artifacts
+4. Extend relevant mapper's dispatch logic to the new Pydantic class
 5. Add/update tests → `make test` → commit
 
-`_add_entity()` currently always emits `rdf:type ontocal:CalliopeThing`. It needs to dispatch based on `base_tech` field to the appropriate subclass. This dispatch logic is the core M1 intellectual work.
+`_add_entity()` currently always emits `rdf:type ontocal:CalliopeThing` (dummy schema). Once updated, it must dispatch based on `base_tech` field to the appropriate subclass. This dispatch logic is the core M1 intellectual work.
 
 ---
 
 ## Next planned work
 
-### Immediate: real ontology (M1)
+### Immediate: wire real ontology into M1
 
-Author `ontology/structural.yaml` starting with the class hierarchy from `ontology_rationale.md`:
-- `ontocal:CalliopeModel`, `ontocal:CalliopeNode`, `ontocal:EnergyCarrier`
-- `ontocal:SupplyTechnology`, `ontocal:DemandTechnology`, `ontocal:StorageTechnology`, `ontocal:TransmissionTechnology`, `ontocal:ConversionTechnology`
-
-When ready:
-- Update `Translator._DEFAULT_SHAPES` to point at profile shapes file
-- Update `StructuralMapper` import from `dummy_schema` to generated profile module
-- Update `namespaces.py` if new namespaces needed
+`ontocal.yaml` is authored. Next steps:
+1. Run `make generate` → produces `calliomapper/generated/ontocal.py` + `ontology/ontocal_shapes.ttl`
+2. Update `StructuralMapper`:
+   - Replace `dummy_schema.py` import with `ontocal.py`
+   - Update `_add_entity()` dispatch to use `base_tech` field → appropriate subclass (`CalliopeSupplyTechnology`, `CalliopeDemandTechnology`, etc.)
+3. Update `Translator._DEFAULT_SHAPES` to point at `ontocal_shapes.ttl`
+4. Run `make test` — fix any failures
+5. Commit M1 completion
 
 ### M2 — EpistemicEngine
 

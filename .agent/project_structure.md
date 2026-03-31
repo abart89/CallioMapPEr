@@ -68,63 +68,45 @@ calliomapper/
 
 ## `ontology/` — Ontology Source Files
 
-The ontology is split into **module sub-schemas** (one per knowledge domain) and **profile master schemas** (fixed combinations of modules). Profiles are the entry points for `make generate` and for `Translator(profile=...)`.
+The ontology authoring entry point is **YAML-first**: edit the LinkML YAML schema, then run `make generate` to produce Pydantic classes, SHACL shapes, and OWL/Turtle.
+
+**Current state (as of 2026-03-27):**
 
 ```
 ontology/
-│   # Module sub-schemas — authoring units, one per knowledge domain
-├── structural.yaml            # M1: nodes, technologies, carriers, parameters
-├── epistemic.yaml             # M2: scenarios, rationale, data provenance (PROV-O)
-├── results_aggregated.yaml    # M3a: aggregate observations (totals per carrier/tech)
-├── results_detailed.yaml      # M3b: per-timestep observations (OPTIONAL module)
-│
-│   # Profile master schemas — each imports a fixed set of sub-schemas.
-│   # These are the `make generate` entry points and the `Translator(profile=...)` targets.
-├── profiles/
-│   ├── minimal.yaml           # imports: structural only
-│   ├── standard.yaml          # imports: structural + epistemic + results_aggregated
-│   └── full.yaml              # imports: structural + epistemic + results_aggregated + results_detailed
-│
-│   # Dummy schema — used during development while the real OEO mapping is being curated.
-│   # Mirrors the same pipeline as the real schema; contains only CalliopeThing (BFO:entity subclass).
-├── dummy_schema.yaml          # Dummy LinkML schema — authoring entry point for dev/testing
-├── dummy.ttl                  # AUTO-GENERATED OWL/Turtle from dummy_schema.yaml
-└── dummy_shapes.ttl           # SHACL shapes for the dummy schema
-                               # NOTE: currently hand-authored because gen-shacl requires network
-                               # access to resolve linkml:types.
+├── ontocal.yaml               # THE real LinkML schema — full ontocal: class hierarchy.
+│                              # Covers CalliopeModel, 5 tech subtypes, NetworkNode,
+│                              # EnergyCarrier, Scenario, OptimisationRun, parameters.
+├── individuals.ttl            # Named individuals (Calliope framework as oeo:SoftwareFramework)
+└── calliope_oeo_shapes.ttl    # SHACL shapes — currently a placeholder (comment only).
+                               # Must be generated from ontocal.yaml via `make generate`.
 ```
 
-### Profile → module mapping
+**Generated artifacts (not yet produced — pending `make generate`):**
+- `calliomapper/generated/ontocal.py` — Pydantic classes for use by mappers
+- `ontology/ontocal_shapes.ttl` — SHACL shapes for validation gate
 
-| Profile | structural | epistemic | results_aggregated | results_detailed |
-| :--- | :---: | :---: | :---: | :---: |
-| `minimal` | ✓ | | | |
-| `standard` | ✓ | ✓ | ✓ | |
-| `full` | ✓ | ✓ | ✓ | ✓ |
+**Planned long-term structure (not yet implemented):**
+The module/profile architecture described in `development_plan.md` (separate `structural.yaml`, `epistemic.yaml`, `results_aggregated.yaml` + `profiles/` directory) is the intended eventual layout. For now `ontocal.yaml` is the single schema file that will grow to cover all modules.
 
-### Ontology pipeline — two authoring workflows
+### Ontology pipeline
 
-**Preferred (YAML-first):** Edit a module sub-schema; regenerate all profiles that include it.
+**YAML-first (the active workflow):**
 ```
-structural.yaml / epistemic.yaml / results_*.yaml   ← author these (text editor, AI-assisted)
+ontology/ontocal.yaml          ← author here (text editor or AI-assisted)
       ↓ make generate
-calliomapper/generated/<profile>.py    — Pydantic classes per profile (generated artifact)
-ontology/profiles/<profile>_shapes.ttl — SHACL shapes per profile (generated artifact)
-ontology/profiles/<profile>.ttl        — OWL/Turtle per profile, for Protégé (generated artifact)
+calliomapper/generated/ontocal.py  — Pydantic classes (generated artifact, never hand-edit)
+ontology/ontocal_shapes.ttl        — SHACL shapes (generated artifact)
+ontology/ontocal.ttl               — OWL/Turtle for Protégé (generated artifact)
 ```
 
-**Alternative (TTL-first, for ontologists using Protégé):** Edit a profile TTL, then manually sync the relevant sub-schema YAML.
+**TTL-first (alternative, for ontologists using Protégé):**
 ```
-ontology/profiles/<profile>.ttl   ← edit in Protégé
-      ↓ manual sync (no automated TTL→YAML tool exists)
-relevant sub-schema .yaml         ← update by hand to reflect the TTL changes
+ontology/ontocal.ttl   ← edit in Protégé
+      ↓ manual sync back to ontocal.yaml (no automated tool)
       ↓ make generate
-(same generated artifacts as above)
+(same generated artifacts)
 ```
-
-The manual sync is a deliberate constraint: LinkML YAML is more restricted than OWL, so not all OWL constructs translate, and the sync step forces a conscious decision about what the tool needs to represent.
-
-The dummy schema follows the exact same pipeline. All pipeline code is schema-agnostic; only the generated artifacts differ.
 
 ---
 
@@ -133,13 +115,15 @@ The dummy schema follows the exact same pipeline. All pipeline code is schema-ag
 ```
 tests/
 ├── fixtures/              # Committed Calliope model fixtures (no live solve needed)
-│   ├── national_scale/    # Calliope built-in example — primary test fixture (M1–M3)
-│   └── urban_scale/       # Calliope built-in example — integration test fixture (M4)
-├── test_structural.py     # Tests for StructuralMapper (M1)
-├── test_epistemic.py      # Tests for EpistemicEngine (M2)
-├── test_results.py        # Tests for ResultsMapper (M3)
-└── test_translator.py     # End-to-end integration tests (M4)
+│   └── README.md          # Placeholder — no model data committed yet
+├── test_structural.py     # Tests for StructuralMapper (M1) — 14 tests, passing
+├── test_ontocal_schema.py # Tests for ontocal LinkML schema
+├── test_epistemic.py      # Tests for EpistemicEngine (M2) — stub, not yet implemented
+├── test_results.py        # Tests for ResultsMapper (M3) — stub, not yet implemented
+└── test_translator.py     # End-to-end integration tests (M4) — stub, not yet implemented
 ```
+
+**Note:** `fixtures/national_scale/` and `fixtures/urban_scale/` are planned but not committed. Tests currently run against in-memory fixtures.
 
 Run tests with `make test` or `pytest tests/`.
 
@@ -168,7 +152,10 @@ Not part of the Python package. For agent and developer orientation only.
 ├── workflow.md               # Logical pipeline description (what and why, no implementation details)
 ├── workflow_implementation.md # Technical pipeline: current state, design decisions, next steps
 ├── ontology_rationale.md     # Ontology scope, OEO fitness, ontocal: hierarchy, namespace policy
-├── ontologynotes.md          # Working ontology drafting notes (in-progress, informal)
+├── ontologynotes.md          # Structured taxonomy reference: class hierarchy, attribute tables
+├── ontology_dev_diary.md     # Chronological decision log for ontology development
+├── attrs_structure.yaml      # Skeleton of Calliope v0.7 attrs.yaml — reference for input parsing
+├── implementation_notes.md   # Implementation ideas from ontology work — read before coding mappers
 └── contexts_index.md         # Index of all files in this folder with status notes
 ```
 

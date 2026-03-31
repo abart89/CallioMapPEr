@@ -25,7 +25,7 @@ from linkml_runtime.loaders import yaml_loader
 from linkml_runtime.linkml_model import SchemaDefinition
 
 REPO_ROOT    = Path(__file__).parent.parent
-SCHEMA_PATH  = REPO_ROOT / "ontology" / "ontocal.yaml"
+SCHEMA_PATH  = REPO_ROOT / "ontology" / "ontocal_core.yaml"
 INDIVIDUALS  = REPO_ROOT / "ontology" / "individuals.ttl"
 GEN_PYTHON   = REPO_ROOT / "dev_calliomapper" / "bin" / "gen-python"
 

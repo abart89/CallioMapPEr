@@ -47,6 +47,34 @@ slots:
     slot_uri: iao:0000136
     description: "Relates an information artifact to the entity it is about."
 
+  applies_to_time:
+    is_a: is_about          # sub-property of iao:is_about
+    slot_uri: ontocal:appliesToTime
+    description: "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons."
+    range: OneDimensionalTemporalRegion
+
+  unit:
+    slot_uri: ontocal:unit
+    range: string
+    required: false
+    description: "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes."
+
+  source_reference:
+    slot_uri: ontocal:sourceReference
+    range: string
+    required: false
+    description: "Provenance string identifying the origin of the parameter value (e.g. 'User CSV Upload', 'base_config.yaml')."
+
+  aggregation_type:
+    slot_uri: ontocal:aggregationType
+    range: AggregationTypeEnum
+    required: false
+    description: "Specifies the statistical aggregation method used for a parameter representing a macro-summary."
+
+  temporal_part_of:
+    slot_uri: bfo:0000139
+    description: "A mereological relation linking a temporal proper part to its temporal whole."
+
 
 # 3. CLASSES (Taxonomy): This is where you build your hierarchy.
 classes:
@@ -78,6 +106,32 @@ classes:
     class_uri: oeo:OEO_00030029
     description: "OEO class for exogenous data (input parameters defined outside the model)."
 
+  OneDimensionalTemporalRegion:
+    class_uri: bfo:0000038
+    description: "BFO stub: a one-dimensional temporal region. Parent of all temporal classes in this schema."
+
+  TimeStep:
+    is_a: OneDimensionalTemporalRegion
+    class_uri: oeo:OEO_00030033
+    description: "OEO class for a discrete timestep in a model simulation."
+
+
+  CalliopeDataHorizon:
+    is_a: OneDimensionalTemporalRegion
+    class_uri: bfo:0000038
+    description: "A one-dimensional temporal region representing the maximal dataset boundaries defined at the base Calliope model level."
+
+  CalliopeExecutionHorizon:
+    is_a: OneDimensionalTemporalRegion
+    class_uri: bfo:0000038
+    description: "A one-dimensional temporal region representing the specific sliced subset simulated by a Calliope scenario."
+    slots:
+      - temporal_part_of
+    slot_usage:
+      temporal_part_of:
+        range: CalliopeDataHorizon
+        required: true
+
 
   # --- Calliope Extensions (ontocal) ---
   CalliopeOptimisationRun:
@@ -91,9 +145,23 @@ classes:
   CalliopeModelParameter:
     is_a: ExogenousData
     description: "An input parameter supplied to a Calliope model from outside the optimisation (e.g. costs, capacities, time series)."
+    slots:
+      - applies_to_time   # optional: granular timestep or macro horizon
+      - aggregation_type  # optional: only for parameters summarising over a macro horizon
+      - unit              # optional: plain string, validated by equals_string on specific subclasses
+      - source_reference  # optional: provenance string, free-form
     slot_usage:
       part_of:
         range: CalliopeScenario
+      applies_to_time:
+        range: OneDimensionalTemporalRegion
+        required: false
+      aggregation_type:
+        required: false
+      unit:
+        required: false
+      source_reference:
+        required: false
 
   TechParameter:
     is_a: CalliopeModelParameter
@@ -101,6 +169,46 @@ classes:
     slot_usage:
       is_about:
         range: CalliopeTechnology
+        required: true
+
+  SupplyTechParameter:
+    is_a: TechParameter
+    description: "A model parameter scoped to a supply technology."
+    slot_usage:
+      is_about:
+        range: CalliopeSupplyTechnology
+        required: true
+
+  DemandTechParameter:
+    is_a: TechParameter
+    description: "A model parameter scoped to a demand technology."
+    slot_usage:
+      is_about:
+        range: CalliopeDemandTechnology
+        required: true
+
+  StorageTechParameter:
+    is_a: TechParameter
+    description: "A model parameter scoped to a storage technology."
+    slot_usage:
+      is_about:
+        range: CalliopeStorageTechnology
+        required: true
+
+  TransmissionTechParameter:
+    is_a: TechParameter
+    description: "A model parameter scoped to a transmission technology."
+    slot_usage:
+      is_about:
+        range: CalliopeTransmissionTechnology
+        required: true
+
+  ConversionTechParameter:
+    is_a: TechParameter
+    description: "A model parameter scoped to a conversion technology."
+    slot_usage:
+      is_about:
+        range: CalliopeConversionTechnology
         required: true
 
   NodeParameter:
@@ -216,7 +324,22 @@ classes:
         required: true
 
 
-# 4. INDIVIDUALS:
+# 4. ENUMS
+enums:
+  AggregationTypeEnum:
+    description: "The mathematical operation applied to aggregate granular occurrent data into a single scalar Information Content Entity over a macro temporal region."
+    permissible_values:
+      sum:
+        description: "The cumulative total over the temporal region."
+      average:
+        description: "The arithmetic mean over the temporal region."
+      max:
+        description: "The peak value observed within the temporal region."
+      min:
+        description: "The lowest value observed within the temporal region."
+
+
+# 5. INDIVIDUALS:
 # LinkML 1.x does not support an 'individuals:' block in the schema — named individuals live in
 # separate data files. The Calliope framework individual is declared in ontology/individuals.ttl
 # as:  ontocal:Calliope  rdf:type  oeo:OEO_00000382 (SoftwareFramework) .
