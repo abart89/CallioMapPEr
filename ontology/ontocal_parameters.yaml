@@ -1,5 +1,5 @@
-id: https://w3id.org/ontocal/params
-name: ontocal_params
+id: https://w3id.org/ontocal/parameters
+name: ontocal_parameters
 description: Calliope technology and node parameter classes, extending ontocal_core.
 
 imports:

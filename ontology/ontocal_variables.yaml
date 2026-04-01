@@ -1,0 +1,452 @@
+id: https://w3id.org/ontocal/variables
+name: ontocal_variables
+description: Calliope model output variable classes, extending ontocal_core.
+
+imports:
+  - linkml:types
+  - ontocal_core  # brings in all tech/node classes and the *TechVariable/*NodeVariable/SystemVariable hierarchy
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  ontocal: https://w3id.org/ontocal/
+default_prefix: ontocal
+
+
+classes:
+
+  # ==========================================================================
+  # 1. Physical System Variables (Capacities & Energy Flows)
+  # ==========================================================================
+
+  FlowCap:
+    is_a: TechVariable
+    description: "Nominal/nameplate flow capacity of the technology at a node. Core investment decision variable."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  LinkFlowCap:
+    is_a: TransmissionTechVariable
+    description: "Nominal flow capacity of a transmission link. Investment decision variable for transmission."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SourceCap:
+    is_a: SupplyTechVariable
+    description: "Upper limit on the flow a supply technology can consume from outside the system boundary."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  StorageCap:
+    is_a: StorageTechVariable
+    description: "Maximum reservoir capacity for storing a carrier at a node."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  AreaUse:
+    is_a: TechVariable
+    description: "Physical footprint utilised directly or indirectly by a technology at a node."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  FlowIn:
+    is_a: TechVariable
+    description: "Carrier inflow consumed by a technology per timestep (demand, conversion, storage, transmission)."
+    slot_usage:
+      at_node:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  FlowOut:
+    is_a: TechVariable
+    description: "Carrier outflow produced by a technology per timestep (supply, conversion, storage, transmission)."
+    slot_usage:
+      at_node:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  FlowExport:
+    is_a: TechVariable
+    description: "Carrier flow exported outside system boundaries per timestep (export-enabled technologies)."
+    slot_usage:
+      at_node:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SourceUse:
+    is_a: SupplyTechVariable
+    description: "Carrier flow consumed from outside system boundaries by a supply technology per timestep."
+    slot_usage:
+      at_node:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  StorageLevel:
+    is_a: StorageTechVariable
+    description: "Instantaneous quantity of stored carrier held in a storage technology at each timestep. (Calliope variable: storage)"
+    slot_usage:
+      at_node:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  UnmetDemand:
+    is_a: NodeVariable
+    description: "Load shedding: virtual source of carrier flow added to ensure model feasibility per timestep."
+    slot_usage:
+      for_carrier:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  UnusedSupply:
+    is_a: NodeVariable
+    description: "Curtailment: virtual sink of carrier flow added to ensure model feasibility per timestep."
+    slot_usage:
+      for_carrier:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+
+  # ==========================================================================
+  # 2. MILP Variables
+  # ==========================================================================
+
+  PurchasedUnits:
+    is_a: TechVariable
+    description: "Integer number of fixed-capacity technology units purchased (integer capacity planning)."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: integer
+        required: true
+
+  OperatingUnits:
+    is_a: TechVariable
+    description: "Integer number of technology units actively operating in each timestep (integer dispatch)."
+    slot_usage:
+      at_node:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: integer
+        required: true
+
+  AvailableFlowCap:
+    is_a: TechVariable
+    description: "Flow capacity active when a technology unit is online; zero when offline (integer dispatch)."
+    slot_usage:
+      at_node:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  AsyncFlowSwitch:
+    is_a: TechVariable
+    description: "Binary switch forcing asynchronous outflow/consumption to prevent simultaneous production and consumption."
+    slot_usage:
+      at_node:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: boolean
+        required: true
+
+  StorageInterCluster:
+    is_a: StorageTechVariable
+    description: "Virtual carrier stored between clustered representative days. Indexed by datestep, not regular timestep."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  StorageIntraClusterMax:
+    is_a: StorageTechVariable
+    description: "Virtual upper bound on stored carrier within a representative day. Indexed by cluster."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  StorageIntraClusterMin:
+    is_a: StorageTechVariable
+    description: "Virtual lower bound on stored carrier within a representative day. Indexed by cluster."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+
+  # ==========================================================================
+  # 3. Global Expressions (Economics & Adjusted Flows)
+  # ==========================================================================
+
+  FlowInIncEff:
+    is_a: TechVariable
+    description: "Carrier inflow after accounting for flow_in_eff and distance-based losses per timestep."
+    slot_usage:
+      at_node:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  FlowOutIncEff:
+    is_a: TechVariable
+    description: "Carrier outflow after accounting for efficiency and parasitic losses per timestep."
+    slot_usage:
+      at_node:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostOperationVariable:
+    is_a: TechVariable
+    description: "Variable operating costs (flow in, flow out, export) calculated per timestep."
+    slot_usage:
+      at_node:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostInvestmentFlowCap:
+    is_a: TechVariable
+    description: "Capital investment cost attributable to installed flow capacity."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostInvestmentStorageCap:
+    is_a: StorageTechVariable
+    description: "Capital investment cost attributable to installed storage capacity."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostInvestmentSourceCap:
+    is_a: SupplyTechVariable
+    description: "Capital investment cost attributable to installed source capture capacity."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostInvestmentAreaUse:
+    is_a: TechVariable
+    description: "Capital investment cost attributable to land or area use."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostInvestmentPurchase:
+    is_a: TechVariable
+    description: "Discrete capital cost for purchasing integer technology units."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostInvestmentTotal:
+    is_a: TechVariable
+    description: "Total upfront investment cost summing all capacity-related cost components."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostInvestmentAnnualised:
+    is_a: TechVariable
+    description: "Equivalent annual investment cost discounted via depreciation and interest rates."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  CostOperationFixed:
+    is_a: TechVariable
+    description: "Fixed annual operation and maintenance cost calculated relative to installed capacity."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  Cost:
+    is_a: TechVariable
+    description: "Total annualised cost of a technology at a node, summing all investment and operation components."
+    slot_usage:
+      at_node:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+
+  # ==========================================================================
+  # 4. Post-Processed Result Metrics
+  # ==========================================================================
+
+  CapacityFactor:
+    is_a: TechVariable
+    description: "Computed fraction of operational production relative to installed capacity per timestep."
+    slot_usage:
+      at_node:
+        required: true
+      applies_to_time:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SystemwideCapacityFactor:
+    is_a: TechVariable
+    description: "Average capacity factor for a technology aggregated across all spatial nodes and weighted timesteps. No at_node: system-wide aggregate."
+    attributes:
+      value:
+        range: float
+        required: true
+
+  SystemwideLevelisedCost:
+    is_a: TechVariable
+    description: "Production cost of a specific carrier per technology across the whole system (LCOE/LCOX per tech)."
+    slot_usage:
+      for_carrier:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  TotalLevelisedCost:
+    is_a: SystemVariable
+    description: "Aggregate levelised cost to produce a specific carrier for the entire system."
+    slot_usage:
+      for_carrier:
+        required: true
+    attributes:
+      value:
+        range: float
+        required: true
+
+  UnmetSum:
+    is_a: SystemVariable
+    description: "System-wide aggregate combining unmet demand and unused supply into a single feasibility/penalty metric."
+    attributes:
+      value:
+        range: float
+        required: true
