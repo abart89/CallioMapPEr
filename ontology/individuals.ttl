@@ -7,6 +7,6 @@
 # declared here as plain RDF and loaded alongside the generated schema artefacts.
 
 ontocal:Calliope
-    a oeo:OEO_00000382 ;                          # rdf:type oeo:SoftwareFramework
+    a oeo:OEO_00000279 ;                          # rdf:type oeo:ModellingSoftware
     rdfs:label "Calliope_0_7_0_dev7" ;
     rdfs:comment "The specific v0.7.0.dev7 release of the Calliope energy system modeling framework." .

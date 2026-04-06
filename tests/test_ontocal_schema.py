@@ -21,7 +21,7 @@ from linkml_runtime.loaders import yaml_loader
 from linkml_runtime.linkml_model import SchemaDefinition
 
 SCHEMA_PATH = Path(__file__).parent.parent / "ontology" / "ontocal_core.yaml"
-OEO_STUBS = {"SoftwareFramework", "EnergySystemModel", "ModelComponent", "Optimisation"}
+OEO_STUBS = {"ModellingSoftware", "EnergySystemModel", "ModelComponent", "Optimisation"}
 EXTERNAL_SLOTS = {"has_part", "part_of"}
 
 # Suppress the urllib3/requests version mismatch warning that linkml CLI tools emit.
@@ -107,9 +107,9 @@ def test_calliope_individual_typed():
     g.parse(ttl_path, format="turtle")
 
     calliope = URIRef("https://w3id.org/ontocal/Calliope")
-    software_framework = URIRef("http://openenergy-platform.org/ontology/oeo/OEO_00000382")
-    assert (calliope, RDF.type, software_framework) in g, (
-        "ontocal:Calliope is not typed as oeo:OEO_00000382 (SoftwareFramework) in individuals.ttl"
+    modelling_software = URIRef("http://openenergy-platform.org/ontology/oeo/OEO_00000279")
+    assert (calliope, RDF.type, modelling_software) in g, (
+        "ontocal:Calliope is not typed as oeo:OEO_00000279 (ModellingSoftware) in individuals.ttl"
     )
 
 

@@ -14,6 +14,7 @@ prefixes:
   bfo: http://purl.obolibrary.org/obo/BFO_
   iao: http://purl.obolibrary.org/obo/IAO_
   ro: http://purl.obolibrary.org/obo/RO_
+  obo: http://purl.obolibrary.org/obo/
 default_prefix: ontocal
 
 
@@ -73,8 +74,21 @@ slots:
     description: "Specifies the statistical aggregation method used for a parameter representing a macro-summary."
 
   temporal_part_of:
-    slot_uri: bfo:0000139
+    slot_uri: obo:BFO_0000139
     description: "A mereological relation linking a temporal proper part to its temporal whole."
+
+  has_solver:
+    slot_uri: ontocal:hasSolver
+    range: Solver
+    description: "Links an optimisation process to the solver software used to execute it."
+
+  has_information_input:
+    slot_uri: oeo:OEO_00140093
+    description: "Relates an optimisation process to the information entities it takes as input."
+
+  information_input_of:
+    slot_uri: oeo:OEO_00020189
+    description: "Inverse of has_information_input. Relates an information entity to the optimisation process it feeds into."
 
   output_of:
     slot_uri: ro:0002353
@@ -97,16 +111,16 @@ classes:
   # --- OEO Stub Classes ---
   # External OEO classes referenced as parents. class_uri pins them to the real OEO IRI.
   # No body beyond class_uri — these are anchors, not local definitions.
-  SoftwareFramework:
-    class_uri: oeo:OEO_00000382
-    description: "OEO class for software frameworks."
+  ModellingSoftware:
+    class_uri: oeo:OEO_00000279
+    description: "OEO class of softwares used to maintain mathematical models."
 
   EnergySystemModel:
-    class_uri: oeo:OEO_00000339
+    class_uri: oeo:OEO_00030015
     description: "OEO class for energy system models."
 
   ModelComponent:
-    class_uri: oeo:OEO_00000340
+    class_uri: oeo:OEO_00000276
     description: "OEO class for model building blocks."
 
   Optimisation:
@@ -118,8 +132,12 @@ classes:
     class_uri: oeo:OEO_00000364
     description: "OEO class for scenarios."
 
+  Solver:
+    class_uri: oeo:OEO_00000392
+    description: "OEO class for solver software (e.g. Gurobi, CBC) used to execute an optimisation."
+
   DataSet:
-    class_uri: iao:IAO_0000100
+    class_uri: obo:IAO_0000100
     description: "IAO class for a data set."
 
   ExogenousData:
@@ -166,6 +184,62 @@ classes:
   CalliopeOptimisationRun:
     is_a: Optimisation
     description: "A single execution of the Calliope solver against a fully parametrised model."
+    # Runtime diagnostics live on CalliopeRunProcess (the occurrent); this class holds the inputs.
+    slots:
+      - has_information_input
+    slot_usage:
+      has_information_input:
+        range: CalliopeScenario
+        required: true
+
+  CalliopeRunProcess:
+    is_a: Optimisation
+    description: >-
+      The occurrent representing the actual execution of the Calliope solver.
+      Holds runtime diagnostics, timing boundaries, and solver link — distinct from
+      CalliopeOptimisationRun which represents the configured run with its inputs.
+    slots:
+      - has_solver
+    slot_usage:
+      has_solver:
+        required: false
+    attributes:
+      termination_condition:
+        range: TerminationConditionEnum
+        required: false
+        description: "The exit state returned by the solver (optimal, infeasible, or unbounded)."
+      preprocess_start:
+        range: float
+        required: false
+        description: "POSIX timestamp marking the start of the preprocessing phase."
+      init_complete:
+        range: float
+        required: false
+        description: "POSIX timestamp marking completion of model initialisation."
+      build_start:
+        range: float
+        required: false
+        description: "POSIX timestamp marking the start of the backend model build phase."
+      build_complete:
+        range: float
+        required: false
+        description: "POSIX timestamp marking completion of the backend model build."
+      solve_start:
+        range: float
+        required: false
+        description: "POSIX timestamp marking the moment the solver is invoked."
+      solver_exit:
+        range: float
+        required: false
+        description: "POSIX timestamp marking the moment the solver returns control."
+      postprocess_complete:
+        range: float
+        required: false
+        description: "POSIX timestamp marking completion of result postprocessing."
+      solve_complete:
+        range: float
+        required: false
+        description: "POSIX timestamp marking the end of the full solve cycle."
 
   CalliopeResultDataset:
     is_a: DataSet
@@ -263,16 +337,32 @@ classes:
   CalliopeScenario:
     is_a: Scenario
     description: "A specific set of assumptions and parameters defining one Calliope model configuration."
+    slots:
+      - is_about
+    slot_usage:
+      is_about:
+        range: CalliopeModel
+        required: true
 
   CalliopeModelParameter:
     is_a: ExogenousData
     description: "An input parameter supplied to a Calliope model from outside the optimisation (e.g. costs, capacities, time series)."
     slots:
+      - is_about
+      - information_input_of
       - applies_to_time   # optional: granular timestep or macro horizon
       - aggregation_type  # optional: only for parameters summarising over a macro horizon
       - unit              # optional: plain string, validated by equals_string on specific subclasses
       - source_reference  # optional: provenance string, free-form
     slot_usage:
+      is_about:
+        any_of:
+          - range: ModelComponent
+          - range: CalliopeModel
+        required: true
+      information_input_of:
+        range: CalliopeOptimisationRun
+        required: false
       part_of:
         range: CalliopeScenario
       applies_to_time:
@@ -448,6 +538,16 @@ classes:
 
 # 4. ENUMS
 enums:
+  TerminationConditionEnum:
+    description: "The discrete exit states returned by a mathematical solver upon completion."
+    permissible_values:
+      optimal:
+        description: "The solver found a globally optimal solution."
+      infeasible:
+        description: "No feasible solution exists given the constraints."
+      unbounded:
+        description: "The objective function is unbounded — the problem is ill-posed."
+
   AggregationTypeEnum:
     description: "The mathematical operation applied to aggregate granular occurrent data into a single scalar Information Content Entity over a macro temporal region."
     permissible_values:

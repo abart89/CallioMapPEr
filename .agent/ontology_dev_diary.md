@@ -6,6 +6,42 @@ Add entries at the top (newest first). Each entry has a date and a short tag.
 ---
 
 
+## 2026-04-06 — Deferred: Calliope Meta-Parameters and the MVP Process Class
+
+### The Problem: The "Everything Everywhere" Config Problem
+
+In Calliope v0.7, the configuration files contain a high density of "meta-parameters" (found in `config.init`, `config.build`, and `config.solve`). While these are essential for the software to function, modeling them all at once risks "ontological bloat." Many of these parameters (like `bigM` penalties or `resample` frequencies) sit in a grey area between the **Energy System Model** (the physical/economic definition) and the **Optimisation Process** (the mathematical solving event).
+
+### The Strategy: Establishing the Occurrent Pattern First
+
+To maintain a clean separation between **Continuants** (the technologies and nodes that exist) and **Occurrents** (the act of solving the model), we have decided to defer the bulk of these meta-parameters.
+
+Instead of a deep dive into every solver kwarg, we are implementing a **Minimum Viable Process (MVP)** for the `CalliopeRunProcess`. This allows us to prove the BFO alignment of the "Run" without getting bogged down in the minutiae of solver-specific heuristics.
+
+### What We Are Implementing Now
+
+We are focusing strictly on the **Temporal Boundaries** and **Exit States** of the process. This provides immediate value for provenance and performance tracking:
+
+1. **Solver Attribution:** Linking the process to `oeo:OEO_00000392` (Solver) to identify the "instrument" of the process.
+2. **Temporal Footprint:** Capturing the 8 core POSIX timestamps (`preprocess_start` through `solve_complete`) as data attributes. This defines the process in time.
+3. **Termination Logic:** Using a controlled vocabulary (`TerminationConditionEnum`) to capture the outcome (e.g., `optimal`, `infeasible`).
+
+### What We Are Skipping (The "Deferred" List)
+
+The following categories are intentionally excluded from the current LinkML schema. These should be treated as **future refinements** for the next iteration of the agent:
+
+* **Mathematical Heuristics:** `bigM` values, `ensure_feasibility` slacks, and `objective_cost_weights`.
+* **Data Transformation Directives:** `resample` strings, `time_cluster` mappings, and `broadcast_input_data` flags.
+* **SPORES Orchestration:** The entire logic for Spatially-explicit Pareto Optimal solutions (number of iterations, slack tolerances).
+* **Custom Math Extensibility:** `extra_math` and `math_paths` logic.
+
+### Note for Future Agents
+
+When revisiting these deferred parameters, they should likely be modeled as subclasses of `oeo:OEO_00000339` (Program parameter) and linked to the `CalliopeRunProcess` via the `has_information_input` relation. This maintains the BFO principle that these are Information Content Entities that *direct* a process but are not the process itself.
+
+**Status:** Minimal Process Class established. Physical-to-Process boundary confirmed. Proceeding to validate against instance data.
+
+---
 
 
 ## 2026-03-31 — Decision: Macro Temporal Horizons and Aggregated Parameters

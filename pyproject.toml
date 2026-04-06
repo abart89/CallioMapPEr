@@ -33,4 +33,5 @@ filterwarnings = [
 dev = [
     "pytest",
     "pytest-cov",
+    "owlready2>=0.40",
 ]
