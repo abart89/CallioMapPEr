@@ -28,3 +28,7 @@ htmlcov/
 
 # Heavy Ontology Sources
 oeo-2/
+
+# Other ignored folders
+.agent/
+_tempfiles/
