@@ -87,7 +87,7 @@ ontology/
 - `ontology/ontocal_shapes.ttl` — SHACL shapes for validation gate
 
 **Planned long-term structure (not yet implemented):**
-The module/profile architecture described in `development_plan.md` (separate `structural.yaml`, `epistemic.yaml`, `results_aggregated.yaml` + `profiles/` directory) is the intended eventual layout. For now `ontocal.yaml` is the single schema file that will grow to cover all modules.
+The module/profile architecture described in `development_plan.md` (separate `structural.yaml` → currently `ontocal.yaml`, `epistemic.yaml`, `results_aggregated.yaml` + `profiles/` directory) is the intended layout. `ontocal.yaml` covers only what Calliope encodes in its core files (the structural module). Extension modules (`epistemic.yaml`, `results_aggregated.yaml`) are separate files by design — they capture knowledge outside Calliope's own file format and must not be merged into `ontocal.yaml`.
 
 ### Ontology pipeline
 

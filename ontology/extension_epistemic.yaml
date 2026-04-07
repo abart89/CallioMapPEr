@@ -1,0 +1,149 @@
+id: https://w3id.org/ontocal/epistemic
+name: extension_epistemic
+description: >-
+  Epistemic extension to ontocal_core. Formalizes agency, attribution, and
+  data lineage for Calliope model artifacts using PROV-O. Pillars 3 and 4
+  (justification/assumptions and epistemic status) are deferred to a future
+  version of this extension.
+
+imports:
+  - linkml:types
+  - ontocal_core  # brings in CalliopeModelParameter, CalliopeScenario, DataSet, etc.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  ontocal: https://w3id.org/ontocal/
+  prov: http://www.w3.org/ns/prov#
+default_prefix: ontocal
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# SLOTS (Relations)
+# ──────────────────────────────────────────────────────────────────────────────
+
+slots:
+
+  # --- Pillar 1: Agency and Attribution ---
+
+  was_attributed_to:
+    slot_uri: prov:wasAttributedTo
+    description: >-
+      Links an information artifact (e.g. a CalliopeModelParameter or
+      CalliopeScenario) to the prov:Agent responsible for it.
+    range: ProvAgent
+
+  acted_on_behalf_of:
+    slot_uri: prov:actedOnBehalfOf
+    description: >-
+      Links a prov:Person or prov:SoftwareAgent to the prov:Organization on
+      whose behalf they acted, establishing hierarchical responsibility.
+    domain: ProvAgent
+    range: ProvOrganization
+
+  # --- Pillar 2: Lineage and Derivation ---
+
+  was_generated_by:
+    slot_uri: prov:wasGeneratedBy
+    description: >-
+      Links an output entity (e.g. a processed parameter or dataset) to the
+      prov:Activity that generated it.
+    range: ProvActivity
+
+  used:
+    slot_uri: prov:used
+    description: >-
+      Links a prov:Activity to an input entity (e.g. raw weather data or a
+      source dataset) that it consumed.
+    domain: ProvActivity
+
+  was_derived_from:
+    slot_uri: prov:wasDerivedFrom
+    description: >-
+      Shortcut derivation relation linking a new entity directly to its source
+      entity, without requiring the intervening activity to be described.
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# CLASSES
+# ──────────────────────────────────────────────────────────────────────────────
+
+classes:
+
+  # ── Pillar 1: Agency and Attribution ──────────────────────────────────────
+
+  ProvAgent:
+    class_uri: prov:Agent
+    description: >-
+      Top-level PROV-O agent class. Represents any entity (person, organisation,
+      or software) that bears responsibility for an activity or artifact.
+    attributes:
+      name:
+        range: string
+        required: true
+        description: "Human-readable name of the agent."
+      description:
+        range: string
+        required: false
+        description: "Optional free-text description of the agent."
+
+  ProvPerson:
+    is_a: ProvAgent
+    class_uri: prov:Person
+    description: >-
+      A human agent — e.g. the energy modeller or the author of a source
+      dataset.
+
+  ProvOrganization:
+    is_a: ProvAgent
+    class_uri: prov:Organization
+    description: >-
+      An organisational agent — e.g. a research institution or government body.
+
+  ProvSoftwareAgent:
+    is_a: ProvAgent
+    class_uri: prov:SoftwareAgent
+    description: >-
+      A software agent — e.g. a specific Python processing script or the
+      Calliope framework itself.
+    attributes:
+      version:
+        range: string
+        required: false
+        description: "Version string of the software (e.g. '0.7.1')."
+      source_url:
+        range: uri
+        required: false
+        description: "URI pointing to the software repository or release."
+
+  # ── Pillar 2: Lineage and Derivation ──────────────────────────────────────
+
+  ProvActivity:
+    class_uri: prov:Activity
+    description: >-
+      A PROV-O activity representing an action taken on data — e.g. "Spatial
+      Aggregation of Wind Nodes", "Currency Inflation Adjustment", or
+      "Literature Review". The entities acted upon are existing classes
+      (oeo:DataSet, CalliopeModelParameter, etc.).
+    slots:
+      - was_attributed_to   # who ran this activity
+    slot_usage:
+      was_attributed_to:
+        range: ProvAgent
+        required: false
+    attributes:
+      label:
+        range: string
+        required: true
+        description: "Short human-readable label for the activity (e.g. 'Currency Conversion 2023→2025 EUR')."
+      description:
+        range: string
+        required: false
+        description: "Detailed description of what the activity did."
+      started_at:
+        range: string           # ISO 8601 datetime string
+        required: false
+        description: "ISO 8601 datetime at which the activity started."
+      ended_at:
+        range: string           # ISO 8601 datetime string
+        required: false
+        description: "ISO 8601 datetime at which the activity ended."

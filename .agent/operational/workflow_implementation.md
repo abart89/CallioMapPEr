@@ -30,7 +30,7 @@ Technical counterpart to `workflow.md`. Contains class names, file paths, design
 
 **M2, M3, M4 are stubs only** (`epistemic.py`, `results.py`, `translator.py` M2/M3 blocks).
 
-**Note on ontology module sub-schema structure:** `workflow_implementation.md` and `project_structure.md` originally described a modular sub-schema layout (`structural.yaml`, `epistemic.yaml`, `results_aggregated.yaml`, profiles/). This has been superseded: the current approach is a single `ontocal.yaml` that will grow to cover all modules, rather than separate files per module. The profile system concept is still valid but its implementation structure may differ from original plans.
+**Note on ontology module sub-schema structure:** `ontocal.yaml` covers only what Calliope itself encodes in its core files (nodes, techs, parameters, carriers) — as designed by the Calliope authors. It does NOT grow to absorb extension modules. Extension modules (`epistemic.yaml`, `results_aggregated.yaml`) are and remain separate LinkML sub-schema files. The modular layout (`structural.yaml` → `ontocal.yaml`, `epistemic.yaml`, `results_aggregated.yaml`, `profiles/`) described in `development_plan.md` is still the intended structure. The profile system is valid and its implementation follows the original plan.
 
 ---
 
