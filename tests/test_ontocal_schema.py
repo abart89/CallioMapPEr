@@ -7,7 +7,7 @@ Checks performed:
   3. Required top-level header fields are present (id, name, imports).
   4. Every OEO stub class has a class_uri (not just a local name).
   5. Every slot that maps to an external property has a slot_uri.
-  6. The Calliope individual is typed as oeo:SoftwareFramework in individuals.ttl.
+  6. The Calliope individual is typed as oeo:SoftwareFramework in ontocal_individuals.ttl.
   7. gen-python round-trip: schema generates valid Python without errors.
 """
 
@@ -94,14 +94,14 @@ def test_slots_have_slot_uri():
 
 def test_calliope_individual_typed():
     """
-    LinkML 1.x has no 'individuals:' block — named individuals live in individuals.ttl.
+    LinkML 1.x has no 'individuals:' block — named individuals live in ontocal_individuals.ttl.
     Check that the file exists and that Calliope is typed as oeo:SoftwareFramework (OEO_00000382).
     """
     from rdflib import Graph, URIRef
     from rdflib.namespace import RDF
 
-    ttl_path = Path(__file__).parent.parent / "ontology" / "individuals.ttl"
-    assert ttl_path.exists(), "ontology/individuals.ttl not found"
+    ttl_path = Path(__file__).parent.parent / "ontology" / "ontocal_individuals.ttl"
+    assert ttl_path.exists(), "ontology/ontocal_individuals.ttl not found"
 
     g = Graph()
     g.parse(ttl_path, format="turtle")
@@ -109,7 +109,7 @@ def test_calliope_individual_typed():
     calliope = URIRef("https://w3id.org/ontocal/Calliope")
     modelling_software = URIRef("http://openenergy-platform.org/ontology/oeo/OEO_00000279")
     assert (calliope, RDF.type, modelling_software) in g, (
-        "ontocal:Calliope is not typed as oeo:OEO_00000279 (ModellingSoftware) in individuals.ttl"
+        "ontocal:Calliope is not typed as oeo:OEO_00000279 (ModellingSoftware) in ontocal_individuals.ttl"
     )
 
 

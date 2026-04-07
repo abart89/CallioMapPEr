@@ -1,7 +1,7 @@
 """
 Translator — main orchestration class.
 
-Coordinates StructuralMapper (M1), EpistemicEngine (M2), and ResultsMapper (M3)
+Coordinates CoreMapper and EpistemicEngine
 to produce a validated N-Quads knowledge graph.
 
 Accepts file paths or in-memory objects so it works inside Jupyter notebooks
@@ -15,7 +15,7 @@ from pathlib import Path
 
 from rdflib import Dataset
 
-from calliomapper.mapper.structural import StructuralMapper
+from calliomapper.mapper.core import CoreMapper
 from calliomapper.utils import io, validation
 
 
@@ -36,17 +36,15 @@ class Translator:
         Pre-loaded nodes dict (alternative to *model_dir*).
     techs:
         Pre-loaded techs dict (alternative to *model_dir*).
-    sidecar:
-        Path to an epistemic sidecar YAML, or pre-loaded dict (M2, optional).
-    results:
-        Path to a ``results.nc`` file, or pre-loaded xarray Dataset (M3, optional).
+    extension:
+        Path to an epistemic extension YAML, or pre-loaded dict (optional).
     shapes:
         Path to a SHACL shapes file.  Defaults to ``ontology/dummy_shapes.ttl``.
     run_id:
         Base URI for this model run.  Auto-generated UUID if not supplied.
     graph_id:
         Override for the named graph URI (the 4th element of every quad in the
-        structural graph).  Defaults to ``{run_id}/structural``.
+        core graph).  Defaults to ``{run_id}/core``.
         Use to encode scenario, parameter sweep, model version, etc.:
         e.g. ``"https://w3id.org/ontocal/runs/my-model/scenario-high-renewables"``.
     """
@@ -57,18 +55,17 @@ class Translator:
         *,
         nodes: dict | None = None,
         techs: dict | None = None,
-        sidecar=None,
-        results=None,
+        extension=None,
         shapes: str | Path | None = None,
         run_id: str | None = None,
         graph_id: str | None = None,
     ) -> None:
         self.run_id = run_id or f"https://w3id.org/ontocal/runs/{uuid.uuid4()}"
-        self.graph_id = graph_id  # None → StructuralMapper uses default
+        self.graph_id = graph_id  # None → CoreMapper uses default
         self.shapes = Path(shapes) if shapes else _DEFAULT_SHAPES
         self._graph: Dataset | None = None
 
-        # Load structural inputs
+        # Load core inputs
         if model_dir is not None:
             model_dir = Path(model_dir)
             self._nodes = io.load_yaml(model_dir / "nodes.yaml")
@@ -77,17 +74,16 @@ class Translator:
             self._nodes = nodes or {}
             self._techs = techs or {}
 
-        # Sidecar and results — placeholders for M2/M3
-        self._sidecar = sidecar
-        self._results = results
+        # Extension placeholder
+        self._extension = extension
 
     # ------------------------------------------------------------------
     # Public interface
     # ------------------------------------------------------------------
 
-    def translate(self) -> ConjunctiveGraph:
+    def translate(self) -> Dataset:
         """
-        Run the full pipeline and return a validated ConjunctiveGraph.
+        Run the full pipeline and return a validated ConjunctiveGraph/Dataset.
 
         Raises
         ------
@@ -96,14 +92,14 @@ class Translator:
         """
         cg = Dataset()
 
-        # M1 — structural graph
-        structural_graph = StructuralMapper(self.run_id, graph_id=self.graph_id).map(
+        # Core graph
+        core_graph = CoreMapper(self.run_id, graph_id=self.graph_id).map(
             nodes=self._nodes,
             techs=self._techs,
         )
-        cg.add_graph(structural_graph)
+        cg.add_graph(core_graph)
 
-        # M2 / M3 — not yet implemented; placeholders for EpistemicEngine / ResultsMapper
+        # Extension — not yet implemented; placeholder for EpistemicEngine
 
         validation.validate(cg, self.shapes)
 

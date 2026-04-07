@@ -1,8 +1,8 @@
-# EpistemicEngine — M2 milestone.
+# EpistemicEngine — Extends Core Graph.
 #
-# Ingests a user-filled YAML sidecar (based on the template in templates/sidecar.yaml)
-# and generates PROV-O provenance triples linked to structural entities produced by
-# the StructuralMapper.
+# Ingests a user-filled YAML extension (based on the template in templates/epistemic_extension.yaml)
+# and generates PROV-O provenance triples linked to core entities produced by
+# the CoreMapper.
 #
 # Supports two annotation levels:
 #   - Model-level: high-level context about the model run (author, date, purpose, assumptions)

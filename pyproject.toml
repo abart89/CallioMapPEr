@@ -20,6 +20,9 @@ dependencies = [
     "pyyaml",
 ]
 
+[project.scripts]
+calliomapper = "calliomapper.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["calliomapper*"]

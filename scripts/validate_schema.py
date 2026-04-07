@@ -8,7 +8,7 @@ Checks:
   3. LinkML SchemaLoader accepts the schema
   4. Every external class_uri / slot_uri resolves to a real IRI in oeo-full.yaml
      (covers OEO, BFO, IAO, RO — anything imported by oeo-full)
-  5. Calliope individual typed correctly in individuals.ttl
+  5. Calliope individual typed correctly in ontocal_individuals.ttl
   6. gen-python round-trip
 
 Usage:
@@ -36,7 +36,7 @@ from linkml_runtime.linkml_model import SchemaDefinition
 REPO_ROOT      = Path(__file__).parent.parent
 SCHEMA_PATH    = REPO_ROOT / "ontology" / "ontocal_core.yaml"
 OEO_FULL_PATH  = REPO_ROOT / "docs" / "ontologies" / "oeo-full.yaml"
-INDIVIDUALS    = REPO_ROOT / "ontology" / "individuals.ttl"
+INDIVIDUALS    = REPO_ROOT / "ontology" / "ontocal_individuals.ttl"
 GEN_PYTHON     = REPO_ROOT / "dev_calliomapper" / "bin" / "gen-python"
 
 # Local namespace — IRIs under this prefix are defined by us, not by OEO/BFO/IAO.
@@ -206,19 +206,19 @@ for slot_name, slot_def in sorted(slots.items()):
         check_external_iri("slot", slot_name, raw_uri)
 
 # ---------------------------------------------------------------------------
-# 6. Calliope individual typed in individuals.ttl
+# 6. Calliope individual typed in ontocal_individuals.ttl
 # ---------------------------------------------------------------------------
 if not INDIVIDUALS.exists():
-    fail("ontology/individuals.ttl not found")
+    fail("ontology/ontocal_individuals.ttl not found")
 else:
     g = Graph()
     g.parse(INDIVIDUALS, format="turtle")
     calliope          = URIRef("https://w3id.org/ontocal/Calliope")
     modelling_software = URIRef("http://openenergy-platform.org/ontology/oeo/OEO_00000279")
     if (calliope, RDF.type, modelling_software) in g:
-        ok("ontocal:Calliope typed as oeo:ModellingSoftware in individuals.ttl")
+        ok("ontocal:Calliope typed as oeo:ModellingSoftware in ontocal_individuals.ttl")
     else:
-        fail("ontocal:Calliope not typed as oeo:OEO_00000279 (ModellingSoftware) in individuals.ttl")
+        fail("ontocal:Calliope not typed as oeo:OEO_00000279 (ModellingSoftware) in ontocal_individuals.ttl")
 
 # ---------------------------------------------------------------------------
 # 7. gen-python round-trip

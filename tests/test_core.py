@@ -1,5 +1,5 @@
 """
-Tests for StructuralMapper (M1) using the dummy schema.
+Tests for CoreMapper using the dummy schema.
 """
 
 from pathlib import Path
@@ -9,7 +9,7 @@ from rdflib import BNode, Dataset, Graph, URIRef
 from rdflib.namespace import RDF, RDFS
 
 from calliomapper import Translator
-from calliomapper.mapper.structural import StructuralMapper
+from calliomapper.mapper.core import CoreMapper
 from calliomapper.ontology.namespaces import ONTOCAL
 from calliomapper.utils.io import serialize_nq  # noqa: F401
 from calliomapper.utils.validation import ValidationError, validate
@@ -19,53 +19,53 @@ RUN_ID = "https://w3id.org/ontocal/runs/test-run-001"
 
 
 # ---------------------------------------------------------------------------
-# StructuralMapper unit tests
+# CoreMapper unit tests
 # ---------------------------------------------------------------------------
 
 
-class TestStructuralMapper:
+class TestCoreMapper:
     def test_single_entity_type_triple(self):
-        g = StructuralMapper(RUN_ID).map(nodes={"region_a": {}})
+        g = CoreMapper(RUN_ID).map(nodes={"region_a": {}})
         entity = URIRef(RUN_ID + "/region_a")
         assert (entity, RDF.type, ONTOCAL.CalliopeThing) in g
 
     def test_single_entity_label_triple(self):
-        g = StructuralMapper(RUN_ID).map(nodes={"region_a": {"name": "Region A"}})
+        g = CoreMapper(RUN_ID).map(nodes={"region_a": {"name": "Region A"}})
         entity = URIRef(RUN_ID + "/region_a")
         labels = list(g.objects(entity, RDFS.label))
         assert len(labels) == 1
         assert str(labels[0]) == "Region A"
 
     def test_label_falls_back_to_key_name(self):
-        g = StructuralMapper(RUN_ID).map(nodes={"wind_onshore": {}})
+        g = CoreMapper(RUN_ID).map(nodes={"wind_onshore": {}})
         entity = URIRef(RUN_ID + "/wind_onshore")
         assert str(list(g.objects(entity, RDFS.label))[0]) == "wind_onshore"
 
     def test_multiple_nodes_and_techs(self):
-        g = StructuralMapper(RUN_ID).map(
+        g = CoreMapper(RUN_ID).map(
             nodes={"region_a": {}, "region_b": {}},
             techs={"wind": {}, "solar": {}},
         )
         assert len(list(g.subjects(RDF.type, ONTOCAL.CalliopeThing))) == 4
 
     def test_graph_identifier_default(self):
-        g = StructuralMapper(RUN_ID).map(nodes={"region_a": {}})
-        assert str(g.identifier) == RUN_ID + "/structural"
+        g = CoreMapper(RUN_ID).map(nodes={"region_a": {}})
+        assert str(g.identifier) == RUN_ID + "/core"
 
     def test_graph_identifier_custom(self):
         custom = RUN_ID + "/scenario-high-renewables"
-        g = StructuralMapper(RUN_ID, graph_id=custom).map(nodes={"region_a": {}})
+        g = CoreMapper(RUN_ID, graph_id=custom).map(nodes={"region_a": {}})
         assert str(g.identifier) == custom
 
     def test_custom_graph_id_does_not_affect_entity_uris(self):
         # Entity URIs are always anchored to run_id, not graph_id
         custom = RUN_ID + "/scenario-high-renewables"
-        g = StructuralMapper(RUN_ID, graph_id=custom).map(nodes={"region_a": {}})
+        g = CoreMapper(RUN_ID, graph_id=custom).map(nodes={"region_a": {}})
         entity = URIRef(RUN_ID + "/region_a")
         assert (entity, RDF.type, ONTOCAL.CalliopeThing) in g
 
     def test_empty_input_produces_empty_graph(self):
-        g = StructuralMapper(RUN_ID).map()
+        g = CoreMapper(RUN_ID).map()
         assert len(g) == 0
 
 
@@ -76,7 +76,7 @@ class TestStructuralMapper:
 
 class TestSHACLValidation:
     def test_valid_graph_passes(self):
-        g = StructuralMapper(RUN_ID).map(nodes={"region_a": {}})
+        g = CoreMapper(RUN_ID).map(nodes={"region_a": {}})
         cg = Dataset()
         cg.add_graph(g)
         validate(cg, SHAPES)  # must not raise
@@ -127,7 +127,7 @@ class TestRoundTrip:
         loaded = Dataset()
         loaded.parse(str(out), format="nquads")
         graph_names = [str(g.identifier) for g in loaded.graphs()]
-        assert RUN_ID + "/structural" in graph_names
+        assert RUN_ID + "/core" in graph_names
 
     def test_nq_contains_custom_named_graph(self, tmp_path):
         out = tmp_path / "test_output.nq"
@@ -137,4 +137,4 @@ class TestRoundTrip:
         loaded.parse(str(out), format="nquads")
         graph_names = [str(g.identifier) for g in loaded.graphs()]
         assert custom in graph_names
-        assert RUN_ID + "/structural" not in graph_names
+        assert RUN_ID + "/core" not in graph_names
