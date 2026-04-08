@@ -14,6 +14,18 @@ It accomplishes three things:
 
 ---
 
+## Why?
+
+Energy system models like Calliope are routinely used for sensitivity studies and scenario families — dozens or hundreds of runs that explore different technology mixes, cost assumptions, or policy constraints. The results end up scattered across NetCDF files and YAML directories, with no structured way to ask cross-run questions like *"in which runs did installed gas capacity exceed 5 GW?"* or *"which runs share the same solar cost assumption?"* The answer today is a custom script per study.
+
+At the same time, the research community is converging on a consensus (Lombardi et al., 2025) that open models are necessary but not sufficient: what matters is *practical reproducibility* — transparency about modeling assumptions that a reviewer or collaborator can actually inspect, not just a PDF supplement.
+
+CallioMapper is a practical response to both problems. By translating a solved Calliope model into a Knowledge Graph, it turns model archives into queryable databases and turns parameter provenance into machine-readable PROV-O triples that can accompany a journal submission or a Zenodo deposit. The base layer requires no effort from the modeler — no restructuring of input files, no ontology knowledge. The epistemic extension adds structured metadata with three fields in a YAML template.
+
+The output is also designed to be compatible with the [Open Energy Knowledge Graph (OEKG)](https://openenergy-platform.org/), the community infrastructure for structured energy model metadata — reducing the friction of contributing model descriptions to the platform.
+
+---
+
 ## Architecture
 
 The pipeline is composed of three mappers orchestrated by a single `Translator` class:
