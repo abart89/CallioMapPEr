@@ -19,7 +19,15 @@ from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import RDF, RDFS
 
 from calliomapper.ontology.namespaces import ONTOCAL
-from calliomapper.generated.dummy_schema import CalliopeThing
+from calliomapper.generated.ontocal_core import (
+    CalliopeNetworkNode,
+    CalliopeTechnology,
+    CalliopeSupplyTechnology,
+    CalliopeDemandTechnology,
+    CalliopeStorageTechnology,
+    CalliopeTransmissionTechnology,
+    CalliopeConversionTechnology,
+)
 
 
 _GRAPH_SUFFIX = "/core"
@@ -69,10 +77,10 @@ class CoreMapper:
         g = Graph(identifier=self.graph_uri)
 
         for name, config in (nodes or {}).items():
-            self._add_entity(g, name, config)
+            self._add_node(g, name, config)
 
         for name, config in (techs or {}).items():
-            self._add_entity(g, name, config)
+            self._add_tech(g, name, config)
 
         return g
 
@@ -84,16 +92,48 @@ class CoreMapper:
         """Mint a URI for a Calliope entity within the run namespace."""
         return URIRef(self.run_id + "/" + name)
 
-    def _add_entity(self, g: Graph, name: str, config: dict) -> None:
+    def _add_node(self, g: Graph, name: str, config: dict) -> None:
         """
-        Validate the entity via the generated Pydantic class, then add
+        Validate the node via the generated Pydantic class, then add
         rdf:type and rdfs:label triples to the graph.
         """
         uri = self._entity_uri(name)
         label = (config or {}).get("name", name)
 
-        # Validate via generated Pydantic class — raises ValidationError if invalid.
-        CalliopeThing(id=str(uri), label=label)
+        # Filter kwargs to only those defined in Pydantic schema
+        kwargs = {k: v for k, v in (config or {}).items() if k in CalliopeNetworkNode.model_fields}
+        kwargs.setdefault("name", label)
 
-        g.add((uri, RDF.type, ONTOCAL.CalliopeThing))
-        g.add((uri, RDFS.label, Literal(label)))
+        # Validate via generated Pydantic class — raises ValidationError if invalid.
+        CalliopeNetworkNode(**kwargs)
+
+        g.add((uri, RDF.type, ONTOCAL.CalliopeNetworkNode))
+        g.add((uri, ONTOCAL.name, Literal(label)))
+
+    def _add_tech(self, g: Graph, name: str, config: dict) -> None:
+        """
+        Validate the tech via the generated Pydantic class based on base_tech,
+        then add rdf:type and rdfs:label triples.
+        """
+        uri = self._entity_uri(name)
+        label = (config or {}).get("name", name)
+        base_tech = (config or {}).get("base_tech")
+
+        tech_classes = {
+            "supply": (CalliopeSupplyTechnology, ONTOCAL.CalliopeSupplyTechnology),
+            "demand": (CalliopeDemandTechnology, ONTOCAL.CalliopeDemandTechnology),
+            "storage": (CalliopeStorageTechnology, ONTOCAL.CalliopeStorageTechnology),
+            "transmission": (CalliopeTransmissionTechnology, ONTOCAL.CalliopeTransmissionTechnology),
+            "conversion": (CalliopeConversionTechnology, ONTOCAL.CalliopeConversionTechnology),
+        }
+
+        PydanticClass, rdf_type = tech_classes.get(base_tech, (CalliopeTechnology, ONTOCAL.CalliopeTechnology))
+
+        kwargs = {k: v for k, v in (config or {}).items() if k in PydanticClass.model_fields}
+        kwargs.setdefault("name", label)
+
+        # Validate via generated Pydantic class — raises ValidationError if invalid.
+        PydanticClass(**kwargs)
+
+        g.add((uri, RDF.type, rdf_type))
+        g.add((uri, ONTOCAL.name, Literal(label)))

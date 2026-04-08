@@ -20,7 +20,7 @@ from calliomapper.utils import io, validation
 
 
 # Default shapes file used when no custom schema is supplied.
-_DEFAULT_SHAPES = Path(__file__).parent.parent / "ontology" / "dummy_shapes.ttl"
+_DEFAULT_SHAPES = Path(__file__).parent.parent / "ontology" / "ontocal_core_shapes.ttl"
 
 
 class Translator:
@@ -29,17 +29,20 @@ class Translator:
 
     Parameters
     ----------
-    model_dir:
-        Path to a Calliope model directory containing ``nodes.yaml`` and
-        ``techs.yaml``.  Pass ``None`` to supply *nodes* / *techs* directly.
+    results_dir:
+        Path to a Calliope ``results_directory/`` produced after solving.
+        CallioMapper reads the solver-normalized ``attrs.yaml`` inside it, which
+        is structurally stable across all Calliope v0.7 models regardless of how
+        the user organized their input files.  Pass ``None`` to supply *nodes* /
+        *techs* directly (useful for tests and notebooks).
     nodes:
-        Pre-loaded nodes dict (alternative to *model_dir*).
+        Pre-loaded nodes dict (alternative to *results_dir*).
     techs:
-        Pre-loaded techs dict (alternative to *model_dir*).
+        Pre-loaded techs dict (alternative to *results_dir*).
     extension:
         Path to an epistemic extension YAML, or pre-loaded dict (optional).
     shapes:
-        Path to a SHACL shapes file.  Defaults to ``ontology/dummy_shapes.ttl``.
+        Path to a SHACL shapes file.  Defaults to ``ontology/ontocal_core_shapes.ttl``.
     run_id:
         Base URI for this model run.  Auto-generated UUID if not supplied.
     graph_id:
@@ -51,7 +54,7 @@ class Translator:
 
     def __init__(
         self,
-        model_dir: str | Path | None = None,
+        results_dir: str | Path | None = None,
         *,
         nodes: dict | None = None,
         techs: dict | None = None,
@@ -65,11 +68,8 @@ class Translator:
         self.shapes = Path(shapes) if shapes else _DEFAULT_SHAPES
         self._graph: Dataset | None = None
 
-        # Load core inputs
-        if model_dir is not None:
-            model_dir = Path(model_dir)
-            self._nodes = io.load_yaml(model_dir / "nodes.yaml")
-            self._techs = io.load_yaml(model_dir / "techs.yaml")
+        if results_dir is not None:
+            self._nodes, self._techs = io.load_results_dir(results_dir)
         else:
             self._nodes = nodes or {}
             self._techs = techs or {}

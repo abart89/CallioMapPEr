@@ -33,7 +33,7 @@ def main():
     if args.command == "translate":
         print(f"Translating {args.results_directory}...")
         try:
-            t = Translator(model_dir=args.results_directory, extension=args.extension)
+            t = Translator(results_dir=args.results_directory, extension=args.extension)
             t.save(args.out)
             print(f"Graph successfully written to {args.out}")
         except Exception as e:

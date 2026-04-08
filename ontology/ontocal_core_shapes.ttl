@@ -1,0 +1,913 @@
+@prefix bfo: <http://purl.obolibrary.org/obo/BFO_> .
+@prefix iao: <http://purl.obolibrary.org/obo/IAO_> .
+@prefix oeo: <http://openenergy-platform.org/ontology/oeo/> .
+@prefix ontocal: <https://w3id.org/ontocal/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+oeo:OEO_00000279 a sh:NodeShape ;
+    rdfs:comment "OEO class of softwares used to maintain mathematical models." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:targetClass oeo:OEO_00000279 .
+
+oeo:OEO_00000313 a sh:NodeShape ;
+    rdfs:comment "OEO class for the core solver/optimisation process." ;
+    sh:closed true ;
+    sh:ignoredProperties ( oeo:OEO_00140093 ontocal:postprocess_complete ontocal:solver_exit ontocal:hasSolver ontocal:termination_condition ontocal:preprocess_start ontocal:build_start ontocal:init_complete ontocal:solve_start rdf:type ontocal:solve_complete ontocal:build_complete ) ;
+    sh:targetClass oeo:OEO_00000313 .
+
+oeo:OEO_00000364 a sh:NodeShape ;
+    rdfs:comment "OEO class for scenarios." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type iao:0000136 ) ;
+    sh:targetClass oeo:OEO_00000364 .
+
+oeo:OEO_00020013 a sh:NodeShape ;
+    rdfs:comment "OEO class for output data determined by a model calculation." ;
+    sh:closed true ;
+    sh:ignoredProperties ( ontocal:unit ontocal:forCarrier ontocal:atNode ontocal:appliesToTime rdf:type ) ;
+    sh:targetClass oeo:OEO_00020013 .
+
+oeo:OEO_00030015 a sh:NodeShape ;
+    rdfs:comment "OEO class for energy system models." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ontocal:name ) ;
+    sh:targetClass oeo:OEO_00030015 .
+
+oeo:OEO_00030029 a sh:NodeShape ;
+    rdfs:comment "OEO class for exogenous data (input parameters defined outside the model)." ;
+    sh:closed true ;
+    sh:ignoredProperties ( ontocal:unit ontocal:appliesToTime ontocal:aggregationType rdf:type iao:0000136 oeo:OEO_00020189 ontocal:sourceReference ) ;
+    sh:targetClass oeo:OEO_00030029 .
+
+oeo:OEO_00030030 a sh:NodeShape ;
+    rdfs:comment "OEO class for endogenous data (data determined within the model)." ;
+    sh:closed true ;
+    sh:ignoredProperties ( ontocal:unit ontocal:forCarrier ontocal:atNode ontocal:appliesToTime rdf:type ) ;
+    sh:targetClass oeo:OEO_00030030 .
+
+oeo:OEO_00030033 a sh:NodeShape ;
+    rdfs:comment "OEO class for a discrete timestep in a model simulation." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:targetClass oeo:OEO_00030033 .
+
+iao:0000100 a sh:NodeShape ;
+    rdfs:comment "IAO class for a data set." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:targetClass iao:0000100 .
+
+ontocal:CalliopeConversionTechnology a sh:NodeShape ;
+    rdfs:comment "A technology that converts between different carriers." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Human-readable name of the technology." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path ontocal:name ] ;
+    sh:targetClass ontocal:CalliopeConversionTechnology .
+
+ontocal:CalliopeDemandTechnology a sh:NodeShape ;
+    rdfs:comment "A technology that consumes a carrier for an external sink." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Human-readable name of the technology." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path ontocal:name ] ;
+    sh:targetClass ontocal:CalliopeDemandTechnology .
+
+ontocal:CalliopeModelParameter a sh:NodeShape ;
+    rdfs:comment "An input parameter supplied to a Calliope model from outside the optimisation (e.g. costs, capacities, time series)." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:description "Specifies the statistical aggregation method used for a parameter representing a macro-summary." ;
+            sh:in ( "sum" "average" "max" "min" ) ;
+            sh:maxCount 1 ;
+            sh:order 3 ;
+            sh:path ontocal:aggregationType ],
+        [ sh:datatype xsd:string ;
+            sh:description "Provenance string identifying the origin of the parameter value (e.g. 'User CSV Upload', 'base_config.yaml')." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 5 ;
+            sh:path ontocal:sourceReference ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:class ontocal:CalliopeOptimisationRun ;
+            sh:description "Inverse of has_information_input. Relates an information entity to the optimisation process it feeds into." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 1 ;
+            sh:path oeo:OEO_00020189 ],
+        [ sh:description "Relates an information artifact to the entity it is about." ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:or ( [ sh:class oeo:OEO_00000276 ] [ sh:class ontocal:CalliopeModel ] ) ;
+            sh:order 0 ;
+            sh:path iao:0000136 ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 4 ;
+            sh:path ontocal:unit ] ;
+    sh:targetClass ontocal:CalliopeModelParameter .
+
+ontocal:CalliopeResultDataset a sh:NodeShape ;
+    rdfs:comment "The complete dataset containing all endogenous output variables generated by a Calliope optimisation process." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:targetClass ontocal:CalliopeResultDataset .
+
+ontocal:CalliopeRunProcess a sh:NodeShape ;
+    rdfs:comment "The occurrent representing the actual execution of the Calliope solver. Holds runtime diagnostics, timing boundaries, and solver link — distinct from CalliopeOptimisationRun which represents the configured run with its inputs." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:float ;
+            sh:description "POSIX timestamp marking the start of the backend model build phase." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 4 ;
+            sh:path ontocal:build_start ],
+        [ sh:datatype xsd:float ;
+            sh:description "POSIX timestamp marking completion of the backend model build." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 5 ;
+            sh:path ontocal:build_complete ],
+        [ sh:datatype xsd:float ;
+            sh:description "POSIX timestamp marking completion of model initialisation." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 3 ;
+            sh:path ontocal:init_complete ],
+        [ sh:datatype xsd:float ;
+            sh:description "POSIX timestamp marking the moment the solver returns control." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 7 ;
+            sh:path ontocal:solver_exit ],
+        [ sh:datatype xsd:float ;
+            sh:description "POSIX timestamp marking completion of result postprocessing." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 8 ;
+            sh:path ontocal:postprocess_complete ],
+        [ sh:description "The exit state returned by the solver (optimal, infeasible, or unbounded)." ;
+            sh:in ( "optimal" "infeasible" "unbounded" ) ;
+            sh:maxCount 1 ;
+            sh:order 1 ;
+            sh:path ontocal:termination_condition ],
+        [ sh:datatype xsd:float ;
+            sh:description "POSIX timestamp marking the end of the full solve cycle." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 9 ;
+            sh:path ontocal:solve_complete ],
+        [ sh:class oeo:OEO_00000392 ;
+            sh:description "Links an optimisation process to the solver software used to execute it." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path ontocal:hasSolver ],
+        [ sh:datatype xsd:float ;
+            sh:description "POSIX timestamp marking the moment the solver is invoked." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 6 ;
+            sh:path ontocal:solve_start ],
+        [ sh:datatype xsd:float ;
+            sh:description "POSIX timestamp marking the start of the preprocessing phase." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 2 ;
+            sh:path ontocal:preprocess_start ] ;
+    sh:targetClass ontocal:CalliopeRunProcess .
+
+ontocal:CalliopeStorageTechnology a sh:NodeShape ;
+    rdfs:comment "A technology that stores a carrier." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Human-readable name of the technology." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path ontocal:name ] ;
+    sh:targetClass ontocal:CalliopeStorageTechnology .
+
+ontocal:CalliopeSupplyTechnology a sh:NodeShape ;
+    rdfs:comment "A technology that draws from a source to produce a carrier." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Human-readable name of the technology." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path ontocal:name ] ;
+    sh:targetClass ontocal:CalliopeSupplyTechnology .
+
+ontocal:CalliopeTransmissionTechnology a sh:NodeShape ;
+    rdfs:comment "A technology that transmits a carrier between nodes." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Human-readable name of the technology." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path ontocal:name ] ;
+    sh:targetClass ontocal:CalliopeTransmissionTechnology .
+
+ontocal:CalliopeVariable a sh:NodeShape ;
+    rdfs:comment "An output variable calculated by the Calliope solver during optimization." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:class ontocal:CalliopeEnergyCarrier ;
+            sh:description "The energy carrier this variable is indexed by. Used for carrier-scoped and balancing variables." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path ontocal:forCarrier ],
+        [ sh:class ontocal:CalliopeNetworkNode ;
+            sh:description "The network node at which a variable is localised. Optional at the base level; required by most tech-scoped variable classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:atNode ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path ontocal:unit ] ;
+    sh:targetClass ontocal:CalliopeVariable .
+
+ontocal:ConversionTechParameter a sh:NodeShape ;
+    rdfs:comment "A model parameter scoped to a conversion technology." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 4 ;
+            sh:path ontocal:unit ],
+        [ sh:class ontocal:CalliopeOptimisationRun ;
+            sh:description "Inverse of has_information_input. Relates an information entity to the optimisation process it feeds into." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 1 ;
+            sh:path oeo:OEO_00020189 ],
+        [ sh:description "Specifies the statistical aggregation method used for a parameter representing a macro-summary." ;
+            sh:in ( "sum" "average" "max" "min" ) ;
+            sh:maxCount 1 ;
+            sh:order 3 ;
+            sh:path ontocal:aggregationType ],
+        [ sh:description "Relates an information artifact to the entity it is about." ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:or ( [ sh:class oeo:OEO_00000276 ] [ sh:class ontocal:CalliopeModel ] ) ;
+            sh:order 0 ;
+            sh:path iao:0000136 ],
+        [ sh:datatype xsd:string ;
+            sh:description "Provenance string identifying the origin of the parameter value (e.g. 'User CSV Upload', 'base_config.yaml')." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 5 ;
+            sh:path ontocal:sourceReference ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:appliesToTime ] ;
+    sh:targetClass ontocal:ConversionTechParameter .
+
+ontocal:ConversionTechVariable a sh:NodeShape ;
+    rdfs:comment "A model variable scoped to a conversion technology." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class ontocal:CalliopeNetworkNode ;
+            sh:description "The network node at which a variable is localised. Optional at the base level; required by most tech-scoped variable classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:atNode ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path ontocal:unit ],
+        [ sh:class ontocal:CalliopeEnergyCarrier ;
+            sh:description "The energy carrier this variable is indexed by. Used for carrier-scoped and balancing variables." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path ontocal:forCarrier ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path ontocal:appliesToTime ] ;
+    sh:targetClass ontocal:ConversionTechVariable .
+
+ontocal:DemandTechParameter a sh:NodeShape ;
+    rdfs:comment "A model parameter scoped to a demand technology." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Provenance string identifying the origin of the parameter value (e.g. 'User CSV Upload', 'base_config.yaml')." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 5 ;
+            sh:path ontocal:sourceReference ],
+        [ sh:description "Relates an information artifact to the entity it is about." ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:or ( [ sh:class oeo:OEO_00000276 ] [ sh:class ontocal:CalliopeModel ] ) ;
+            sh:order 0 ;
+            sh:path iao:0000136 ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 4 ;
+            sh:path ontocal:unit ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:class ontocal:CalliopeOptimisationRun ;
+            sh:description "Inverse of has_information_input. Relates an information entity to the optimisation process it feeds into." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 1 ;
+            sh:path oeo:OEO_00020189 ],
+        [ sh:description "Specifies the statistical aggregation method used for a parameter representing a macro-summary." ;
+            sh:in ( "sum" "average" "max" "min" ) ;
+            sh:maxCount 1 ;
+            sh:order 3 ;
+            sh:path ontocal:aggregationType ] ;
+    sh:targetClass ontocal:DemandTechParameter .
+
+ontocal:DemandTechVariable a sh:NodeShape ;
+    rdfs:comment "A model variable scoped to a demand technology." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path ontocal:unit ],
+        [ sh:class ontocal:CalliopeNetworkNode ;
+            sh:description "The network node at which a variable is localised. Optional at the base level; required by most tech-scoped variable classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:atNode ],
+        [ sh:class ontocal:CalliopeEnergyCarrier ;
+            sh:description "The energy carrier this variable is indexed by. Used for carrier-scoped and balancing variables." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path ontocal:forCarrier ] ;
+    sh:targetClass ontocal:DemandTechVariable .
+
+ontocal:NodeParameter a sh:NodeShape ;
+    rdfs:comment "A model parameter that applies to a specific node." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Provenance string identifying the origin of the parameter value (e.g. 'User CSV Upload', 'base_config.yaml')." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 5 ;
+            sh:path ontocal:sourceReference ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 4 ;
+            sh:path ontocal:unit ],
+        [ sh:description "Specifies the statistical aggregation method used for a parameter representing a macro-summary." ;
+            sh:in ( "sum" "average" "max" "min" ) ;
+            sh:maxCount 1 ;
+            sh:order 3 ;
+            sh:path ontocal:aggregationType ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:class ontocal:CalliopeOptimisationRun ;
+            sh:description "Inverse of has_information_input. Relates an information entity to the optimisation process it feeds into." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 1 ;
+            sh:path oeo:OEO_00020189 ],
+        [ sh:description "Relates an information artifact to the entity it is about." ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:or ( [ sh:class oeo:OEO_00000276 ] [ sh:class ontocal:CalliopeModel ] ) ;
+            sh:order 0 ;
+            sh:path iao:0000136 ] ;
+    sh:targetClass ontocal:NodeParameter .
+
+ontocal:NodeVariable a sh:NodeShape ;
+    rdfs:comment "A model variable scoped to a specific network node (e.g. node-level cost summaries)." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class ontocal:CalliopeEnergyCarrier ;
+            sh:description "The energy carrier this variable is indexed by. Used for carrier-scoped and balancing variables." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path ontocal:forCarrier ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path ontocal:unit ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:class ontocal:CalliopeNetworkNode ;
+            sh:description "The network node at which a variable is localised. Optional at the base level; required by most tech-scoped variable classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:atNode ] ;
+    sh:targetClass ontocal:NodeVariable .
+
+ontocal:StorageTechParameter a sh:NodeShape ;
+    rdfs:comment "A model parameter scoped to a storage technology." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:description "Relates an information artifact to the entity it is about." ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:or ( [ sh:class oeo:OEO_00000276 ] [ sh:class ontocal:CalliopeModel ] ) ;
+            sh:order 0 ;
+            sh:path iao:0000136 ],
+        [ sh:class ontocal:CalliopeOptimisationRun ;
+            sh:description "Inverse of has_information_input. Relates an information entity to the optimisation process it feeds into." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 1 ;
+            sh:path oeo:OEO_00020189 ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:datatype xsd:string ;
+            sh:description "Provenance string identifying the origin of the parameter value (e.g. 'User CSV Upload', 'base_config.yaml')." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 5 ;
+            sh:path ontocal:sourceReference ],
+        [ sh:description "Specifies the statistical aggregation method used for a parameter representing a macro-summary." ;
+            sh:in ( "sum" "average" "max" "min" ) ;
+            sh:maxCount 1 ;
+            sh:order 3 ;
+            sh:path ontocal:aggregationType ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 4 ;
+            sh:path ontocal:unit ] ;
+    sh:targetClass ontocal:StorageTechParameter .
+
+ontocal:StorageTechVariable a sh:NodeShape ;
+    rdfs:comment "A model variable scoped to a storage technology." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:class ontocal:CalliopeNetworkNode ;
+            sh:description "The network node at which a variable is localised. Optional at the base level; required by most tech-scoped variable classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:atNode ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path ontocal:unit ],
+        [ sh:class ontocal:CalliopeEnergyCarrier ;
+            sh:description "The energy carrier this variable is indexed by. Used for carrier-scoped and balancing variables." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path ontocal:forCarrier ] ;
+    sh:targetClass ontocal:StorageTechVariable .
+
+ontocal:SupplyTechParameter a sh:NodeShape ;
+    rdfs:comment "A model parameter scoped to a supply technology." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Provenance string identifying the origin of the parameter value (e.g. 'User CSV Upload', 'base_config.yaml')." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 5 ;
+            sh:path ontocal:sourceReference ],
+        [ sh:description "Relates an information artifact to the entity it is about." ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:or ( [ sh:class oeo:OEO_00000276 ] [ sh:class ontocal:CalliopeModel ] ) ;
+            sh:order 0 ;
+            sh:path iao:0000136 ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:class ontocal:CalliopeOptimisationRun ;
+            sh:description "Inverse of has_information_input. Relates an information entity to the optimisation process it feeds into." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 1 ;
+            sh:path oeo:OEO_00020189 ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 4 ;
+            sh:path ontocal:unit ],
+        [ sh:description "Specifies the statistical aggregation method used for a parameter representing a macro-summary." ;
+            sh:in ( "sum" "average" "max" "min" ) ;
+            sh:maxCount 1 ;
+            sh:order 3 ;
+            sh:path ontocal:aggregationType ] ;
+    sh:targetClass ontocal:SupplyTechParameter .
+
+ontocal:SupplyTechVariable a sh:NodeShape ;
+    rdfs:comment "A model variable scoped to a supply technology." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path ontocal:unit ],
+        [ sh:class ontocal:CalliopeNetworkNode ;
+            sh:description "The network node at which a variable is localised. Optional at the base level; required by most tech-scoped variable classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:atNode ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:class ontocal:CalliopeEnergyCarrier ;
+            sh:description "The energy carrier this variable is indexed by. Used for carrier-scoped and balancing variables." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path ontocal:forCarrier ] ;
+    sh:targetClass ontocal:SupplyTechVariable .
+
+ontocal:SystemVariable a sh:NodeShape ;
+    rdfs:comment "A model variable representing a system-wide aggregate quantity (e.g. total system cost, total emissions)." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class ontocal:CalliopeEnergyCarrier ;
+            sh:description "The energy carrier this variable is indexed by. Used for carrier-scoped and balancing variables." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path ontocal:forCarrier ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path ontocal:unit ],
+        [ sh:class ontocal:CalliopeNetworkNode ;
+            sh:description "The network node at which a variable is localised. Optional at the base level; required by most tech-scoped variable classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:atNode ] ;
+    sh:targetClass ontocal:SystemVariable .
+
+ontocal:TechParameter a sh:NodeShape ;
+    rdfs:comment "A model parameter that applies to a specific technology." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:datatype xsd:string ;
+            sh:description "Provenance string identifying the origin of the parameter value (e.g. 'User CSV Upload', 'base_config.yaml')." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 5 ;
+            sh:path ontocal:sourceReference ],
+        [ sh:description "Specifies the statistical aggregation method used for a parameter representing a macro-summary." ;
+            sh:in ( "sum" "average" "max" "min" ) ;
+            sh:maxCount 1 ;
+            sh:order 3 ;
+            sh:path ontocal:aggregationType ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 4 ;
+            sh:path ontocal:unit ],
+        [ sh:description "Relates an information artifact to the entity it is about." ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:or ( [ sh:class oeo:OEO_00000276 ] [ sh:class ontocal:CalliopeModel ] ) ;
+            sh:order 0 ;
+            sh:path iao:0000136 ],
+        [ sh:class ontocal:CalliopeOptimisationRun ;
+            sh:description "Inverse of has_information_input. Relates an information entity to the optimisation process it feeds into." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 1 ;
+            sh:path oeo:OEO_00020189 ] ;
+    sh:targetClass ontocal:TechParameter .
+
+ontocal:TechVariable a sh:NodeShape ;
+    rdfs:comment "A model variable scoped to a specific technology (e.g. flow_cap, carrier_prod)." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class ontocal:CalliopeNetworkNode ;
+            sh:description "The network node at which a variable is localised. Optional at the base level; required by most tech-scoped variable classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:atNode ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:class ontocal:CalliopeEnergyCarrier ;
+            sh:description "The energy carrier this variable is indexed by. Used for carrier-scoped and balancing variables." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path ontocal:forCarrier ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path ontocal:unit ] ;
+    sh:targetClass ontocal:TechVariable .
+
+ontocal:TransmissionTechParameter a sh:NodeShape ;
+    rdfs:comment "A model parameter scoped to a transmission technology." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:description "Relates an information artifact to the entity it is about." ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:or ( [ sh:class oeo:OEO_00000276 ] [ sh:class ontocal:CalliopeModel ] ) ;
+            sh:order 0 ;
+            sh:path iao:0000136 ],
+        [ sh:description "Specifies the statistical aggregation method used for a parameter representing a macro-summary." ;
+            sh:in ( "sum" "average" "max" "min" ) ;
+            sh:maxCount 1 ;
+            sh:order 3 ;
+            sh:path ontocal:aggregationType ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:datatype xsd:string ;
+            sh:description "Provenance string identifying the origin of the parameter value (e.g. 'User CSV Upload', 'base_config.yaml')." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 5 ;
+            sh:path ontocal:sourceReference ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 4 ;
+            sh:path ontocal:unit ],
+        [ sh:class ontocal:CalliopeOptimisationRun ;
+            sh:description "Inverse of has_information_input. Relates an information entity to the optimisation process it feeds into." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 1 ;
+            sh:path oeo:OEO_00020189 ] ;
+    sh:targetClass ontocal:TransmissionTechParameter .
+
+ontocal:TransmissionTechVariable a sh:NodeShape ;
+    rdfs:comment "A model variable scoped to a transmission technology." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class ontocal:CalliopeEnergyCarrier ;
+            sh:description "The energy carrier this variable is indexed by. Used for carrier-scoped and balancing variables." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path ontocal:forCarrier ],
+        [ sh:class bfo:0000038 ;
+            sh:description "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path ontocal:appliesToTime ],
+        [ sh:datatype xsd:string ;
+            sh:description "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path ontocal:unit ],
+        [ sh:class ontocal:CalliopeNetworkNode ;
+            sh:description "The network node at which a variable is localised. Optional at the base level; required by most tech-scoped variable classes." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path ontocal:atNode ] ;
+    sh:targetClass ontocal:TransmissionTechVariable .
+
+oeo:OEO_00000392 a sh:NodeShape ;
+    rdfs:comment "OEO class for solver software (e.g. Gurobi, CBC) used to execute an optimisation." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:targetClass oeo:OEO_00000392 .
+
+ontocal:CalliopeScenario a sh:NodeShape ;
+    rdfs:comment "A specific set of assumptions and parameters defining one Calliope model configuration." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class ontocal:CalliopeModel ;
+            sh:description "Relates an information artifact to the entity it is about." ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path iao:0000136 ] ;
+    sh:targetClass ontocal:CalliopeScenario .
+
+ontocal:CalliopeTechnology a sh:NodeShape ;
+    rdfs:comment "Base class for Calliope technologies." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Human-readable name of the technology." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path ontocal:name ] ;
+    sh:targetClass ontocal:CalliopeTechnology .
+
+oeo:OEO_00000276 a sh:NodeShape ;
+    rdfs:comment "OEO class for model building blocks." ;
+    sh:closed true ;
+    sh:ignoredProperties ( ontocal:latitude ontocal:has_assigned_technology ontocal:name rdf:type ontocal:longitude ) ;
+    sh:targetClass oeo:OEO_00000276 .
+
+ontocal:CalliopeOptimisationRun a sh:NodeShape ;
+    rdfs:comment "A single execution of the Calliope solver against a fully parametrised model." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class ontocal:CalliopeScenario ;
+            sh:description "Relates an optimisation process to the information entities it takes as input." ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path oeo:OEO_00140093 ] ;
+    sh:targetClass ontocal:CalliopeOptimisationRun .
+
+ontocal:CalliopeEnergyCarrier a sh:NodeShape ;
+    rdfs:comment "An energy carrier that can be used by technologies." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Human-readable name of the energy carrier." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path ontocal:name ] ;
+    sh:targetClass ontocal:CalliopeEnergyCarrier .
+
+ontocal:CalliopeModel a sh:NodeShape ;
+    rdfs:comment "The overarching informational representation of a Calliope v0.7 model." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:description "Human-readable name of the Calliope model." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path ontocal:name ] ;
+    sh:targetClass ontocal:CalliopeModel .
+
+ontocal:CalliopeNetworkNode a sh:NodeShape ;
+    rdfs:comment "A spatial node in Calliope." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:float ;
+            sh:description "WGS84 latitude of the node in decimal degrees." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path ontocal:latitude ],
+        [ sh:datatype xsd:string ;
+            sh:description "Human-readable name of the node." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path ontocal:name ],
+        [ sh:class ontocal:CalliopeTechnology ;
+            sh:description "Technologies located at this node. Covers Supply, Demand, Storage, and Conversion. Transmission technologies are excluded — their node assignment is handled via link_from/link_to." ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path ontocal:has_assigned_technology ],
+        [ sh:datatype xsd:float ;
+            sh:description "WGS84 longitude of the node in decimal degrees." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 2 ;
+            sh:path ontocal:longitude ] ;
+    sh:targetClass ontocal:CalliopeNetworkNode .
+
+bfo:0000038 a sh:NodeShape ;
+    rdfs:comment "A one-dimensional temporal region representing the maximal dataset boundaries defined at the base Calliope model level.",
+        "A one-dimensional temporal region representing the specific sliced subset simulated by a Calliope scenario.",
+        "BFO stub: a one-dimensional temporal region. Parent of all temporal classes in this schema." ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ),
+        ( bfo:0000139 rdf:type ),
+        ( rdf:type ) ;
+    sh:property [ sh:class bfo:0000038 ;
+            sh:description "A mereological relation linking a temporal proper part to its temporal whole." ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 0 ;
+            sh:path bfo:0000139 ] ;
+    sh:targetClass bfo:0000038 .
+
+

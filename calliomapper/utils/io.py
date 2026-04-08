@@ -20,6 +20,27 @@ def load_yaml(path: str | Path) -> dict:
         return yaml.safe_load(f) or {}
 
 
+def load_results_dir(results_dir: str | Path) -> tuple[dict, dict]:
+    """
+    Load nodes and techs from a Calliope results_directory.
+
+    Calliope writes a fully normalized ``attrs.yaml`` to every results_directory
+    after solving. This file is the canonical, solver-resolved snapshot of the
+    model definition and is structurally stable regardless of how the user
+    originally split their input files.
+
+    Returns
+    -------
+    nodes : dict
+        ``{node_name: node_config}`` extracted from ``attrs.yaml``.
+    techs : dict
+        ``{tech_name: tech_config}`` extracted from ``attrs.yaml``.
+    """
+    attrs = load_yaml(Path(results_dir) / "attrs.yaml")
+    definition = attrs.get("definition", {})
+    return definition.get("nodes", {}), definition.get("techs", {})
+
+
 def load_netcdf(path: str | Path) -> xr.Dataset:
     """Load a NetCDF results file as an xarray Dataset."""
     return xr.open_dataset(path)

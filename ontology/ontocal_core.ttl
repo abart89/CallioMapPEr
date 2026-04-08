@@ -1,0 +1,1044 @@
+@prefix bfo: <http://purl.obolibrary.org/obo/BFO_> .
+@prefix iao: <http://purl.obolibrary.org/obo/IAO_> .
+@prefix linkml: <https://w3id.org/linkml/> .
+@prefix oeo: <http://openenergy-platform.org/ontology/oeo/> .
+@prefix ontocal: <https://w3id.org/ontocal/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://w3id.org/ontocal.owl.ttl> a owl:Ontology ;
+    rdfs:label "ontocal" ;
+    skos:definition "An ontology extension mapping Calliope v0.7 to BFO and OEO." .
+
+ontocal:CalliopeExecutionHorizon a owl:Class ;
+    rdfs:label "CalliopeExecutionHorizon" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:temporal_part_of ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeDataHorizon ;
+            owl:onProperty ontocal:temporal_part_of ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:temporal_part_of ],
+        ontocal:OneDimensionalTemporalRegion ;
+    skos:definition "A one-dimensional temporal region representing the specific sliced subset simulated by a Calliope scenario." ;
+    skos:exactMatch bfo:0000038 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeRunProcess a owl:Class ;
+    rdfs:label "CalliopeRunProcess" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:build_start ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:has_solver ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:solver_exit ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:termination_condition ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:build_start ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:solve_start ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:solve_complete ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:postprocess_complete ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:init_complete ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:solve_start ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:has_solver ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:TerminationConditionEnum ;
+            owl:onProperty ontocal:termination_condition ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:build_complete ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:preprocess_start ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:postprocess_complete ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:solve_complete ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:termination_condition ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:solver_exit ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:solve_complete ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:preprocess_start ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:build_complete ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:preprocess_start ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:postprocess_complete ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:Solver ;
+            owl:onProperty ontocal:has_solver ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:init_complete ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:build_complete ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:solver_exit ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:init_complete ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:build_start ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:solve_start ],
+        ontocal:Optimisation ;
+    skos:definition "The occurrent representing the actual execution of the Calliope solver. Holds runtime diagnostics, timing boundaries, and solver link — distinct from CalliopeOptimisationRun which represents the configured run with its inputs." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:ConversionTechParameter a owl:Class ;
+    rdfs:label "ConversionTechParameter" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeConversionTechnology ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:TechParameter ;
+    skos:definition "A model parameter scoped to a conversion technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:ConversionTechVariable a owl:Class ;
+    rdfs:label "ConversionTechVariable" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeConversionTechnology ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:TechVariable ;
+    skos:definition "A model variable scoped to a conversion technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:DemandTechParameter a owl:Class ;
+    rdfs:label "DemandTechParameter" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeDemandTechnology ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:TechParameter ;
+    skos:definition "A model parameter scoped to a demand technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:DemandTechVariable a owl:Class ;
+    rdfs:label "DemandTechVariable" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeDemandTechnology ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:TechVariable ;
+    skos:definition "A model variable scoped to a demand technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:ModellingSoftware a owl:Class ;
+    rdfs:label "ModellingSoftware" ;
+    skos:definition "OEO class of softwares used to maintain mathematical models." ;
+    skos:exactMatch oeo:OEO_00000279 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:NodeParameter a owl:Class ;
+    rdfs:label "NodeParameter" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:CalliopeModelParameter ;
+    skos:definition "A model parameter that applies to a specific node." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:NodeVariable a owl:Class ;
+    rdfs:label "NodeVariable" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:CalliopeVariable ;
+    skos:definition "A model variable scoped to a specific network node (e.g. node-level cost summaries)." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:StorageTechParameter a owl:Class ;
+    rdfs:label "StorageTechParameter" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeStorageTechnology ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:TechParameter ;
+    skos:definition "A model parameter scoped to a storage technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:StorageTechVariable a owl:Class ;
+    rdfs:label "StorageTechVariable" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeStorageTechnology ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:TechVariable ;
+    skos:definition "A model variable scoped to a storage technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:SupplyTechParameter a owl:Class ;
+    rdfs:label "SupplyTechParameter" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeSupplyTechnology ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:TechParameter ;
+    skos:definition "A model parameter scoped to a supply technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:SupplyTechVariable a owl:Class ;
+    rdfs:label "SupplyTechVariable" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeSupplyTechnology ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:TechVariable ;
+    skos:definition "A model variable scoped to a supply technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:SystemVariable a owl:Class ;
+    rdfs:label "SystemVariable" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeModel ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:CalliopeVariable ;
+    skos:definition "A model variable representing a system-wide aggregate quantity (e.g. total system cost, total emissions)." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:TimeStep a owl:Class ;
+    rdfs:label "TimeStep" ;
+    rdfs:subClassOf ontocal:OneDimensionalTemporalRegion ;
+    skos:definition "OEO class for a discrete timestep in a model simulation." ;
+    skos:exactMatch oeo:OEO_00030033 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:TransmissionTechParameter a owl:Class ;
+    rdfs:label "TransmissionTechParameter" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeTransmissionTechnology ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:TechParameter ;
+    skos:definition "A model parameter scoped to a transmission technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:TransmissionTechVariable a owl:Class ;
+    rdfs:label "TransmissionTechVariable" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeTransmissionTechnology ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:TechVariable ;
+    skos:definition "A model variable scoped to a transmission technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeDataHorizon a owl:Class ;
+    rdfs:label "CalliopeDataHorizon" ;
+    rdfs:subClassOf ontocal:OneDimensionalTemporalRegion ;
+    skos:definition "A one-dimensional temporal region representing the maximal dataset boundaries defined at the base Calliope model level." ;
+    skos:exactMatch bfo:0000038 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeResultDataset a owl:Class ;
+    rdfs:label "CalliopeResultDataset" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:has_part ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:has_part ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeOptimisationRun ;
+            owl:onProperty ontocal:output_of ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeVariable ;
+            owl:onProperty ontocal:has_part ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:output_of ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:output_of ],
+        ontocal:DataSet ;
+    skos:definition "The complete dataset containing all endogenous output variables generated by a Calliope optimisation process." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:DataSet a owl:Class ;
+    rdfs:label "DataSet" ;
+    skos:definition "IAO class for a data set." ;
+    skos:exactMatch iao:0000100 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:EndogenousData a owl:Class ;
+    rdfs:label "EndogenousData" ;
+    skos:definition "OEO class for endogenous data (data determined within the model)." ;
+    skos:exactMatch oeo:OEO_00030030 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:EnergySystemModel a owl:Class ;
+    rdfs:label "EnergySystemModel" ;
+    skos:definition "OEO class for energy system models." ;
+    skos:exactMatch oeo:OEO_00030015 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:ExogenousData a owl:Class ;
+    rdfs:label "ExogenousData" ;
+    skos:definition "OEO class for exogenous data (input parameters defined outside the model)." ;
+    skos:exactMatch oeo:OEO_00030029 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:OutputData a owl:Class ;
+    rdfs:label "OutputData" ;
+    rdfs:subClassOf ontocal:EndogenousData ;
+    skos:definition "OEO class for output data determined by a model calculation." ;
+    skos:exactMatch oeo:OEO_00020013 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:Scenario a owl:Class ;
+    rdfs:label "Scenario" ;
+    skos:definition "OEO class for scenarios." ;
+    skos:exactMatch oeo:OEO_00000364 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+<https://w3id.org/ontocal/AggregationTypeEnum#average> a owl:Class ;
+    rdfs:label "average" ;
+    rdfs:subClassOf ontocal:AggregationTypeEnum ;
+    skos:definition "The arithmetic mean over the temporal region." .
+
+<https://w3id.org/ontocal/AggregationTypeEnum#max> a owl:Class ;
+    rdfs:label "max" ;
+    rdfs:subClassOf ontocal:AggregationTypeEnum ;
+    skos:definition "The peak value observed within the temporal region." .
+
+<https://w3id.org/ontocal/AggregationTypeEnum#min> a owl:Class ;
+    rdfs:label "min" ;
+    rdfs:subClassOf ontocal:AggregationTypeEnum ;
+    skos:definition "The lowest value observed within the temporal region." .
+
+<https://w3id.org/ontocal/AggregationTypeEnum#sum> a owl:Class ;
+    rdfs:label "sum" ;
+    rdfs:subClassOf ontocal:AggregationTypeEnum ;
+    skos:definition "The cumulative total over the temporal region." .
+
+ontocal:CalliopeConversionTechnology a owl:Class ;
+    rdfs:label "CalliopeConversionTechnology" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:carrier_in ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:onProperty ontocal:carrier_in ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:carrier_in ],
+        ontocal:CalliopeTechnology ;
+    skos:definition "A technology that converts between different carriers." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeDemandTechnology a owl:Class ;
+    rdfs:label "CalliopeDemandTechnology" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:onProperty ontocal:carrier_in ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:carrier_in ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:carrier_in ],
+        ontocal:CalliopeTechnology ;
+    skos:definition "A technology that consumes a carrier for an external sink." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeModelParameter a owl:Class ;
+    rdfs:label "CalliopeModelParameter" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:aggregation_type ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom [ owl:unionOf ( ontocal:ModelComponent ontocal:CalliopeModel ) ] ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:information_input_of ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeScenario ;
+            owl:onProperty ontocal:part_of ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeOptimisationRun ;
+            owl:onProperty ontocal:information_input_of ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:string ;
+            owl:onProperty ontocal:unit ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:unit ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:aggregation_type ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:unit ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:information_input_of ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:source_reference ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:AggregationTypeEnum ;
+            owl:onProperty ontocal:aggregation_type ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:string ;
+            owl:onProperty ontocal:source_reference ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:part_of ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:part_of ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:source_reference ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:applies_to_time ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:OneDimensionalTemporalRegion ;
+            owl:onProperty ontocal:applies_to_time ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:applies_to_time ],
+        ontocal:ExogenousData ;
+    skos:definition "An input parameter supplied to a Calliope model from outside the optimisation (e.g. costs, capacities, time series)." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeOptimisationRun a owl:Class ;
+    rdfs:label "CalliopeOptimisationRun" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:has_information_input ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeScenario ;
+            owl:onProperty ontocal:has_information_input ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:has_information_input ],
+        ontocal:Optimisation ;
+    skos:definition "A single execution of the Calliope solver against a fully parametrised model." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeScenario a owl:Class ;
+    rdfs:label "CalliopeScenario" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeModel ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:Scenario ;
+    skos:definition "A specific set of assumptions and parameters defining one Calliope model configuration." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeStorageTechnology a owl:Class ;
+    rdfs:label "CalliopeStorageTechnology" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:carrier_in ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:onProperty ontocal:carrier_in ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:carrier_in ],
+        ontocal:CalliopeTechnology ;
+    skos:definition "A technology that stores a carrier." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeSupplyTechnology a owl:Class ;
+    rdfs:label "CalliopeSupplyTechnology" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:onProperty ontocal:carrier_out ],
+        ontocal:CalliopeTechnology ;
+    skos:definition "A technology that draws from a source to produce a carrier." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeTransmissionTechnology a owl:Class ;
+    rdfs:label "CalliopeTransmissionTechnology" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:onProperty ontocal:carrier_in ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:carrier_in ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:link_from ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:link_to ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:link_from ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
+            owl:onProperty ontocal:link_from ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:carrier_in ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:link_to ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
+            owl:onProperty ontocal:link_to ],
+        ontocal:CalliopeTechnology ;
+    skos:definition "A technology that transmits a carrier between nodes." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:Optimisation a owl:Class ;
+    rdfs:label "Optimisation" ;
+    skos:definition "OEO class for the core solver/optimisation process." ;
+    skos:exactMatch oeo:OEO_00000313 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:Solver a owl:Class ;
+    rdfs:label "Solver" ;
+    skos:definition "OEO class for solver software (e.g. Gurobi, CBC) used to execute an optimisation." ;
+    skos:exactMatch oeo:OEO_00000392 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+<https://w3id.org/ontocal/TerminationConditionEnum#infeasible> a owl:Class ;
+    rdfs:label "infeasible" ;
+    rdfs:subClassOf ontocal:TerminationConditionEnum ;
+    skos:definition "No feasible solution exists given the constraints." .
+
+<https://w3id.org/ontocal/TerminationConditionEnum#optimal> a owl:Class ;
+    rdfs:label "optimal" ;
+    rdfs:subClassOf ontocal:TerminationConditionEnum ;
+    skos:definition "The solver found a globally optimal solution." .
+
+<https://w3id.org/ontocal/TerminationConditionEnum#unbounded> a owl:Class ;
+    rdfs:label "unbounded" ;
+    rdfs:subClassOf ontocal:TerminationConditionEnum ;
+    skos:definition "The objective function is unbounded — the problem is ill-posed." .
+
+ontocal:has_assigned_technology a owl:ObjectProperty ;
+    rdfs:label "has_assigned_technology" ;
+    skos:definition "Technologies located at this node. Covers Supply, Demand, Storage, and Conversion. Transmission technologies are excluded — their node assignment is handled via link_from/link_to." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:aggregation_type a owl:ObjectProperty ;
+    rdfs:label "aggregation_type" ;
+    rdfs:range ontocal:AggregationTypeEnum ;
+    skos:definition "Specifies the statistical aggregation method used for a parameter representing a macro-summary." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:at_node a owl:ObjectProperty ;
+    rdfs:label "at_node" ;
+    rdfs:range ontocal:CalliopeNetworkNode ;
+    skos:definition "The network node at which a variable is localised. Optional at the base level; required by most tech-scoped variable classes." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:build_complete a owl:DatatypeProperty ;
+    rdfs:label "build_complete" ;
+    skos:definition "POSIX timestamp marking completion of the backend model build." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:build_start a owl:DatatypeProperty ;
+    rdfs:label "build_start" ;
+    skos:definition "POSIX timestamp marking the start of the backend model build phase." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:for_carrier a owl:ObjectProperty ;
+    rdfs:label "for_carrier" ;
+    rdfs:range ontocal:CalliopeEnergyCarrier ;
+    skos:definition "The energy carrier this variable is indexed by. Used for carrier-scoped and balancing variables." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:has_information_input a owl:ObjectProperty ;
+    rdfs:label "has_information_input" ;
+    skos:definition "Relates an optimisation process to the information entities it takes as input." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:has_solver a owl:ObjectProperty ;
+    rdfs:label "has_solver" ;
+    rdfs:range ontocal:Solver ;
+    skos:definition "Links an optimisation process to the solver software used to execute it." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:information_input_of a owl:ObjectProperty ;
+    rdfs:label "information_input_of" ;
+    skos:definition "Inverse of has_information_input. Relates an information entity to the optimisation process it feeds into." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:init_complete a owl:DatatypeProperty ;
+    rdfs:label "init_complete" ;
+    skos:definition "POSIX timestamp marking completion of model initialisation." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:latitude a owl:DatatypeProperty ;
+    rdfs:label "latitude" ;
+    skos:definition "WGS84 latitude of the node in decimal degrees." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:link_from a owl:ObjectProperty ;
+    rdfs:label "link_from" ;
+    skos:definition "The node from which a transmission technology originates." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:link_to a owl:ObjectProperty ;
+    rdfs:label "link_to" ;
+    skos:definition "The node to which a transmission technology connects." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:longitude a owl:DatatypeProperty ;
+    rdfs:label "longitude" ;
+    skos:definition "WGS84 longitude of the node in decimal degrees." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:output_of a owl:ObjectProperty ;
+    rdfs:label "output_of" ;
+    skos:definition "The BFO/OBO standard relation for inverse of has output. Links a continuant (such as output data) to the occurrent process that generated it." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:postprocess_complete a owl:DatatypeProperty ;
+    rdfs:label "postprocess_complete" ;
+    skos:definition "POSIX timestamp marking completion of result postprocessing." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:preprocess_start a owl:DatatypeProperty ;
+    rdfs:label "preprocess_start" ;
+    skos:definition "POSIX timestamp marking the start of the preprocessing phase." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:solve_complete a owl:DatatypeProperty ;
+    rdfs:label "solve_complete" ;
+    skos:definition "POSIX timestamp marking the end of the full solve cycle." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:solve_start a owl:DatatypeProperty ;
+    rdfs:label "solve_start" ;
+    skos:definition "POSIX timestamp marking the moment the solver is invoked." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:solver_exit a owl:DatatypeProperty ;
+    rdfs:label "solver_exit" ;
+    skos:definition "POSIX timestamp marking the moment the solver returns control." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:source_reference a owl:DatatypeProperty ;
+    rdfs:label "source_reference" ;
+    rdfs:range xsd:string ;
+    skos:definition "Provenance string identifying the origin of the parameter value (e.g. 'User CSV Upload', 'base_config.yaml')." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:temporal_part_of a owl:ObjectProperty ;
+    rdfs:label "temporal_part_of" ;
+    skos:definition "A mereological relation linking a temporal proper part to its temporal whole." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:termination_condition a owl:ObjectProperty ;
+    rdfs:label "termination_condition" ;
+    skos:definition "The exit state returned by the solver (optimal, infeasible, or unbounded)." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeModel a owl:Class ;
+    rdfs:label "CalliopeModel" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:name ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:has_part ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:has_part ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:ModelComponent ;
+            owl:onProperty ontocal:has_part ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:name ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:string ;
+            owl:onProperty ontocal:name ],
+        ontocal:EnergySystemModel ;
+    skos:definition "The overarching informational representation of a Calliope v0.7 model." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeVariable a owl:Class ;
+    rdfs:label "CalliopeVariable" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:part_of ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:unit ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:for_carrier ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom [ owl:unionOf ( ontocal:ModelComponent ontocal:CalliopeModel ) ] ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:for_carrier ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:OneDimensionalTemporalRegion ;
+            owl:onProperty ontocal:applies_to_time ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeResultDataset ;
+            owl:onProperty ontocal:part_of ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:at_node ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:string ;
+            owl:onProperty ontocal:unit ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:at_node ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:applies_to_time ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:applies_to_time ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:onProperty ontocal:for_carrier ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:unit ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:part_of ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
+            owl:onProperty ontocal:at_node ],
+        ontocal:OutputData ;
+    skos:definition "An output variable calculated by the Calliope solver during optimization." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:TerminationConditionEnum a owl:Class ;
+    rdfs:label "TerminationConditionEnum" ;
+    owl:unionOf ( <https://w3id.org/ontocal/TerminationConditionEnum#optimal> <https://w3id.org/ontocal/TerminationConditionEnum#infeasible> <https://w3id.org/ontocal/TerminationConditionEnum#unbounded> ) ;
+    skos:definition "The discrete exit states returned by a mathematical solver upon completion." ;
+    skos:inScheme <https://w3id.org/ontocal> ;
+    linkml:permissible_values <https://w3id.org/ontocal/TerminationConditionEnum#infeasible>,
+        <https://w3id.org/ontocal/TerminationConditionEnum#optimal>,
+        <https://w3id.org/ontocal/TerminationConditionEnum#unbounded> .
+
+ontocal:TechParameter a owl:Class ;
+    rdfs:label "TechParameter" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeTechnology ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:CalliopeModelParameter ;
+    skos:definition "A model parameter that applies to a specific technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:TechVariable a owl:Class ;
+    rdfs:label "TechVariable" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeTechnology ;
+            owl:onProperty ontocal:is_about ],
+        ontocal:CalliopeVariable ;
+    skos:definition "A model variable scoped to a specific technology (e.g. flow_cap, carrier_prod)." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:AggregationTypeEnum a owl:Class ;
+    rdfs:label "AggregationTypeEnum" ;
+    owl:unionOf ( <https://w3id.org/ontocal/AggregationTypeEnum#sum> <https://w3id.org/ontocal/AggregationTypeEnum#average> <https://w3id.org/ontocal/AggregationTypeEnum#max> <https://w3id.org/ontocal/AggregationTypeEnum#min> ) ;
+    skos:definition "The mathematical operation applied to aggregate granular occurrent data into a single scalar Information Content Entity over a macro temporal region." ;
+    skos:inScheme <https://w3id.org/ontocal> ;
+    linkml:permissible_values <https://w3id.org/ontocal/AggregationTypeEnum#average>,
+        <https://w3id.org/ontocal/AggregationTypeEnum#max>,
+        <https://w3id.org/ontocal/AggregationTypeEnum#min>,
+        <https://w3id.org/ontocal/AggregationTypeEnum#sum> .
+
+ontocal:CalliopeNetworkNode a owl:Class ;
+    rdfs:label "CalliopeNetworkNode" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:longitude ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:latitude ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:latitude ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:latitude ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:longitude ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:name ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:string ;
+            owl:onProperty ontocal:name ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:longitude ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:has_assigned_technology ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeTechnology ;
+            owl:onProperty ontocal:has_assigned_technology ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:name ],
+        ontocal:ModelComponent ;
+    skos:definition "A spatial node in Calliope." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:ModelComponent a owl:Class ;
+    rdfs:label "ModelComponent" ;
+    skos:definition "OEO class for model building blocks." ;
+    skos:exactMatch oeo:OEO_00000276 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:OneDimensionalTemporalRegion a owl:Class ;
+    rdfs:label "OneDimensionalTemporalRegion" ;
+    skos:definition "BFO stub: a one-dimensional temporal region. Parent of all temporal classes in this schema." ;
+    skos:exactMatch bfo:0000038 ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:applies_to_time a owl:ObjectProperty ;
+    rdfs:label "applies_to_time" ;
+    rdfs:range ontocal:OneDimensionalTemporalRegion ;
+    rdfs:subPropertyOf ontocal:is_about ;
+    skos:definition "Links an Information Content Entity to the temporal region it describes. Accepts granular timesteps or macro horizons." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:has_part a owl:ObjectProperty ;
+    rdfs:label "has_part" ;
+    skos:definition "Links a whole to its parts." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:part_of a owl:ObjectProperty ;
+    rdfs:label "part_of" ;
+    skos:definition "Links a part to its whole." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:unit a owl:DatatypeProperty ;
+    rdfs:label "unit" ;
+    rdfs:range xsd:string ;
+    skos:definition "Unit of measure for the parameter value (e.g. 'fraction', 'year', 'kW'). Optional metadata hook — not semantically validated beyond equals_string constraints on specific parameter classes." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeTechnology a owl:Class ;
+    rdfs:label "CalliopeTechnology" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:name ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:name ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:string ;
+            owl:onProperty ontocal:name ],
+        ontocal:ModelComponent ;
+    skos:definition "Base class for Calliope technologies." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:CalliopeEnergyCarrier a owl:Class ;
+    rdfs:label "CalliopeEnergyCarrier" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:name ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:string ;
+            owl:onProperty ontocal:name ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:name ],
+        ontocal:ModelComponent ;
+    skos:definition "An energy carrier that can be used by technologies." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:carrier_in a owl:ObjectProperty ;
+    rdfs:label "carrier_in" ;
+    skos:definition "The energy carrier consumed as input by a technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:carrier_out a owl:ObjectProperty ;
+    rdfs:label "carrier_out" ;
+    skos:definition "The energy carrier produced as output by a technology." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+ontocal:name a owl:DatatypeProperty .
+
+ontocal:is_about a owl:ObjectProperty ;
+    rdfs:label "is_about" ;
+    skos:definition "Relates an information artifact to the entity it is about." ;
+    skos:inScheme <https://w3id.org/ontocal> .
+
+

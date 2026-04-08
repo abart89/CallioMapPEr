@@ -32,3 +32,6 @@ oeo-2/
 # Other ignored folders
 .agent/
 _tempfiles/
+
+# Generated output graphs
+*.nq

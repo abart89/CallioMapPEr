@@ -18,9 +18,9 @@ GEN     := calliomapper/generated
 #   ontology/calliope_oeo_shapes.ttl        — SHACL shapes
 #   ontology/calliope_oeo.ttl               — OWL/Turtle (for Protégé / ontologists)
 generate:
-	$(VENV)/gen-pydantic $(SCHEMA)/calliope_oeo.yaml > $(GEN)/calliope_oeo.py
-	$(VENV)/gen-shacl   $(SCHEMA)/calliope_oeo.yaml > $(SCHEMA)/calliope_oeo_shapes.ttl
-	$(VENV)/gen-owl     $(SCHEMA)/calliope_oeo.yaml > $(SCHEMA)/calliope_oeo.ttl
+	$(VENV)/gen-pydantic $(SCHEMA)/ontocal_core.yaml > $(GEN)/ontocal_core.py
+	$(VENV)/gen-shacl   $(SCHEMA)/ontocal_core.yaml > $(SCHEMA)/ontocal_core_shapes.ttl
+	$(VENV)/gen-owl     $(SCHEMA)/ontocal_core.yaml > $(SCHEMA)/ontocal_core.ttl
 
 # Regenerate artifacts from the dummy schema (development only).
 generate-dummy:

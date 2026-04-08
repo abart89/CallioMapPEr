@@ -1,11 +1,11 @@
 """
-Tests for CoreMapper using the dummy schema.
+Tests for CoreMapper using the real ontocal_core schema.
 """
 
 from pathlib import Path
 
 import pytest
-from rdflib import BNode, Dataset, Graph, URIRef
+from rdflib import BNode, Dataset, Graph, URIRef, Literal
 from rdflib.namespace import RDF, RDFS
 
 from calliomapper import Translator
@@ -14,7 +14,7 @@ from calliomapper.ontology.namespaces import ONTOCAL
 from calliomapper.utils.io import serialize_nq  # noqa: F401
 from calliomapper.utils.validation import ValidationError, validate
 
-SHAPES = Path(__file__).parent.parent / "ontology" / "dummy_shapes.ttl"
+SHAPES = Path(__file__).parent.parent / "ontology" / "ontocal_core_shapes.ttl"
 RUN_ID = "https://w3id.org/ontocal/runs/test-run-001"
 
 
@@ -27,26 +27,31 @@ class TestCoreMapper:
     def test_single_entity_type_triple(self):
         g = CoreMapper(RUN_ID).map(nodes={"region_a": {}})
         entity = URIRef(RUN_ID + "/region_a")
-        assert (entity, RDF.type, ONTOCAL.CalliopeThing) in g
+        assert (entity, RDF.type, ONTOCAL.CalliopeNetworkNode) in g
 
     def test_single_entity_label_triple(self):
         g = CoreMapper(RUN_ID).map(nodes={"region_a": {"name": "Region A"}})
         entity = URIRef(RUN_ID + "/region_a")
-        labels = list(g.objects(entity, RDFS.label))
+        labels = list(g.objects(entity, ONTOCAL.name))
         assert len(labels) == 1
         assert str(labels[0]) == "Region A"
 
     def test_label_falls_back_to_key_name(self):
         g = CoreMapper(RUN_ID).map(nodes={"wind_onshore": {}})
         entity = URIRef(RUN_ID + "/wind_onshore")
-        assert str(list(g.objects(entity, RDFS.label))[0]) == "wind_onshore"
+        assert str(list(g.objects(entity, ONTOCAL.name))[0]) == "wind_onshore"
 
     def test_multiple_nodes_and_techs(self):
         g = CoreMapper(RUN_ID).map(
             nodes={"region_a": {}, "region_b": {}},
-            techs={"wind": {}, "solar": {}},
+            techs={
+                "wind": {"base_tech": "supply", "carrier_out": "electricity"},
+                "demand_elec": {"base_tech": "demand", "carrier_in": "electricity"}
+            },
         )
-        assert len(list(g.subjects(RDF.type, ONTOCAL.CalliopeThing))) == 4
+        assert len(list(g.subjects(RDF.type, ONTOCAL.CalliopeNetworkNode))) == 2
+        assert len(list(g.subjects(RDF.type, ONTOCAL.CalliopeSupplyTechnology))) == 1
+        assert len(list(g.subjects(RDF.type, ONTOCAL.CalliopeDemandTechnology))) == 1
 
     def test_graph_identifier_default(self):
         g = CoreMapper(RUN_ID).map(nodes={"region_a": {}})
@@ -62,7 +67,7 @@ class TestCoreMapper:
         custom = RUN_ID + "/scenario-high-renewables"
         g = CoreMapper(RUN_ID, graph_id=custom).map(nodes={"region_a": {}})
         entity = URIRef(RUN_ID + "/region_a")
-        assert (entity, RDF.type, ONTOCAL.CalliopeThing) in g
+        assert (entity, RDF.type, ONTOCAL.CalliopeNetworkNode) in g
 
     def test_empty_input_produces_empty_graph(self):
         g = CoreMapper(RUN_ID).map()
@@ -79,12 +84,16 @@ class TestSHACLValidation:
         g = CoreMapper(RUN_ID).map(nodes={"region_a": {}})
         cg = Dataset()
         cg.add_graph(g)
+        # Note: if shape validation requires missing properties on the actual shapes, 
+        # it might fail. But ontocal_core currently seems to pass for pure Node triples.
         validate(cg, SHAPES)  # must not raise
 
     def test_invalid_graph_raises(self):
-        # Blank node subject violates sh:nodeKind sh:IRI
+        # Adding an unknown property violates the sh:closed true constraint
         bad = Graph(identifier=URIRef(RUN_ID + "/bad"))
-        bad.add((BNode(), RDF.type, ONTOCAL.CalliopeThing))
+        uri = URIRef(RUN_ID + "/bad_node")
+        bad.add((uri, RDF.type, ONTOCAL.CalliopeNetworkNode))
+        bad.add((uri, ONTOCAL.invalidProperty, Literal("x")))
         cg = Dataset()
         cg.add_graph(bad)
         with pytest.raises(ValidationError):
@@ -100,7 +109,7 @@ class TestRoundTrip:
     def test_translator_produces_nq_file(self, tmp_path):
         out = tmp_path / "test_output.nq"
         Translator(
-            nodes={"test_calliope_thing": {"name": "Test Calliope Thing"}},
+            nodes={"test_node": {"name": "Test Node"}},
             run_id=RUN_ID,
         ).save(out)
         assert out.exists()
@@ -109,21 +118,21 @@ class TestRoundTrip:
     def test_nq_file_is_valid_rdf(self, tmp_path):
         out = tmp_path / "test_output.nq"
         Translator(
-            nodes={"test_calliope_thing": {"name": "Test Calliope Thing"}},
+            nodes={"test_node": {"name": "Test Node"}},
             run_id=RUN_ID,
         ).save(out)
         loaded = Dataset()
         loaded.parse(str(out), format="nquads")
-        entity = URIRef(RUN_ID + "/test_calliope_thing")
+        entity = URIRef(RUN_ID + "/test_node")
         # Search across all named graphs in the dataset
         assert any(
-            (entity, RDF.type, ONTOCAL.CalliopeThing) in g
+            (entity, RDF.type, ONTOCAL.CalliopeNetworkNode) in g
             for g in loaded.graphs()
         )
 
     def test_nq_contains_default_named_graph(self, tmp_path):
         out = tmp_path / "test_output.nq"
-        Translator(nodes={"test_calliope_thing": {}}, run_id=RUN_ID).save(out)
+        Translator(nodes={"test_node": {}}, run_id=RUN_ID).save(out)
         loaded = Dataset()
         loaded.parse(str(out), format="nquads")
         graph_names = [str(g.identifier) for g in loaded.graphs()]
@@ -132,7 +141,7 @@ class TestRoundTrip:
     def test_nq_contains_custom_named_graph(self, tmp_path):
         out = tmp_path / "test_output.nq"
         custom = RUN_ID + "/scenario-high-renewables"
-        Translator(nodes={"test_calliope_thing": {}}, run_id=RUN_ID, graph_id=custom).save(out)
+        Translator(nodes={"test_node": {}}, run_id=RUN_ID, graph_id=custom).save(out)
         loaded = Dataset()
         loaded.parse(str(out), format="nquads")
         graph_names = [str(g.identifier) for g in loaded.graphs()]
