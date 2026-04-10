@@ -20,7 +20,7 @@ from calliomapper.utils import io, validation
 
 
 # Default shapes file used when no custom schema is supplied.
-_DEFAULT_SHAPES = Path(__file__).parent.parent / "ontology" / "ontocal_core_shapes.ttl"
+_DEFAULT_SHAPES = Path(__file__).parent.parent / "ontocal" / "ontocal_core_shapes.ttl"
 
 
 class Translator:
@@ -42,7 +42,7 @@ class Translator:
     extension:
         Path to an epistemic extension YAML, or pre-loaded dict (optional).
     shapes:
-        Path to a SHACL shapes file.  Defaults to ``ontology/ontocal_core_shapes.ttl``.
+        Path to a SHACL shapes file.  Defaults to ``ontocal/ontocal_core_shapes.ttl``.
     run_id:
         Base URI for this model run.  Auto-generated UUID if not supplied.
     graph_id:

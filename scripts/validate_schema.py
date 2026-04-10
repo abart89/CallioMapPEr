@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Standalone validator for ontology/ontocal_core.yaml.
+Standalone validator for ontocal/ontocal_core.yaml.
 
 Checks:
   1. File exists and is valid YAML
@@ -34,9 +34,9 @@ from linkml_runtime.loaders import yaml_loader
 from linkml_runtime.linkml_model import SchemaDefinition
 
 REPO_ROOT      = Path(__file__).parent.parent
-SCHEMA_PATH    = REPO_ROOT / "ontology" / "ontocal_core.yaml"
+SCHEMA_PATH    = REPO_ROOT / "ontocal" / "ontocal_core.yaml"
 OEO_FULL_PATH  = REPO_ROOT / "docs" / "ontologies" / "oeo-full.yaml"
-INDIVIDUALS    = REPO_ROOT / "ontology" / "ontocal_individuals.ttl"
+INDIVIDUALS    = REPO_ROOT / "ontocal" / "ontocal_individuals.ttl"
 GEN_PYTHON     = REPO_ROOT / "dev_calliomapper" / "bin" / "gen-python"
 
 # Local namespace — IRIs under this prefix are defined by us, not by OEO/BFO/IAO.
@@ -209,7 +209,7 @@ for slot_name, slot_def in sorted(slots.items()):
 # 6. Calliope individual typed in ontocal_individuals.ttl
 # ---------------------------------------------------------------------------
 if not INDIVIDUALS.exists():
-    fail("ontology/ontocal_individuals.ttl not found")
+    fail("ontocal/ontocal_individuals.ttl not found")
 else:
     g = Graph()
     g.parse(INDIVIDUALS, format="turtle")

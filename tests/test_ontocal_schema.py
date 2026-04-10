@@ -1,5 +1,5 @@
 """
-Validates ontology/ontocal.yaml as a well-formed LinkML schema.
+Validates ontocal/ontocal_core.yaml as a well-formed LinkML schema.
 
 Checks performed:
   1. File is parseable YAML.
@@ -20,7 +20,7 @@ import yaml
 from linkml_runtime.loaders import yaml_loader
 from linkml_runtime.linkml_model import SchemaDefinition
 
-SCHEMA_PATH = Path(__file__).parent.parent / "ontology" / "ontocal_core.yaml"
+SCHEMA_PATH = Path(__file__).parent.parent / "ontocal" / "ontocal_core.yaml"
 OEO_STUBS = {"ModellingSoftware", "EnergySystemModel", "ModelComponent", "Optimisation"}
 EXTERNAL_SLOTS = {"has_part", "part_of"}
 
@@ -100,8 +100,8 @@ def test_calliope_individual_typed():
     from rdflib import Graph, URIRef
     from rdflib.namespace import RDF
 
-    ttl_path = Path(__file__).parent.parent / "ontology" / "ontocal_individuals.ttl"
-    assert ttl_path.exists(), "ontology/ontocal_individuals.ttl not found"
+    ttl_path = Path(__file__).parent.parent / "ontocal" / "ontocal_individuals.ttl"
+    assert ttl_path.exists(), "ontocal/ontocal_individuals.ttl not found"
 
     g = Graph()
     g.parse(ttl_path, format="turtle")

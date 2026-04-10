@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "agent",
+            "if": "Edit(.agent/contexts/kg_questions.md)|Write(.agent/contexts/kg_questions.md)",
+            "prompt": "The file .agent/contexts/kg_questions.md was just edited. Follow the workflow in .agent/workflows/update-kg-questions.md exactly: identify any question entries whose Q-id has no corresponding reference in scripts/verify_kg.py, then add the SPARQL query and assertion for each unsynced question. If scripts/verify_kg.py does not exist yet, create it with the appropriate scaffold before adding entries.",
+            "timeout": 120,
+            "statusMessage": "Syncing verify_kg.py with new questions..."
+          }
+        ]
+      }
+    ]
+  }
+}

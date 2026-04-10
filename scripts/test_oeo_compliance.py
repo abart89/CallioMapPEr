@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Semantic validator for ontology/ontocal_core.yaml using owlready2.
+Semantic validator for ontocal/ontocal_core.yaml using owlready2.
 
 This script tests true semantic/logical compliance. It verifies that Calliope's schema definitions correctly align with OEO abstract categories without triggering contradictions or violating disjointness axioms.
 
@@ -18,7 +18,7 @@ import logging
 logging.getLogger("owlready2").setLevel(logging.CRITICAL)
 
 REPO_ROOT     = Path(__file__).parent.parent
-SCHEMA_PATH   = REPO_ROOT / "ontology" / "ontocal_core.yaml"
+SCHEMA_PATH   = REPO_ROOT / "ontocal" / "ontocal_core.yaml"
 OEO_PATH      = REPO_ROOT / "oeo-2" / "oeo.owl"
 GEN_OWL       = REPO_ROOT / "dev_calliomapper" / "bin" / "gen-owl"
 TEMP_OWL      = REPO_ROOT / "_temp_schema.owl"

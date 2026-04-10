@@ -563,5 +563,5 @@ enums:
 
 # 5. INDIVIDUALS:
 # LinkML 1.x does not support an 'individuals:' block in the schema — named individuals live in
-# separate data files. The Calliope framework individual is declared in ontology/ontocal_individuals.ttl
+# separate data files. The Calliope framework individual is declared in ontocal/ontocal_individuals.ttl
 # as:  ontocal:Calliope  rdf:type  oeo:OEO_00000382 (SoftwareFramework) .

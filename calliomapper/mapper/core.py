@@ -18,7 +18,7 @@ from __future__ import annotations
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import RDF, RDFS
 
-from calliomapper.ontology.namespaces import ONTOCAL
+from calliomapper.ontocal.namespaces import ONTOCAL
 from calliomapper.generated.ontocal_core import (
     CalliopeNetworkNode,
     CalliopeTechnology,

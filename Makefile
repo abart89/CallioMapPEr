@@ -1,7 +1,7 @@
 # Makefile — project automation shortcuts.
 
 VENV    := dev_calliomapper/bin
-SCHEMA  := ontology
+SCHEMA  := ontocal
 GEN     := calliomapper/generated
 
 # ---------------------------------------------------------------------------
@@ -15,8 +15,8 @@ GEN     := calliomapper/generated
 # Preferred entry point: edit calliope_oeo.yaml, then run this target.
 # Produces:
 #   calliomapper/generated/calliope_oeo.py  — Pydantic classes
-#   ontology/calliope_oeo_shapes.ttl        — SHACL shapes
-#   ontology/calliope_oeo.ttl               — OWL/Turtle (for Protégé / ontologists)
+#   ontocal/calliope_oeo_shapes.ttl        — SHACL shapes
+#   ontocal/calliope_oeo.ttl               — OWL/Turtle (for Protégé / ontologists)
 generate:
 	$(VENV)/gen-pydantic $(SCHEMA)/ontocal_core.yaml > $(GEN)/ontocal_core.py
 	$(VENV)/gen-shacl   $(SCHEMA)/ontocal_core.yaml > $(SCHEMA)/ontocal_core_shapes.ttl

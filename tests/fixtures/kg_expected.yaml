@@ -1,0 +1,119 @@
+# KG Expected Answers
+#
+# Machine-readable ground truth for verify_kg.py assertions.
+# Scalar answers live inline in kg_questions.md.
+# This file holds lists, sets, and structured parameter data.
+#
+# Keys match the references in kg_questions.md (e.g. "kg_expected > national_scale.structural.nodes").
+# Do not edit manually unless the fixture models change — derive from attrs.yaml.
+
+national_scale:
+
+  structural:
+
+    node_count: 5
+
+    nodes:
+      - region1
+      - region2
+      - region1_1
+      - region1_2
+      - region1_3
+
+    tech_count: 8
+
+    technologies:
+      all:
+        - battery
+        - ccgt
+        - csp
+        - demand_power
+        - region1_to_region1_1
+        - region1_to_region1_2
+        - region1_to_region1_3
+        - region1_to_region2
+      supply:
+        - ccgt
+        - csp
+      demand:
+        - demand_power
+      storage:
+        - battery
+      transmission:
+        - region1_to_region1_1
+        - region1_to_region1_2
+        - region1_to_region1_3
+        - region1_to_region2
+
+  parameters:
+    nodes:
+      region1:    {latitude: 40.0,  longitude: -2.0}
+      region2:    {latitude: 40.0,  longitude: -8.0}
+      region1_1:  {latitude: 41.0,  longitude: -2.0}
+      region1_2:  {latitude: 39.0,  longitude: -1.0}
+      region1_3:  {latitude: 39.0,  longitude: -2.0}
+
+  relational:
+    node_tech_assignments:
+      region1:   [demand_power, ccgt]
+      region2:   [demand_power, battery]
+      region1_1: [csp]
+      region1_2: [csp]
+      region1_3: [csp]
+
+
+urban_scale:
+
+  structural:
+
+    node_count: 4
+
+    nodes:
+      - X1
+      - X2
+      - X3
+      - N1
+
+    tech_count: 12
+
+    technologies:
+      all:
+        - boiler
+        - chp
+        - demand_electricity
+        - demand_heat
+        - N1_to_X2
+        - N1_to_X3
+        - pv
+        - supply_gas
+        - supply_grid_power
+        - X1_to_N1
+        - X1_to_X2
+        - X1_to_X3
+      supply:
+        - supply_grid_power
+        - supply_gas
+        - pv
+      demand:
+        - demand_electricity
+        - demand_heat
+      conversion:
+        - boiler
+        - chp
+      transmission:
+        - X1_to_X2
+        - X1_to_X3
+        - X1_to_N1
+        - N1_to_X2
+        - N1_to_X3
+
+  parameters:
+    nodes:
+      X1: {latitude: 51.4596158, longitude: -0.1613446}
+      X2: {latitude: 51.4652373, longitude: -0.1141548}
+      X3: {latitude: 51.4287016, longitude: -0.1310635}
+      N1: {latitude: 51.4450766, longitude: -0.1247183}
+
+  relational:
+    node_tech_assignments:
+      # to be filled when node-tech assignment mapping is implemented

@@ -10,11 +10,11 @@ from rdflib.namespace import RDF, RDFS
 
 from calliomapper import Translator
 from calliomapper.mapper.core import CoreMapper
-from calliomapper.ontology.namespaces import ONTOCAL
+from calliomapper.ontocal.namespaces import ONTOCAL
 from calliomapper.utils.io import serialize_nq  # noqa: F401
 from calliomapper.utils.validation import ValidationError, validate
 
-SHAPES = Path(__file__).parent.parent / "ontology" / "ontocal_core_shapes.ttl"
+SHAPES = Path(__file__).parent.parent / "ontocal" / "ontocal_core_shapes.ttl"
 RUN_ID = "https://w3id.org/ontocal/runs/test-run-001"
 
 

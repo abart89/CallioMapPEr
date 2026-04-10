@@ -60,8 +60,8 @@ Each model run produces a `.nq` file with distinct named graphs:
 ontocal_core.yaml      (LinkML schema — source of truth, committed to repo)
       ↓  make generate
 calliomapper/generated/ontocal_core.py    (Pydantic classes — never hand-edited)
-ontology/ontocal_core_shapes.ttl          (SHACL shapes — auto-generated)
-ontology/ontocal_core.ttl                 (OWL/Turtle — for Protégé/ontologists)
+ontocal/ontocal_core_shapes.ttl          (SHACL shapes — auto-generated)
+ontocal/ontocal_core.ttl                 (OWL/Turtle — for Protégé/ontologists)
 ```
 
 Run `make generate` to regenerate all artifacts after editing the LinkML schema.
