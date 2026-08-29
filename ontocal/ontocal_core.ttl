@@ -16,10 +16,10 @@
 ontocal:CalliopeExecutionHorizon a owl:Class ;
     rdfs:label "CalliopeExecutionHorizon" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:minCardinality 1 ;
             owl:onProperty ontocal:temporal_part_of ],
         [ a owl:Restriction ;
-            owl:minCardinality 1 ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:temporal_part_of ],
         [ a owl:Restriction ;
             owl:allValuesFrom ontocal:CalliopeDataHorizon ;
@@ -32,95 +32,95 @@ ontocal:CalliopeExecutionHorizon a owl:Class ;
 ontocal:CalliopeRunProcess a owl:Class ;
     rdfs:label "CalliopeRunProcess" ;
     rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:solver_exit ],
+        [ a owl:Restriction ;
             owl:allValuesFrom ontocal:TerminationConditionEnum ;
             owl:onProperty ontocal:termination_condition ],
         [ a owl:Restriction ;
             owl:allValuesFrom xsd:float ;
-            owl:onProperty ontocal:preprocess_start ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:termination_condition ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:preprocess_start ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
             owl:onProperty ontocal:solve_complete ],
         [ a owl:Restriction ;
             owl:allValuesFrom xsd:float ;
-            owl:onProperty ontocal:solve_start ],
+            owl:onProperty ontocal:init_complete ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty ontocal:has_solver ],
+            owl:onProperty ontocal:solver_exit ],
         [ a owl:Restriction ;
             owl:allValuesFrom xsd:float ;
-            owl:onProperty ontocal:init_complete ],
+            owl:onProperty ontocal:build_complete ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:build_complete ],
         [ a owl:Restriction ;
             owl:allValuesFrom ontocal:Solver ;
             owl:onProperty ontocal:has_solver ],
         [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:preprocess_start ],
-        [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:solve_complete ],
         [ a owl:Restriction ;
-            owl:allValuesFrom xsd:float ;
-            owl:onProperty ontocal:solve_complete ],
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:solve_start ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
-            owl:onProperty ontocal:solver_exit ],
+            owl:onProperty ontocal:build_start ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:build_start ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:postprocess_complete ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
             owl:onProperty ontocal:has_solver ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty ontocal:build_complete ],
+            owl:onProperty ontocal:init_complete ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
+            owl:onProperty ontocal:build_start ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:preprocess_start ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
             owl:onProperty ontocal:postprocess_complete ],
         [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:solver_exit ],
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:termination_condition ],
         [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:allValuesFrom xsd:float ;
             owl:onProperty ontocal:solve_start ],
         [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:build_start ],
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:solver_exit ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:preprocess_start ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty ontocal:init_complete ],
+            owl:onProperty ontocal:postprocess_complete ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:preprocess_start ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
             owl:onProperty ontocal:build_complete ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
-            owl:onProperty ontocal:build_start ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:postprocess_complete ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:init_complete ],
+            owl:onProperty ontocal:solve_complete ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:termination_condition ],
         [ a owl:Restriction ;
-            owl:allValuesFrom xsd:float ;
-            owl:onProperty ontocal:build_complete ],
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:init_complete ],
         [ a owl:Restriction ;
-            owl:allValuesFrom xsd:float ;
-            owl:onProperty ontocal:build_start ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom xsd:float ;
-            owl:onProperty ontocal:postprocess_complete ],
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:has_solver ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
             owl:onProperty ontocal:solve_start ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom xsd:float ;
-            owl:onProperty ontocal:solver_exit ],
         ontocal:Optimisation ;
     skos:definition "The occurrent representing the actual execution of the Calliope solver. Holds runtime diagnostics, timing boundaries, and solver link — distinct from CalliopeOptimisationRun which represents the configured run with its inputs." ;
     skos:inScheme <https://w3id.org/ontocal> .
@@ -131,10 +131,10 @@ ontocal:ConversionTechParameter a owl:Class ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
-            owl:minCardinality 1 ;
+            owl:allValuesFrom ontocal:CalliopeConversionTechnology ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeConversionTechnology ;
+            owl:minCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         ontocal:TechParameter ;
     skos:definition "A model parameter scoped to a conversion technology." ;
@@ -161,10 +161,10 @@ ontocal:DemandTechParameter a owl:Class ;
             owl:allValuesFrom ontocal:CalliopeDemandTechnology ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
-            owl:minCardinality 1 ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:minCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         ontocal:TechParameter ;
     skos:definition "A model parameter scoped to a demand technology." ;
@@ -173,13 +173,13 @@ ontocal:DemandTechParameter a owl:Class ;
 ontocal:DemandTechVariable a owl:Class ;
     rdfs:label "DemandTechVariable" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:minCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
             owl:allValuesFrom ontocal:CalliopeDemandTechnology ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
-            owl:minCardinality 1 ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         ontocal:TechVariable ;
     skos:definition "A model variable scoped to a demand technology." ;
@@ -194,13 +194,13 @@ ontocal:ModellingSoftware a owl:Class ;
 ontocal:NodeParameter a owl:Class ;
     rdfs:label "NodeParameter" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
-            owl:onProperty ontocal:is_about ],
-        [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
             owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
             owl:onProperty ontocal:is_about ],
         ontocal:CalliopeModelParameter ;
     skos:definition "A model parameter that applies to a specific node." ;
@@ -209,13 +209,13 @@ ontocal:NodeParameter a owl:Class ;
 ontocal:NodeVariable a owl:Class ;
     rdfs:label "NodeVariable" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
-            owl:onProperty ontocal:is_about ],
-        [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
             owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
             owl:onProperty ontocal:is_about ],
         ontocal:CalliopeVariable ;
     skos:definition "A model variable scoped to a specific network node (e.g. node-level cost summaries)." ;
@@ -224,13 +224,13 @@ ontocal:NodeVariable a owl:Class ;
 ontocal:StorageTechParameter a owl:Class ;
     rdfs:label "StorageTechParameter" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeStorageTechnology ;
-            owl:onProperty ontocal:is_about ],
-        [ a owl:Restriction ;
             owl:minCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeStorageTechnology ;
             owl:onProperty ontocal:is_about ],
         ontocal:TechParameter ;
     skos:definition "A model parameter scoped to a storage technology." ;
@@ -239,13 +239,13 @@ ontocal:StorageTechParameter a owl:Class ;
 ontocal:StorageTechVariable a owl:Class ;
     rdfs:label "StorageTechVariable" ;
     rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
             owl:allValuesFrom ontocal:CalliopeStorageTechnology ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty ontocal:is_about ],
-        [ a owl:Restriction ;
-            owl:minCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         ontocal:TechVariable ;
     skos:definition "A model variable scoped to a storage technology." ;
@@ -254,13 +254,13 @@ ontocal:StorageTechVariable a owl:Class ;
 ontocal:SupplyTechParameter a owl:Class ;
     rdfs:label "SupplyTechParameter" ;
     rdfs:subClassOf [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
             owl:allValuesFrom ontocal:CalliopeSupplyTechnology ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
             owl:minCardinality 1 ;
-            owl:onProperty ontocal:is_about ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         ontocal:TechParameter ;
     skos:definition "A model parameter scoped to a supply technology." ;
@@ -269,10 +269,10 @@ ontocal:SupplyTechParameter a owl:Class ;
 ontocal:SupplyTechVariable a owl:Class ;
     rdfs:label "SupplyTechVariable" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeSupplyTechnology ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:allValuesFrom ontocal:CalliopeSupplyTechnology ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
             owl:minCardinality 1 ;
@@ -284,13 +284,13 @@ ontocal:SupplyTechVariable a owl:Class ;
 ontocal:SystemVariable a owl:Class ;
     rdfs:label "SystemVariable" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:allValuesFrom ontocal:CalliopeModel ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
             owl:minCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeModel ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         ontocal:CalliopeVariable ;
     skos:definition "A model variable representing a system-wide aggregate quantity (e.g. total system cost, total emissions)." ;
@@ -306,13 +306,13 @@ ontocal:TimeStep a owl:Class ;
 ontocal:TransmissionTechParameter a owl:Class ;
     rdfs:label "TransmissionTechParameter" ;
     rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeTransmissionTechnology ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
             owl:minCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty ontocal:is_about ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeTransmissionTechnology ;
             owl:onProperty ontocal:is_about ],
         ontocal:TechParameter ;
     skos:definition "A model parameter scoped to a transmission technology." ;
@@ -343,22 +343,22 @@ ontocal:CalliopeDataHorizon a owl:Class ;
 ontocal:CalliopeResultDataset a owl:Class ;
     rdfs:label "CalliopeResultDataset" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:output_of ],
-        [ a owl:Restriction ;
             owl:minCardinality 0 ;
             owl:onProperty ontocal:has_part ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeVariable ;
-            owl:onProperty ontocal:has_part ],
-        [ a owl:Restriction ;
-            owl:minCardinality 1 ;
-            owl:onProperty ontocal:output_of ],
         [ a owl:Restriction ;
             owl:allValuesFrom ontocal:CalliopeOptimisationRun ;
             owl:onProperty ontocal:output_of ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
+            owl:onProperty ontocal:has_part ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:output_of ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:output_of ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeVariable ;
             owl:onProperty ontocal:has_part ],
         ontocal:DataSet ;
     skos:definition "The complete dataset containing all endogenous output variables generated by a Calliope optimisation process." ;
@@ -424,23 +424,23 @@ ontocal:Scenario a owl:Class ;
 ontocal:CalliopeConversionTechnology a owl:Class ;
     rdfs:label "CalliopeConversionTechnology" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:minCardinality 1 ;
             owl:onProperty ontocal:carrier_out ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:carrier_in ],
         [ a owl:Restriction ;
             owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
             owl:onProperty ontocal:carrier_in ],
         [ a owl:Restriction ;
-            owl:minCardinality 1 ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:carrier_in ],
-        [ a owl:Restriction ;
-            owl:minCardinality 1 ;
-            owl:onProperty ontocal:carrier_out ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:carrier_in ],
         ontocal:CalliopeTechnology ;
     skos:definition "A technology that converts between different carriers." ;
     skos:inScheme <https://w3id.org/ontocal> .
@@ -448,13 +448,13 @@ ontocal:CalliopeConversionTechnology a owl:Class ;
 ontocal:CalliopeDemandTechnology a owl:Class ;
     rdfs:label "CalliopeDemandTechnology" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:minCardinality 1 ;
-            owl:onProperty ontocal:carrier_in ],
-        [ a owl:Restriction ;
             owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
             owl:onProperty ontocal:carrier_in ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
+            owl:onProperty ontocal:carrier_in ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
             owl:onProperty ontocal:carrier_in ],
         ontocal:CalliopeTechnology ;
     skos:definition "A technology that consumes a carrier for an external sink." ;
@@ -463,35 +463,20 @@ ontocal:CalliopeDemandTechnology a owl:Class ;
 ontocal:CalliopeModelParameter a owl:Class ;
     rdfs:label "CalliopeModelParameter" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeOptimisationRun ;
+            owl:minCardinality 0 ;
             owl:onProperty ontocal:information_input_of ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:AggregationTypeEnum ;
-            owl:onProperty ontocal:aggregation_type ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:aggregation_type ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:source_reference ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:applies_to_time ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:OneDimensionalTemporalRegion ;
-            owl:onProperty ontocal:applies_to_time ],
         [ a owl:Restriction ;
             owl:allValuesFrom xsd:string ;
             owl:onProperty ontocal:source_reference ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
-            owl:onProperty ontocal:part_of ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:aggregation_type ],
+            owl:onProperty ontocal:source_reference ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
             owl:onProperty ontocal:unit ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:information_input_of ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:is_about ],
@@ -499,32 +484,47 @@ ontocal:CalliopeModelParameter a owl:Class ;
             owl:allValuesFrom [ owl:unionOf ( ontocal:ModelComponent ontocal:CalliopeModel ) ] ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:information_input_of ],
-        [ a owl:Restriction ;
-            owl:minCardinality 1 ;
-            owl:onProperty ontocal:is_about ],
-        [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:part_of ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
+            owl:onProperty ontocal:part_of ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:source_reference ],
         [ a owl:Restriction ;
             owl:allValuesFrom ontocal:CalliopeScenario ;
             owl:onProperty ontocal:part_of ],
         [ a owl:Restriction ;
-            owl:allValuesFrom xsd:string ;
-            owl:onProperty ontocal:unit ],
+            owl:allValuesFrom ontocal:OneDimensionalTemporalRegion ;
+            owl:onProperty ontocal:applies_to_time ],
         [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:allValuesFrom ontocal:AggregationTypeEnum ;
+            owl:onProperty ontocal:aggregation_type ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:applies_to_time ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeOptimisationRun ;
             owl:onProperty ontocal:information_input_of ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:unit ],
         [ a owl:Restriction ;
-            owl:minCardinality 0 ;
+            owl:allValuesFrom xsd:string ;
+            owl:onProperty ontocal:unit ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:applies_to_time ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:aggregation_type ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:aggregation_type ],
         ontocal:ExogenousData ;
     skos:definition "An input parameter supplied to a Calliope model from outside the optimisation (e.g. costs, capacities, time series)." ;
     skos:inScheme <https://w3id.org/ontocal> .
@@ -532,13 +532,13 @@ ontocal:CalliopeModelParameter a owl:Class ;
 ontocal:CalliopeOptimisationRun a owl:Class ;
     rdfs:label "CalliopeOptimisationRun" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:has_information_input ],
-        [ a owl:Restriction ;
             owl:minCardinality 1 ;
             owl:onProperty ontocal:has_information_input ],
         [ a owl:Restriction ;
             owl:allValuesFrom ontocal:CalliopeScenario ;
+            owl:onProperty ontocal:has_information_input ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:has_information_input ],
         ontocal:Optimisation ;
     skos:definition "A single execution of the Calliope solver against a fully parametrised model." ;
@@ -562,23 +562,23 @@ ontocal:CalliopeScenario a owl:Class ;
 ontocal:CalliopeStorageTechnology a owl:Class ;
     rdfs:label "CalliopeStorageTechnology" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
             owl:onProperty ontocal:carrier_out ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:carrier_in ],
         [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:carrier_out ],
         [ a owl:Restriction ;
             owl:minCardinality 1 ;
             owl:onProperty ontocal:carrier_in ],
         [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
-            owl:onProperty ontocal:carrier_in ],
-        [ a owl:Restriction ;
             owl:minCardinality 1 ;
             owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:onProperty ontocal:carrier_in ],
         ontocal:CalliopeTechnology ;
     skos:definition "A technology that stores a carrier." ;
     skos:inScheme <https://w3id.org/ontocal> .
@@ -589,10 +589,10 @@ ontocal:CalliopeSupplyTechnology a owl:Class ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:carrier_out ],
         [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:minCardinality 1 ;
             owl:onProperty ontocal:carrier_out ],
         [ a owl:Restriction ;
-            owl:minCardinality 1 ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
             owl:onProperty ontocal:carrier_out ],
         ontocal:CalliopeTechnology ;
     skos:definition "A technology that draws from a source to produce a carrier." ;
@@ -602,30 +602,27 @@ ontocal:CalliopeTransmissionTechnology a owl:Class ;
     rdfs:label "CalliopeTransmissionTechnology" ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:minCardinality 1 ;
+            owl:onProperty ontocal:link_from ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
             owl:onProperty ontocal:link_to ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:link_from ],
         [ a owl:Restriction ;
-            owl:minCardinality 1 ;
-            owl:onProperty ontocal:carrier_in ],
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:link_to ],
         [ a owl:Restriction ;
-            owl:minCardinality 1 ;
-            owl:onProperty ontocal:carrier_out ],
+            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
+            owl:onProperty ontocal:link_to ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:carrier_in ],
         [ a owl:Restriction ;
             owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
-            owl:onProperty ontocal:carrier_out ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:link_to ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:carrier_in ],
-        [ a owl:Restriction ;
-            owl:minCardinality 1 ;
-            owl:onProperty ontocal:link_from ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
             owl:onProperty ontocal:carrier_out ],
         [ a owl:Restriction ;
             owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
@@ -634,8 +631,11 @@ ontocal:CalliopeTransmissionTechnology a owl:Class ;
             owl:allValuesFrom ontocal:CalliopeNetworkNode ;
             owl:onProperty ontocal:link_from ],
         [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
-            owl:onProperty ontocal:link_to ],
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:carrier_out ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:carrier_in ],
         ontocal:CalliopeTechnology ;
     skos:definition "A technology that transmits a carrier between nodes." ;
     skos:inScheme <https://w3id.org/ontocal> .
@@ -790,23 +790,23 @@ ontocal:termination_condition a owl:ObjectProperty ;
 ontocal:CalliopeModel a owl:Class ;
     rdfs:label "CalliopeModel" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:minCardinality 0 ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:has_part ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:name ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:name ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:ModelComponent ;
-            owl:onProperty ontocal:has_part ],
         [ a owl:Restriction ;
             owl:allValuesFrom xsd:string ;
             owl:onProperty ontocal:name ],
         [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:minCardinality 0 ;
             owl:onProperty ontocal:has_part ],
         [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:name ],
+            owl:allValuesFrom ontocal:ModelComponent ;
+            owl:onProperty ontocal:has_part ],
         ontocal:EnergySystemModel ;
     skos:definition "The overarching informational representation of a Calliope v0.7 model." ;
     skos:inScheme <https://w3id.org/ontocal> .
@@ -815,58 +815,58 @@ ontocal:CalliopeVariable a owl:Class ;
     rdfs:label "CalliopeVariable" ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty ontocal:at_node ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
-            owl:onProperty ontocal:for_carrier ],
-        [ a owl:Restriction ;
-            owl:minCardinality 1 ;
-            owl:onProperty ontocal:part_of ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:part_of ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom xsd:string ;
             owl:onProperty ontocal:unit ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:for_carrier ],
-        [ a owl:Restriction ;
-            owl:minCardinality 1 ;
-            owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
             owl:allValuesFrom ontocal:OneDimensionalTemporalRegion ;
             owl:onProperty ontocal:applies_to_time ],
         [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:applies_to_time ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:at_node ],
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:part_of ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:for_carrier ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
+            owl:onProperty ontocal:for_carrier ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
+            owl:onProperty ontocal:at_node ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:string ;
             owl:onProperty ontocal:unit ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:applies_to_time ],
         [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeNetworkNode ;
-            owl:onProperty ontocal:at_node ],
-        [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeResultDataset ;
-            owl:onProperty ontocal:part_of ],
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:is_about ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:applies_to_time ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeEnergyCarrier ;
+            owl:onProperty ontocal:for_carrier ],
         [ a owl:Restriction ;
             owl:allValuesFrom [ owl:unionOf ( ontocal:ModelComponent ontocal:CalliopeModel ) ] ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:minCardinality 0 ;
             owl:onProperty ontocal:unit ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:at_node ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom ontocal:CalliopeResultDataset ;
+            owl:onProperty ontocal:part_of ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty ontocal:part_of ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:at_node ],
         ontocal:OutputData ;
     skos:definition "An output variable calculated by the Calliope solver during optimization." ;
     skos:inScheme <https://w3id.org/ontocal> .
@@ -883,10 +883,10 @@ ontocal:TerminationConditionEnum a owl:Class ;
 ontocal:TechParameter a owl:Class ;
     rdfs:label "TechParameter" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:minCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
-            owl:minCardinality 1 ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
             owl:allValuesFrom ontocal:CalliopeTechnology ;
@@ -898,13 +898,13 @@ ontocal:TechParameter a owl:Class ;
 ontocal:TechVariable a owl:Class ;
     rdfs:label "TechVariable" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeTechnology ;
+            owl:minCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:is_about ],
         [ a owl:Restriction ;
-            owl:minCardinality 1 ;
+            owl:allValuesFrom ontocal:CalliopeTechnology ;
             owl:onProperty ontocal:is_about ],
         ontocal:CalliopeVariable ;
     skos:definition "A model variable scoped to a specific technology (e.g. flow_cap, carrier_prod)." ;
@@ -923,38 +923,38 @@ ontocal:AggregationTypeEnum a owl:Class ;
 ontocal:CalliopeNetworkNode a owl:Class ;
     rdfs:label "CalliopeNetworkNode" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:latitude ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom xsd:float ;
+            owl:maxCardinality 1 ;
             owl:onProperty ontocal:longitude ],
         [ a owl:Restriction ;
             owl:allValuesFrom xsd:string ;
             owl:onProperty ontocal:name ],
         [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:minCardinality 0 ;
             owl:onProperty ontocal:longitude ],
         [ a owl:Restriction ;
-            owl:allValuesFrom ontocal:CalliopeTechnology ;
+            owl:minCardinality 0 ;
             owl:onProperty ontocal:has_assigned_technology ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:latitude ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:latitude ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom xsd:float ;
+            owl:onProperty ontocal:longitude ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty ontocal:name ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty ontocal:name ],
         [ a owl:Restriction ;
             owl:allValuesFrom xsd:float ;
             owl:onProperty ontocal:latitude ],
         [ a owl:Restriction ;
-            owl:minCardinality 0 ;
+            owl:allValuesFrom ontocal:CalliopeTechnology ;
             owl:onProperty ontocal:has_assigned_technology ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:name ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:name ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty ontocal:latitude ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty ontocal:longitude ],
         ontocal:ModelComponent ;
     skos:definition "A spatial node in Calliope." ;
     skos:inScheme <https://w3id.org/ontocal> .
@@ -1015,10 +1015,10 @@ ontocal:CalliopeEnergyCarrier a owl:Class ;
             owl:maxCardinality 1 ;
             owl:onProperty ontocal:name ],
         [ a owl:Restriction ;
-            owl:minCardinality 0 ;
+            owl:allValuesFrom xsd:string ;
             owl:onProperty ontocal:name ],
         [ a owl:Restriction ;
-            owl:allValuesFrom xsd:string ;
+            owl:minCardinality 0 ;
             owl:onProperty ontocal:name ],
         ontocal:ModelComponent ;
     skos:definition "An energy carrier that can be used by technologies." ;
