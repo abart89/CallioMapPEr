@@ -31,8 +31,9 @@ oeo-2/
 
 # Other ignored folders
 .agent/
-.docs
-.vscode
+.claude/
+.docs/
+.vscode/
 _tempfiles/
 
 # Generated output graphs

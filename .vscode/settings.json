@@ -1,6 +1,0 @@
-{
-    "files.exclude": {
-        "**/dev_calliomapper": true,
-        "**/*.egg-info": true
-    }
-}
