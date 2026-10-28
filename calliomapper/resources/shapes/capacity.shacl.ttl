@@ -1,0 +1,86 @@
+@prefix oc: <https://w3id.org/ontocal/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix oeo: <https://openenergyplatform.org/ontology/oeo/> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Common constraints for explicitly represented OntoCal records. External OEO entities are not implicitly enrolled in this application profile.
+oc:ComponentShape a sh:NodeShape ; sh:targetClass oc:CalliopeTechnology, oc:CalliopeNetworkNode ;
+    sh:property [ sh:path oc:inConfiguration ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oc:ConfigurationSpecification ] ;
+    sh:property [ sh:path obo:BFO_0000050 ; sh:minCount 1 ; sh:class oeo:OEO_00000274 ] ;
+    sh:property [ sh:path oc:sourceKey ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] .
+
+oc:SupplyShape a sh:NodeShape ; sh:targetClass oc:CalliopeTechnology ;
+    sh:property [ sh:path oc:atNode ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oc:CalliopeNetworkNode ] ;
+    sh:sparql [ sh:message "Technology and node must belong to the same configuration." ;
+        sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+        SELECT $this WHERE { $this oc:inConfiguration ?c ; oc:atNode ?node .
+          ?node oc:inConfiguration ?other . FILTER (?c != ?other) }""" ] .
+
+oc:AssignmentShape a sh:NodeShape ; sh:targetClass oc:InputAssignment, oc:ResultRecord ;
+    sh:property oc:RequiredComponent ;
+    sh:property [ sh:path oc:inConfiguration ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oc:ConfigurationSpecification ] ;
+    sh:property [ sh:path oc:hasDatum ; sh:minCount 1 ; sh:maxCount 1 ; sh:node oc:DatumShape ] ;
+    sh:property [ sh:path oc:sourceKey ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:sparql oc:MatchingComponentConfiguration .
+oc:RequiredComponent a sh:PropertyShape ; sh:path oc:forComponent ;
+    sh:minCount 1 ; sh:maxCount 1 ; sh:class oeo:OEO_00000276 ;
+    sh:message "A selected assignment or result requires exactly one component." .
+oc:MatchingComponentConfiguration a sh:SPARQLConstraint ;
+    sh:message "The record and its component must have the same configuration." ;
+    sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+      SELECT $this WHERE { $this oc:inConfiguration ?c ; oc:forComponent ?component .
+        FILTER NOT EXISTS { ?component oc:inConfiguration ?c } }""" .
+
+oc:DatumShape a sh:NodeShape ;
+    sh:property [ sh:path obo:IAO_0000136 ; sh:node oc:OptionalQuantityInterpretationShape ] ;
+    sh:property [ sh:path oc:reportedNumericValue ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:decimal ] ;
+    sh:sparql [ sh:message "The reported numeral must agree with its supplied quantity-value interpretation." ;
+        sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+        PREFIX obo: <http://purl.obolibrary.org/obo/>
+        PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+        SELECT $this WHERE { $this oc:reportedNumericValue ?raw ; obo:IAO_0000136 ?q .
+          ?q a oeo:OEO_00000350 ; oeo:OEO_00140178 ?value . FILTER (?raw != ?value) }""" ] .
+
+oc:OptionalQuantityInterpretationShape a sh:NodeShape ;
+    sh:or ( [ sh:not [ sh:class oeo:OEO_00000350 ] ] [ sh:node oc:QuantityShape ] ) .
+
+oc:QuantityShape a sh:NodeShape ;
+    sh:property [ sh:path oeo:OEO_00140178 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:decimal ] ;
+    sh:property [ sh:path oeo:OEO_00040010 ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] .
+
+oc:ResultShape a sh:NodeShape ; sh:targetClass oc:ResultRecord ;
+    sh:property oc:OneGeneratingExecution ;
+    sh:sparql oc:MatchingExecutionOutput ;
+    sh:sparql [ sh:message "Selected flow capacity and flow results require their carrier coordinate." ;
+      sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+        SELECT $this WHERE { $this oc:sourceKey ?key .
+          FILTER (?key IN ("flow_cap", "flow_in", "flow_out"))
+          FILTER NOT EXISTS { $this oc:carrierIndex ?carrier } }""" ] ;
+    sh:property [ sh:path oc:carrierIndex ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:sparql [ sh:message "The generating execution must use the result's configuration." ;
+        sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        SELECT $this WHERE { $this oc:inConfiguration ?c ; prov:wasGeneratedBy ?run .
+          FILTER NOT EXISTS { ?run oc:usesConfiguration ?c } }""" ] .
+oc:OneGeneratingExecution a sh:PropertyShape ; sh:path prov:wasGeneratedBy ;
+    sh:minCount 1 ; sh:maxCount 1 ; sh:class prov:Activity ;
+    sh:message "Each result record must retain exactly one generating execution." .
+
+oc:ExecutionShape a sh:NodeShape ; sh:targetSubjectsOf oc:usesConfiguration ;
+    sh:property [ sh:path oc:usesConfiguration ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oc:ConfigurationSpecification ] .
+
+oc:CorrespondenceShape a sh:NodeShape ; sh:targetClass oc:ComponentCorrespondence ;
+    sh:property [ sh:path oc:sourceComponent ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oeo:OEO_00000276 ] ;
+    sh:property [ sh:path oc:targetComponent ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oeo:OEO_00000276 ] ;
+    sh:property [ sh:path prov:wasAttributedTo ; sh:minCount 1 ; sh:class prov:Agent ] .
+
+
+oc:MatchingExecutionOutput a sh:SPARQLConstraint ;
+    sh:message "The result datum must be an information output of the recorded generating execution." ;
+    sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+        SELECT $this WHERE { $this oc:hasDatum ?datum ; prov:wasGeneratedBy ?run .
+          FILTER NOT EXISTS { ?run oeo:OEO_00140094 ?datum } }""" .

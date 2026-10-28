@@ -1,0 +1,845 @@
+{
+  "captured_on": "2026-10-13",
+  "source_repository": "CallioMapPEr",
+  "source_commit": "20ba5ea1c2f77f8cfd1249d0c27b0f9b26dfbdc7",
+  "copy_policy": "Complete model and saved-output files; macOS .DS_Store files excluded.",
+  "upstream_release": "https://github.com/calliope-project/calliope/releases/tag/v0.7.0.dev7",
+  "configuration_version": "0.7.0",
+  "recorded_execution_version": "0.7.0.dev7",
+  "files": [
+    {
+      "path": "national_scale/data_tables/cluster_days.csv",
+      "source_path": "examples/national_scale/data_tables/cluster_days.csv",
+      "bytes": 8048,
+      "sha256": "6b3c6a3141ad757b5ea3d52721afb4b7dcc2d85c8a8a6313563c26689dbece8e"
+    },
+    {
+      "path": "national_scale/data_tables/costs.csv",
+      "source_path": "examples/national_scale/data_tables/costs.csv",
+      "bytes": 288,
+      "sha256": "b0b9489771cb1db6903e516c7023ae494a01c93b2caffc3113834ced11028adc"
+    },
+    {
+      "path": "national_scale/data_tables/time_varying_params.csv",
+      "source_path": "examples/national_scale/data_tables/time_varying_params.csv",
+      "bytes": 464434,
+      "sha256": "758d65c90f102404afcd8da20f08a7327935ec482c125c01b3bcb4aa6c0f5da8"
+    },
+    {
+      "path": "national_scale/model.yaml",
+      "source_path": "examples/national_scale/model.yaml",
+      "bytes": 1894,
+      "sha256": "58358d1eb9224d2d991912fa49ee7dc193bd6c0f075972bec15403ed6e48c552"
+    },
+    {
+      "path": "national_scale/model_config/locations.yaml",
+      "source_path": "examples/national_scale/model_config/locations.yaml",
+      "bytes": 723,
+      "sha256": "edc5bf03c124b99dc5681fef6f84f1a96a870090a83b78c19253af3c4f03ba79"
+    },
+    {
+      "path": "national_scale/model_config/techs.yaml",
+      "source_path": "examples/national_scale/model_config/techs.yaml",
+      "bytes": 2365,
+      "sha256": "74fb0cf35961c9121b6e64a462d90e3b7e975eec4b4a8ff1ca028ec5b7f47963"
+    },
+    {
+      "path": "national_scale/results.nc",
+      "source_path": "examples/national_scale/results.nc",
+      "bytes": 540200,
+      "sha256": "840e60c77649db0465807899ede55069be80531a715a66f473fce9d2566a4a9f"
+    },
+    {
+      "path": "national_scale/results_directory/attrs.yaml",
+      "source_path": "examples/national_scale/results_directory/attrs.yaml",
+      "bytes": 162782,
+      "sha256": "488da71b1239411b54a020a509c4ff5516386aea4145083dad5a5549daecf671"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_area_use_max.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_area_use_max.csv",
+      "bytes": 27,
+      "sha256": "a5eb01315c8c4599393522f0a6c5fb2553abbc28348e315c30f648a4b18ebd5b"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_base_tech.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_base_tech.csv",
+      "bytes": 209,
+      "sha256": "51e3d6fb2c8237fbe22e118d1050524ad8938e339c652da09ea7d8b8467eb8f4"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_bigM.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_bigM.csv",
+      "bytes": 12,
+      "sha256": "9d7e70ef5e092be21a4bc2c6ccab5f3488e3a282900ca805e8d675cf63518b62"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_carrier_in.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_carrier_in.csv",
+      "bytes": 1429,
+      "sha256": "e0d1c3d7f542df996ec61a9964c8d12e6e3022f9ada4771c66d5356945508be0"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_carrier_out.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_carrier_out.csv",
+      "bytes": 1428,
+      "sha256": "890aa5a025cfed7b2490dd2cd41c254983492918b595bb964104f9a85068db9d"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_color.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_color.csv",
+      "bytes": 188,
+      "sha256": "0b4e3856a80a96243402d09070a9e9e24655c505261c51f79772226ddd1a7c2a"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_cost_area_use.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_cost_area_use.csv",
+      "bytes": 45,
+      "sha256": "22ef5f5e57d013c9d056d454cbbdc9ceeff30a5e3ca08493b19d346b131213ef"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_cost_flow_cap.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_cost_flow_cap.csv",
+      "bytes": 100,
+      "sha256": "bd8b897e654b4f88e3c037077a836aeaf29a78e7efa9555f057340c35fe013ca"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_cost_flow_in.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_cost_flow_in.csv",
+      "bytes": 44,
+      "sha256": "faba94036f52bfb9d13a60226dde146e1ef69e6c2538a20bd67c96cc9f6398a4"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_cost_flow_out.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_cost_flow_out.csv",
+      "bytes": 79,
+      "sha256": "30afd3d2317e23bdab3032649abfaf13d93ccad0b4fcc706bfe59ffbc3d434d4"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_cost_interest_rate.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_cost_interest_rate.csv",
+      "bytes": 38,
+      "sha256": "902cedaf050f0f32941b2db7cdd1d1ae425a6066771cff665193f59230fdd58f"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_cost_source_cap.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_cost_source_cap.csv",
+      "bytes": 47,
+      "sha256": "0a8b7b02e63b57363286f6d912f97f37201cc36b0598704c179f9c35bd71257e"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_cost_storage_cap.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_cost_storage_cap.csv",
+      "bytes": 70,
+      "sha256": "657c02581f03de98d402197d1e29d0b1e795e33c8fd92250eeff865a75875715"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_definition_matrix.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_definition_matrix.csv",
+      "bytes": 1432,
+      "sha256": "e15657b7b684f0fe442d02b015c3fd29a2fa2d4331043a74935ff24b55928b0f"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_distance.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_distance.csv",
+      "bytes": 172,
+      "sha256": "b391efa4f7514218632b832827bfdea6f1fdafde999ff6aa3be8445629c92f44"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_flow_cap_max.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_flow_cap_max.csv",
+      "bytes": 205,
+      "sha256": "3ba3e59df2806aadd30d5345f8417effd2869aa46fd8c9032ba7dd40fd705790"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_flow_cap_max_systemwide.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_flow_cap_max_systemwide.csv",
+      "bytes": 44,
+      "sha256": "18dbeb8715bc508e1dfa46cddb842c27ac69307c562cbb2c063236040383fe14"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_flow_cap_per_storage_cap_max.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_flow_cap_per_storage_cap_max.csv",
+      "bytes": 55,
+      "sha256": "e41db9da70a375532863e8ab0735146e13fccfafd902fe8b19f11d51155b0c66"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_flow_in_eff.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_flow_in_eff.csv",
+      "bytes": 31,
+      "sha256": "9ca7f84a4bcbd57ced3a460927aafdc561558a8c921d3a93e46b642018499492"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_flow_out_eff.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_flow_out_eff.csv",
+      "bytes": 73,
+      "sha256": "2c04e13aca641872ad05efea73d27dce559a31d1f54383674383a8dce458a646"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_flow_out_parasitic_eff.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_flow_out_parasitic_eff.csv",
+      "bytes": 37,
+      "sha256": "0adee7f58bfb8bcf8260f688d2155de6d694e7af79614335099ccc5ec67c1881"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_flow_ramping.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_flow_ramping.csv",
+      "bytes": 28,
+      "sha256": "5f5d10ad667e39e5aa8d608165b4ddfdaeaa6e34bc1f2537d6d3221289757ce3"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_include_storage.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_include_storage.csv",
+      "bytes": 181,
+      "sha256": "1fa703c00b90418f6e344e7df4b9679bf8f907d08becb6ac49fa2d17940fd991"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_latitude.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_latitude.csv",
+      "bytes": 86,
+      "sha256": "3f0a053980ea9b0811f8196eddb92b50db3261828c491dd88dad49b244892049"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_lifetime.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_lifetime.csv",
+      "bytes": 71,
+      "sha256": "1edcd98ac384f536a55f16df28a69f6d42ff1f8e3fb9535de7a3d4dda9fee425"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_longitude.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_longitude.csv",
+      "bytes": 87,
+      "sha256": "c826de2551a46f7e05465123b560d733070199b7d69d735d87b1014d7ce76f28"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_name.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_name.csv",
+      "bytes": 302,
+      "sha256": "e7e64430cc698981d4da6aca40bd2afa3c8e691d7aaee7a444b527cabd3d57fa"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_objective_cost_weights.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_objective_cost_weights.csv",
+      "bytes": 42,
+      "sha256": "588f3a407d90f3f8dccc9cb91f3241b2f453d14d34952578cd80cead0ad2ab65"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_sink_use_equals.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_sink_use_equals.csv",
+      "bytes": 12106,
+      "sha256": "adb1c984d939d8d76fba5f12214d613ecbf492a49d3838dbd6dc9312bcd5b631"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_source_unit.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_source_unit.csv",
+      "bytes": 31,
+      "sha256": "7e43b280614aadc555ae40d1abcddf492d727fa46317c8a002f265483456d8b6"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_source_use_max.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_source_use_max.csv",
+      "bytes": 14286,
+      "sha256": "ffc5bdb1ef92c2b3c6a7a2773edad5bdca8d49663510ed6eff43e1701144b74a"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_storage_cap_max.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_storage_cap_max.csv",
+      "bytes": 47,
+      "sha256": "5789ea2f45e34e625f3efeefce14ecadfc727932355b5c21a2b1d5f37500295a"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_storage_loss.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_storage_loss.csv",
+      "bytes": 41,
+      "sha256": "15d8c8a47d09e1d0ed79450ca72fa80f5d745dbf3c02dba6deb645282f954ced"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_timestep_resolution.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_timestep_resolution.csv",
+      "bytes": 2910,
+      "sha256": "db0698b4b2fad8b30aef3bc52defafd79c9763d414d96ce3f62bf55737ef5015"
+    },
+    {
+      "path": "national_scale/results_directory/inputs_timestep_weights.csv",
+      "source_path": "examples/national_scale/results_directory/inputs_timestep_weights.csv",
+      "bytes": 2907,
+      "sha256": "77a5bf76b9bc5726737993261c62abf121c8713ddd0f40edef98fb804c510a00"
+    },
+    {
+      "path": "national_scale/results_directory/results_area_use.csv",
+      "source_path": "examples/national_scale/results_directory/results_area_use.csv",
+      "bytes": 87,
+      "sha256": "2e44efda6ac2889875cf8328fe4736b5750027ce8caa7badf7c0f307e7ceccfc"
+    },
+    {
+      "path": "national_scale/results_directory/results_capacity_factor.csv",
+      "source_path": "examples/national_scale/results_directory/results_capacity_factor.csv",
+      "bytes": 67821,
+      "sha256": "42e9c9d14509f7148fb9d3ec1e2522ef9c60c237f2eadbdbdaf01811b1d96d7c"
+    },
+    {
+      "path": "national_scale/results_directory/results_cost.csv",
+      "source_path": "examples/national_scale/results_directory/results_cost.csv",
+      "bytes": 325,
+      "sha256": "bb4f3a0b148eb87ea0a4e9626e7d099a7dfe7c660b1427e62962392e8a6a0196"
+    },
+    {
+      "path": "national_scale/results_directory/results_cost_investment.csv",
+      "source_path": "examples/national_scale/results_directory/results_cost_investment.csv",
+      "bytes": 323,
+      "sha256": "bf9c6afa35b884630ee231084b2c21ea9089c2925786f117d1bbb801c11879d2"
+    },
+    {
+      "path": "national_scale/results_directory/results_cost_investment_annualised.csv",
+      "source_path": "examples/national_scale/results_directory/results_cost_investment_annualised.csv",
+      "bytes": 346,
+      "sha256": "3fd672557384710cf07773c02d6af0c6d926238d692981459b4d39afccae2ca1"
+    },
+    {
+      "path": "national_scale/results_directory/results_cost_investment_area_use.csv",
+      "source_path": "examples/national_scale/results_directory/results_cost_investment_area_use.csv",
+      "bytes": 146,
+      "sha256": "ce5e28cfe3580bca31316b63a503ea64788cc214b5cf6262fd524e0a673cfa21"
+    },
+    {
+      "path": "national_scale/results_directory/results_cost_investment_flow_cap.csv",
+      "source_path": "examples/national_scale/results_directory/results_cost_investment_flow_cap.csv",
+      "bytes": 325,
+      "sha256": "07047b0a01d5a400c762bb3192b702f811c041d60a415afc86f4d84feb4b4298"
+    },
+    {
+      "path": "national_scale/results_directory/results_cost_investment_source_cap.csv",
+      "source_path": "examples/national_scale/results_directory/results_cost_investment_source_cap.csv",
+      "bytes": 147,
+      "sha256": "f1b31fbdb9d77684026fd1a1b9737887d7b26c7af618d06577a179f4b6f38179"
+    },
+    {
+      "path": "national_scale/results_directory/results_cost_investment_storage_cap.csv",
+      "source_path": "examples/national_scale/results_directory/results_cost_investment_storage_cap.csv",
+      "bytes": 193,
+      "sha256": "0d5457c1772be043ae7ea11d13fee78e3dd2fda24b85649f612719dc97fe8675"
+    },
+    {
+      "path": "national_scale/results_directory/results_cost_operation_variable.csv",
+      "source_path": "examples/national_scale/results_directory/results_cost_operation_variable.csv",
+      "bytes": 38798,
+      "sha256": "8156f6f67898fc84e921e20968b9e7d112768775f5a4b7d7879c8075969e92e9"
+    },
+    {
+      "path": "national_scale/results_directory/results_flow_cap.csv",
+      "source_path": "examples/national_scale/results_directory/results_flow_cap.csv",
+      "bytes": 584,
+      "sha256": "c3dca59ef9ab993d12f15ff7d5adfe447a05846b95f3aba580dbc60d7cfc3d0f"
+    },
+    {
+      "path": "national_scale/results_directory/results_flow_in.csv",
+      "source_path": "examples/national_scale/results_directory/results_flow_in.csv",
+      "bytes": 77327,
+      "sha256": "1e16853b450d3621e1e2d4f83e24f9ff7fd54ac5ee8b85aa1503e9ec88cd5a2e"
+    },
+    {
+      "path": "national_scale/results_directory/results_flow_in_inc_eff.csv",
+      "source_path": "examples/national_scale/results_directory/results_flow_in_inc_eff.csv",
+      "bytes": 77513,
+      "sha256": "18b27b45a3b09386e23add0feb768c278e0b1a86dd5b99cc7831c79bf3a84b13"
+    },
+    {
+      "path": "national_scale/results_directory/results_flow_out.csv",
+      "source_path": "examples/national_scale/results_directory/results_flow_out.csv",
+      "bytes": 85744,
+      "sha256": "4380349cc4c8f1669943d3aa34afa8e2f60851411c5c9ac9dc4750a83a8c6cac"
+    },
+    {
+      "path": "national_scale/results_directory/results_flow_out_inc_eff.csv",
+      "source_path": "examples/national_scale/results_directory/results_flow_out_inc_eff.csv",
+      "bytes": 88086,
+      "sha256": "2d8a99fdc3943efabb0ae7805143cc17253b5c3462b43ce6b737f8f1dd243873"
+    },
+    {
+      "path": "national_scale/results_directory/results_link_flow_cap.csv",
+      "source_path": "examples/national_scale/results_directory/results_link_flow_cap.csv",
+      "bytes": 133,
+      "sha256": "0c3c0d59edea84162f59e03636b208dab1cf645465726660790945dfb786df31"
+    },
+    {
+      "path": "national_scale/results_directory/results_min_cost_optimisation.csv",
+      "source_path": "examples/national_scale/results_directory/results_min_cost_optimisation.csv",
+      "bytes": 20,
+      "sha256": "71450fb82ebfa5839d1a7093bbee71aad6a8cd0d1961aff6dcf988cd3ead622d"
+    },
+    {
+      "path": "national_scale/results_directory/results_source_cap.csv",
+      "source_path": "examples/national_scale/results_directory/results_source_cap.csv",
+      "bytes": 110,
+      "sha256": "1e1f9814a43391ec5aaa6f9d99332c90aba81edecd4376f1fcf9ddc98e51d585"
+    },
+    {
+      "path": "national_scale/results_directory/results_source_use.csv",
+      "source_path": "examples/national_scale/results_directory/results_source_use.csv",
+      "bytes": 19149,
+      "sha256": "c57b93c3af9e1eadd35fc05ba89d65e2d9a03c66efeedb0a4a8873be18177bd8"
+    },
+    {
+      "path": "national_scale/results_directory/results_storage.csv",
+      "source_path": "examples/national_scale/results_directory/results_storage.csv",
+      "bytes": 20333,
+      "sha256": "81178326f513750a50d47457e0d0a56763a6cb23d91dba0552084f1bc228c38a"
+    },
+    {
+      "path": "national_scale/results_directory/results_storage_cap.csv",
+      "source_path": "examples/national_scale/results_directory/results_storage_cap.csv",
+      "bytes": 115,
+      "sha256": "dce898d36c342cd2c1ca494e144e4083aed6d19d7b05d59a952f8f5205ad32bc"
+    },
+    {
+      "path": "national_scale/results_directory/results_systemwide_capacity_factor.csv",
+      "source_path": "examples/national_scale/results_directory/results_systemwide_capacity_factor.csv",
+      "bytes": 328,
+      "sha256": "602716c4f9645058bf69c72a63f964c6843418a700be494710f3e4a2a7f9c517"
+    },
+    {
+      "path": "national_scale/results_directory/results_systemwide_levelised_cost.csv",
+      "source_path": "examples/national_scale/results_directory/results_systemwide_levelised_cost.csv",
+      "bytes": 224,
+      "sha256": "df426634779c97faa60e144bde3ab2eac54c3c818c1e8c2ee2e13d438aaa71af"
+    },
+    {
+      "path": "national_scale/results_directory/results_total_levelised_cost.csv",
+      "source_path": "examples/national_scale/results_directory/results_total_levelised_cost.csv",
+      "bytes": 71,
+      "sha256": "acaf4cda30c019288723748257e3733842d1529df0b288f4702d2eabf8584f42"
+    },
+    {
+      "path": "national_scale/results_directory/results_unmet_demand.csv",
+      "source_path": "examples/national_scale/results_directory/results_unmet_demand.csv",
+      "bytes": 23558,
+      "sha256": "e8b0427f83f8924a7b805ee6954907df3f91490a66a0948d2e5dc6dff704de10"
+    },
+    {
+      "path": "national_scale/results_directory/results_unmet_sum.csv",
+      "source_path": "examples/national_scale/results_directory/results_unmet_sum.csv",
+      "bytes": 23555,
+      "sha256": "84b635769c8d3a7f76fbdb1c137288bdf3b79ad6fabdf695c4242dc2734df820"
+    },
+    {
+      "path": "national_scale/results_directory/results_unused_supply.csv",
+      "source_path": "examples/national_scale/results_directory/results_unused_supply.csv",
+      "bytes": 23559,
+      "sha256": "b291a7520c2350aeab086cb7d711688e1e4431273c0cb55fe72306afb637b144"
+    },
+    {
+      "path": "national_scale/scenarios.yaml",
+      "source_path": "examples/national_scale/scenarios.yaml",
+      "bytes": 5733,
+      "sha256": "89d8246e63d57ba25da312b91122e5910ae738859959ea9c9503010bcbee0218"
+    },
+    {
+      "path": "urban_scale/additional_math.yaml",
+      "source_path": "examples/urban_scale/additional_math.yaml",
+      "bytes": 882,
+      "sha256": "d36ab6466ccd6b7f5d8059ee14b8f04890178b77b0e74296206c1a74252bddb7"
+    },
+    {
+      "path": "urban_scale/data_tables/demand.csv",
+      "source_path": "examples/urban_scale/data_tables/demand.csv",
+      "bytes": 859604,
+      "sha256": "0c859f15e2c2a007815c49344e2a83fee0323c5a4ba9d97facc86bad1cde41c1"
+    },
+    {
+      "path": "urban_scale/data_tables/export_power.csv",
+      "source_path": "examples/urban_scale/data_tables/export_power.csv",
+      "bytes": 242949,
+      "sha256": "7a24ecdc50a5082938614b085917ea04a2419a021f36a1b62397295a38802670"
+    },
+    {
+      "path": "urban_scale/data_tables/pv_resource.csv",
+      "source_path": "examples/urban_scale/data_tables/pv_resource.csv",
+      "bytes": 271334,
+      "sha256": "4b33c76a9841aa297ef99e77bcefc20266e7c38284632c75aeb796527630b42d"
+    },
+    {
+      "path": "urban_scale/model.yaml",
+      "source_path": "examples/urban_scale/model.yaml",
+      "bytes": 1890,
+      "sha256": "ae9edc28b665f3dc7dc63402918cc1b7c12dec6eef5ac0a44c820ab327727ac3"
+    },
+    {
+      "path": "urban_scale/model_config/locations.yaml",
+      "source_path": "examples/urban_scale/model_config/locations.yaml",
+      "bytes": 1424,
+      "sha256": "5d5ce3c95b6f5723af52da69ad121f3562c32fc35407dd738572deaeb85969e4"
+    },
+    {
+      "path": "urban_scale/model_config/techs.yaml",
+      "source_path": "examples/urban_scale/model_config/techs.yaml",
+      "bytes": 4140,
+      "sha256": "a972b13a0b1d42f5756892b6ceb401bc09e6af011867f49a0017ad6153200de0"
+    },
+    {
+      "path": "urban_scale/results.nc",
+      "source_path": "examples/urban_scale/results.nc",
+      "bytes": 537274,
+      "sha256": "8d04f0aefcd260bb6c66bb24a3d9b19478fa02ed342bd2f184d7fb3b4037e147"
+    },
+    {
+      "path": "urban_scale/results_directory/attrs.yaml",
+      "source_path": "examples/urban_scale/results_directory/attrs.yaml",
+      "bytes": 168314,
+      "sha256": "51a6202dde4c3884ccd51256d9b04b9b683537857a2a95cbb55b291322b42b7c"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_area_use_max.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_area_use_max.csv",
+      "bytes": 29,
+      "sha256": "f02e409613db285eb3257676b10da632a7e6e4b3a1ad3268a39994934351b119"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_area_use_per_flow_cap.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_area_use_per_flow_cap.csv",
+      "bytes": 35,
+      "sha256": "7d07f4289fb863dbadc3074186e75121d0cd2f7ccd0e9b16a6a67f45a5d63674"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_available_area.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_available_area.csv",
+      "bytes": 49,
+      "sha256": "51e929cd46818be6073603d456bb0ba1e2573d4bd40882e3444dc695370fb12c"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_base_tech.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_base_tech.csv",
+      "bytes": 257,
+      "sha256": "2cb0b1474b99cc3c2f6b89a177c228bc185ab1bf2076b163d856814a079c0f91"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_bigM.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_bigM.csv",
+      "bytes": 12,
+      "sha256": "9d7e70ef5e092be21a4bc2c6ccab5f3488e3a282900ca805e8d675cf63518b62"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_carrier_export.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_carrier_export.csv",
+      "bytes": 853,
+      "sha256": "eda8e7f499a8ea1a9fffbe594065d5ceb913314148b44ffd8790fe4372174a1d"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_carrier_in.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_carrier_in.csv",
+      "bytes": 3745,
+      "sha256": "421490178ce024d0f4bdfdeb5bae4adcce0459b7615711aaefe2a6d7ddc9f319"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_carrier_out.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_carrier_out.csv",
+      "bytes": 3744,
+      "sha256": "c38ac89d4488e23b227478238cf7c18398af22c3dfe8b69a1166ef0ae5613a77"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_color.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_color.csv",
+      "bytes": 227,
+      "sha256": "51f53e5973f73bf659417f1e90b9eb16bb352c8e7e89b237dc67a1b288d72504"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_cost_export.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_cost_export.csv",
+      "bytes": 5462,
+      "sha256": "bdd5637c4feb42816af241fe5b9fba5ee83f4deece36dd5a9efa1371b140276d"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_cost_flow_cap.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_cost_flow_cap.csv",
+      "bytes": 376,
+      "sha256": "ea97ad3bc4b117b198dadfde78cd936259e9a7bdcaf65b3590bdf14f68f1a088"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_cost_flow_cap_per_distance.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_cost_flow_cap_per_distance.csv",
+      "bytes": 151,
+      "sha256": "62de3353d5feb1be6cfbaa9109313b75edf51cbb253a976b24accd7131e3d246"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_cost_flow_in.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_cost_flow_in.csv",
+      "bytes": 104,
+      "sha256": "db9122377204f82bda5f21492ee5c66a8c1f91208d154e474fa7f744c29e59cb"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_cost_flow_out.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_cost_flow_out.csv",
+      "bytes": 110,
+      "sha256": "78a623ca59f1526dcc2827f8c4ee22a90853452db6d6fd096c0a6d29bce5bf7d"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_cost_interest_rate.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_cost_interest_rate.csv",
+      "bytes": 38,
+      "sha256": "902cedaf050f0f32941b2db7cdd1d1ae425a6066771cff665193f59230fdd58f"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_cost_om_annual.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_cost_om_annual.csv",
+      "bytes": 54,
+      "sha256": "969eb34b5628689011096322c0b38a6b38d99c5968f622bddedb5e208e3aa27f"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_definition_matrix.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_definition_matrix.csv",
+      "bytes": 3741,
+      "sha256": "31472c65190ab30c77ce9cc6fa7cd78204c076ce9f35be14a828890d135b1f81"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_distance.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_distance.csv",
+      "bytes": 81,
+      "sha256": "2985768fd39fa9dba98c446288f5bda1eb36fd34f18aed5f9b383238e79f4f27"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_flow_cap_max.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_flow_cap_max.csv",
+      "bytes": 556,
+      "sha256": "41136f6a72d65b9988571d4cce328ce64b8d7b70e68dea79d32c951a54236e1c"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_flow_out_eff.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_flow_out_eff.csv",
+      "bytes": 135,
+      "sha256": "e8f5883ee2e28d2d7475cc03d118c41a64bb20f5bf7999eefb5112d05bc4b590"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_flow_out_eff_per_distance.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_flow_out_eff_per_distance.csv",
+      "bytes": 77,
+      "sha256": "e93deb6d8c951c251490d2f207a38244c65f8660afda52203ee9720f9db39513"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_flow_out_parasitic_eff.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_flow_out_parasitic_eff.csv",
+      "bytes": 37,
+      "sha256": "1e20f25d77d946f693a11ed816ab13c1126e93a9f28abfe58d705f868bb3d387"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_heat_to_power_ratio.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_heat_to_power_ratio.csv",
+      "bytes": 34,
+      "sha256": "f1e3f469eb7bab1308e05bf2734bfa94a19c17dce05da3538e2b1fde7763c387"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_latitude.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_latitude.csv",
+      "bytes": 71,
+      "sha256": "475b1627800d37c71aba6b1833c3168e1d53c27fde08c6a2ef8397eb34848051"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_lifetime.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_lifetime.csv",
+      "bytes": 153,
+      "sha256": "ca4f405f0587e2e56fa8c6972b34b10dd7e25f4429a0d181d11a2af9d5fab4f0"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_longitude.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_longitude.csv",
+      "bytes": 72,
+      "sha256": "3d2d10c8a2ddee060cf0b898665c002ba5dc196222e19614a9496593c9fd59ba"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_name.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_name.csv",
+      "bytes": 409,
+      "sha256": "45d6bc87e50c1bd16fd4de68fd5d1abda9a89a7fd8b3427e04e8e9e8675890d6"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_objective_cost_weights.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_objective_cost_weights.csv",
+      "bytes": 42,
+      "sha256": "588f3a407d90f3f8dccc9cb91f3241b2f453d14d34952578cd80cead0ad2ab65"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_sink_use_equals.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_sink_use_equals.csv",
+      "bytes": 14667,
+      "sha256": "4b200f6dcaa9c09e6b1f6ea870ccc17d630ac80038acc41915de6cf7c235a932"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_source_unit.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_source_unit.csv",
+      "bytes": 30,
+      "sha256": "7678fd75a771184942fecda6c2a6a32400abe943d613c39eed764674c4b95e08"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_source_use_equals.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_source_use_equals.csv",
+      "bytes": 1543,
+      "sha256": "fd01945195d8bb5244230b88276bf9165f938ca0d2bc2590cf59b0e38c14a24b"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_source_use_max.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_source_use_max.csv",
+      "bytes": 58,
+      "sha256": "ec2390c6741516fe40e1ccca2b4c7dd6e4089378efe34c009a9fca89c3dfecbf"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_timestep_resolution.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_timestep_resolution.csv",
+      "bytes": 1182,
+      "sha256": "52b0736acd33cbc3a209f48af0eb24149c05881fa662af3abd9030c5c5624ea5"
+    },
+    {
+      "path": "urban_scale/results_directory/inputs_timestep_weights.csv",
+      "source_path": "examples/urban_scale/results_directory/inputs_timestep_weights.csv",
+      "bytes": 1179,
+      "sha256": "c581cfca79af5d8ab00e909440dc49cae8ed76901ce8c934b2c9bb00b0a604ab"
+    },
+    {
+      "path": "urban_scale/results_directory/results_area_use.csv",
+      "source_path": "examples/urban_scale/results_directory/results_area_use.csv",
+      "bytes": 59,
+      "sha256": "7ad9db0c7fb211d03bbaedba9ccfe26c193d27ef586020141af027c5db3ecea5"
+    },
+    {
+      "path": "urban_scale/results_directory/results_capacity_factor.csv",
+      "source_path": "examples/urban_scale/results_directory/results_capacity_factor.csv",
+      "bytes": 48186,
+      "sha256": "b160f14278ebfef02cba281fdf70cf7f5339496a4470e7303065a0b147462b48"
+    },
+    {
+      "path": "urban_scale/results_directory/results_cost.csv",
+      "source_path": "examples/urban_scale/results_directory/results_cost.csv",
+      "bytes": 817,
+      "sha256": "ad5d44042116815826c87ac68b96df822cca0b1051c00e27f31965c65c619e35"
+    },
+    {
+      "path": "urban_scale/results_directory/results_cost_investment.csv",
+      "source_path": "examples/urban_scale/results_directory/results_cost_investment.csv",
+      "bytes": 720,
+      "sha256": "9a2d4deb8848a3053af380c70419b5c5fcce95cb3bcdd8a67d5e0f50350ba3d0"
+    },
+    {
+      "path": "urban_scale/results_directory/results_cost_investment_annualised.csv",
+      "source_path": "examples/urban_scale/results_directory/results_cost_investment_annualised.csv",
+      "bytes": 846,
+      "sha256": "2a61468fc43ff64b1583deb188f4d0c77a22d82eca391e12846b47569f7fac18"
+    },
+    {
+      "path": "urban_scale/results_directory/results_cost_investment_flow_cap.csv",
+      "source_path": "examples/urban_scale/results_directory/results_cost_investment_flow_cap.csv",
+      "bytes": 898,
+      "sha256": "0d147523bf19737fdf0a2916abfa76ebd6f045652748fecb97e44d451e074308"
+    },
+    {
+      "path": "urban_scale/results_directory/results_cost_operation_fixed.csv",
+      "source_path": "examples/urban_scale/results_directory/results_cost_operation_fixed.csv",
+      "bytes": 74,
+      "sha256": "a9db82b25e67fceb68ad9705ae025fa9463b5cc9691bd302fb390daae8b7ea81"
+    },
+    {
+      "path": "urban_scale/results_directory/results_cost_operation_variable.csv",
+      "source_path": "examples/urban_scale/results_directory/results_cost_operation_variable.csv",
+      "bytes": 19907,
+      "sha256": "bba4430187e409ba500d6719460c2021618370a3a3cf33364af3ce22d2e74667"
+    },
+    {
+      "path": "urban_scale/results_directory/results_flow_cap.csv",
+      "source_path": "examples/urban_scale/results_directory/results_flow_cap.csv",
+      "bytes": 918,
+      "sha256": "f83fb5bdaf8ca116cfa6e2e58f0ad95ab08425c63751f4c72b01cab8528a512d"
+    },
+    {
+      "path": "urban_scale/results_directory/results_flow_export.csv",
+      "source_path": "examples/urban_scale/results_directory/results_flow_export.csv",
+      "bytes": 8212,
+      "sha256": "55848178294b391e9dc1f8f3c5b9428ef33a0c4334935f2b7635b2b58358183d"
+    },
+    {
+      "path": "urban_scale/results_directory/results_flow_in.csv",
+      "source_path": "examples/urban_scale/results_directory/results_flow_in.csv",
+      "bytes": 45158,
+      "sha256": "ce1c398530a0221a3e572b3041cc80cb7977f10b7fccd9eade0166b87486bae6"
+    },
+    {
+      "path": "urban_scale/results_directory/results_flow_in_inc_eff.csv",
+      "source_path": "examples/urban_scale/results_directory/results_flow_in_inc_eff.csv",
+      "bytes": 45166,
+      "sha256": "1efc10552096fd68e19142938af246b852e8842e6202d1723d22ce9fb7940ea5"
+    },
+    {
+      "path": "urban_scale/results_directory/results_flow_out.csv",
+      "source_path": "examples/urban_scale/results_directory/results_flow_out.csv",
+      "bytes": 46779,
+      "sha256": "3709b68a922d5d90f9e2cbc7eac7b9abaa82507e404860c825b1b41eda40f9f9"
+    },
+    {
+      "path": "urban_scale/results_directory/results_flow_out_inc_eff.csv",
+      "source_path": "examples/urban_scale/results_directory/results_flow_out_inc_eff.csv",
+      "bytes": 50255,
+      "sha256": "55a1f2db9d8d5ac585d32e7499e81a1c1ca708efeef0e2f6a2a0b9cbaca9e294"
+    },
+    {
+      "path": "urban_scale/results_directory/results_link_flow_cap.csv",
+      "source_path": "examples/urban_scale/results_directory/results_link_flow_cap.csv",
+      "bytes": 114,
+      "sha256": "b9e088831fe7fee2882b41f0ae2bd4722a15b8345708616a91e638a4ec29cbb1"
+    },
+    {
+      "path": "urban_scale/results_directory/results_min_cost_optimisation.csv",
+      "source_path": "examples/urban_scale/results_directory/results_min_cost_optimisation.csv",
+      "bytes": 20,
+      "sha256": "245ff63619b2cffded2a63dd273cb828d027b12fa9a0f7141927f4c2c2eec8db"
+    },
+    {
+      "path": "urban_scale/results_directory/results_source_cap.csv",
+      "source_path": "examples/urban_scale/results_directory/results_source_cap.csv",
+      "bytes": 166,
+      "sha256": "22000a22fc8df41d91b9a4ce814ef7a27d774132c02f19b54efe061a138196c0"
+    },
+    {
+      "path": "urban_scale/results_directory/results_source_use.csv",
+      "source_path": "examples/urban_scale/results_directory/results_source_use.csv",
+      "bytes": 12902,
+      "sha256": "38cf08c302e727a0b70f2caf154d864b06ce22b9d3e3506449c823fdb5e362b7"
+    },
+    {
+      "path": "urban_scale/results_directory/results_systemwide_capacity_factor.csv",
+      "source_path": "examples/urban_scale/results_directory/results_systemwide_capacity_factor.csv",
+      "bytes": 966,
+      "sha256": "da1553792b95f99e33635fc4edd7d24b084c591e49544a003bbf7cea459307b0"
+    },
+    {
+      "path": "urban_scale/results_directory/results_systemwide_levelised_cost.csv",
+      "source_path": "examples/urban_scale/results_directory/results_systemwide_levelised_cost.csv",
+      "bytes": 564,
+      "sha256": "b5c2561cdca4a482376d6f1de97870ec37a28af5c1c46208482c85aacef47b74"
+    },
+    {
+      "path": "urban_scale/results_directory/results_total_levelised_cost.csv",
+      "source_path": "examples/urban_scale/results_directory/results_total_levelised_cost.csv",
+      "bytes": 144,
+      "sha256": "6689ba53d88a3f06479bd3940ff690f81a510236af9f416982f6134b4f6b562a"
+    },
+    {
+      "path": "urban_scale/results_directory/results_unmet_demand.csv",
+      "source_path": "examples/urban_scale/results_directory/results_unmet_demand.csv",
+      "bytes": 16262,
+      "sha256": "54fb20a9319636c63f74cc7b8a9acead24e42daa01220ed150d9257f84a6fe6c"
+    },
+    {
+      "path": "urban_scale/results_directory/results_unmet_sum.csv",
+      "source_path": "examples/urban_scale/results_directory/results_unmet_sum.csv",
+      "bytes": 16259,
+      "sha256": "951c59038f2a9d9601d82b729b46b87b0f1da59f928f8b0bab17613cd9c89554"
+    },
+    {
+      "path": "urban_scale/results_directory/results_unused_supply.csv",
+      "source_path": "examples/urban_scale/results_directory/results_unused_supply.csv",
+      "bytes": 16263,
+      "sha256": "71c8b4b662b75ad8f99fccbe06328bef96e37d17a1e1f095afc5a3050349f188"
+    },
+    {
+      "path": "urban_scale/scenarios.yaml",
+      "source_path": "examples/urban_scale/scenarios.yaml",
+      "bytes": 2045,
+      "sha256": "853711c563754d8070d4d1eddaac5e7092ffb95838f53b0bb874c978db916d43"
+    }
+  ]
+}

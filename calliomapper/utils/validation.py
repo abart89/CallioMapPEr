@@ -1,46 +1,29 @@
-"""
-SHACL validation gate.
-
-Wraps pyshacl to validate a produced rdflib.ConjunctiveGraph against a set of
-SHACL shapes. Called by the Translator before any output is written or returned.
-Raises ValidationError with the full SHACL report on failure — never silently
-emits an invalid graph.
-"""
-
-from __future__ import annotations
-
-from pathlib import Path
-
-from rdflib import Dataset, Graph
+"""Validate asserted data with the fixed, packaged OntoCal application profile."""
+from importlib.resources import files
 import pyshacl
+from rdflib import Dataset, Graph
 
 
-class ValidationError(Exception):
-    """Raised when the produced graph fails SHACL validation."""
+class ValidationError(ValueError):
+    """The generated data does not conform to the selected SHACL profile."""
 
 
-def validate(graph: Dataset, shapes_path: str | Path) -> None:
-    """
-    Validate *graph* against the SHACL shapes at *shapes_path*.
-
-    Raises ValidationError if validation fails.
-    Returns None on success.
-    """
-    shapes_graph = Graph().parse(str(shapes_path), format="turtle")
-    try:
-        conforms, _, report_text = pyshacl.validate(
-            graph,
-            shacl_graph=shapes_graph,
-            inference="none",
-            abort_on_first=False,
-        )
-    except RuntimeError as exc:
-        # pyshacl raises RuntimeError when it encounters blank-node subjects
-        # in a Dataset context (a known pyshacl limitation). Treat as failure.
-        raise ValidationError(
-            f"Graph failed SHACL validation against {shapes_path}: {exc}"
-        ) from exc
+def validate(graph, shapes_path=None):
+    resources = files("calliomapper").joinpath("resources")
+    shapes = Graph()
+    if shapes_path is not None:
+        shapes.parse(str(shapes_path), format="turtle")
+    else:
+        for name in ("capacity", "technology", "time-series", "context"):
+            shapes.parse(data=resources.joinpath(f"shapes/{name}.shacl.ttl").read_text(), format="turtle")
+    ontology = Graph().parse(data=resources.joinpath("ontocal.ttl").read_text(), format="turtle")
+    data = Graph()
+    if isinstance(graph, Dataset):
+        for s, p, o, _ in graph.quads():
+            data.add((s, p, o))
+    else:
+        data += graph
+    conforms, _, report = pyshacl.validate(data, shacl_graph=shapes, ont_graph=ontology, inference="none", do_owl_imports=False)
     if not conforms:
-        raise ValidationError(
-            f"Graph failed SHACL validation against {shapes_path}:\n{report_text}"
-        )
+        raise ValidationError(str(report))
+    return str(report)

@@ -1,0 +1,5 @@
+techs,carriers,costs,systemwide_levelised_cost
+battery,power,monetary,0.10003473641786927
+ccgt,power,monetary,0.04996132750832601
+csp,power,monetary,0.14271870116149216
+region1_to_region2,power,monetary,0.005364316243866001

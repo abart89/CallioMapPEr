@@ -1,0 +1,15 @@
+PREFIX oc: <https://w3id.org/ontocal/>
+PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dct: <http://purl.org/dc/terms/>
+# Nodes without supplied correspondence remain visible with unbound claim fields.
+SELECT ?component ?assertion ?kind ?target ?scope ?supplier ?source WHERE {
+ ?component a oeo:OEO_00000276 .
+ OPTIONAL {
+   ?assertion a oc:PhysicalCorrespondenceAssertion ; oc:forComponent ?component ;
+       oc:correspondenceKind ?kind ; oc:correspondenceTarget ?target ; oc:correspondenceScope ?scope ;
+       prov:wasAttributedTo ?supplier ; prov:wasDerivedFrom ?source .
+ }
+} ORDER BY ?component

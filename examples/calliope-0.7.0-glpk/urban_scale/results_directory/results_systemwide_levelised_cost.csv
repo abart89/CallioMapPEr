@@ -1,0 +1,12 @@
+techs,carriers,costs,systemwide_levelised_cost
+N1_to_X2,heat,monetary,2.402175149387436e-05
+N1_to_X3,heat,monetary,5.906758724857965e-05
+X1_to_N1,heat,monetary,1.9988294343865754e-05
+X1_to_X2,electricity,monetary,1.9828028686440903e-06
+X1_to_X3,electricity,monetary,1.5916318298819314e-06
+boiler,heat,monetary,0.008231331635851186
+chp,electricity,monetary,0.016821934023661736
+chp,heat,monetary,0.021027417529577146
+pv,electricity,monetary,0.03875434803862578
+supply_gas,gas,monetary,0.02502153109406121
+supply_grid_power,electricity,monetary,0.11597242545973824

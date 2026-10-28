@@ -1,0 +1,112 @@
+PREFIX oc: <https://w3id.org/ontocal/>
+PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+# Compare the evaluated capacity-bound/capacity-result pairs only.
+# A shared descriptor asserts common time coverage. Independent descriptions
+# instead require identical complete saved weight and duration file hashes.
+# There is no unit conversion, annualisation or causal interpretation.
+SELECT DISTINCT ?comparison ?runA ?runB ?componentA ?componentB ?inputVariable ?resultVariable
+       ?inputCarrier ?resultCarrier ?inputA ?inputB (?inputB - ?inputA AS ?inputDifference)
+       ?resultA ?resultB (?resultB - ?resultA AS ?resultDifference) ?unitClass ?unitLabel ?first ?last ?count
+WHERE {
+
+  { SELECT ?componentA ?cfgA ?runA ?inputVariable ?resultVariable
+           ?inputA ?resultA ?inputCarrierA ?resultCarrierA
+           ?inputCostA ?resultCostA ?unitClass ?unitLabel WHERE {
+      ?inputRecord a oc:InputAssignment ; oc:inConfiguration ?cfgA ; oc:forComponent ?componentA ;
+          oc:sourceKey ?inputKey ; oc:hasDatum ?inputDatum .
+      ?resultRecord a oc:ResultRecord ; oc:inConfiguration ?cfgA ; oc:forComponent ?componentA ;
+          oc:sourceKey ?resultKey ; oc:hasDatum ?resultDatum ; prov:wasGeneratedBy ?runA .
+      FILTER ((STR(?inputKey) = "flow_cap_max" && STR(?resultKey) = "flow_cap") ||
+              (STR(?inputKey) = "storage_cap_max" && STR(?resultKey) = "storage_cap"))
+      BIND(STR(?inputKey) AS ?inputVariable)
+      BIND(STR(?resultKey) AS ?resultVariable)
+      ?inputDatum oc:reportedNumericValue ?inputA ; obo:IAO_0000136 ?inputQuantity .
+      ?resultDatum oc:reportedNumericValue ?resultA ; obo:IAO_0000136 ?resultQuantity .
+      ?inputQuantity a oeo:OEO_00000350 ; oeo:OEO_00040010 ?inputUnit .
+      ?resultQuantity a oeo:OEO_00000350 ; oeo:OEO_00040010 ?resultUnit .
+      ?inputUnit a ?unitClass ; rdfs:label ?inputLabel .
+      ?resultUnit a ?unitClass ; rdfs:label ?resultLabel .
+      BIND(STR(?inputLabel) AS ?unitLabel)
+      FILTER (STR(?resultLabel) = ?unitLabel)
+      FILTER ((?unitClass = oeo:OEO_00390000 && ?unitLabel = "kW") ||
+              (?unitClass = oeo:OEO_00390001 && ?unitLabel = "MW") ||
+              (?unitClass = obo:UO_0000224 && ?unitLabel = "kWh") ||
+              (?unitClass = oeo:OEO_00050008 && ?unitLabel = "MWh"))
+      OPTIONAL { ?inputRecord oc:carrierIndex ?inputCarrierA }
+      OPTIONAL { ?resultRecord oc:carrierIndex ?resultCarrierA }
+      OPTIONAL { ?inputRecord oc:costIndex ?inputCostA }
+      OPTIONAL { ?resultRecord oc:costIndex ?resultCostA }
+      FILTER NOT EXISTS { ?inputRecord oc:timeIndexLabel ?inputTime }
+      FILTER NOT EXISTS { ?resultRecord oc:timeIndexLabel ?resultTime }
+    }
+  }
+
+  { SELECT ?componentB ?cfgB ?runB ?inputVariable ?resultVariable
+           ?inputB ?resultB ?inputCarrierB ?resultCarrierB
+           ?inputCostB ?resultCostB ?unitClass ?unitLabel WHERE {
+      ?inputRecord a oc:InputAssignment ; oc:inConfiguration ?cfgB ; oc:forComponent ?componentB ;
+          oc:sourceKey ?inputKey ; oc:hasDatum ?inputDatum .
+      ?resultRecord a oc:ResultRecord ; oc:inConfiguration ?cfgB ; oc:forComponent ?componentB ;
+          oc:sourceKey ?resultKey ; oc:hasDatum ?resultDatum ; prov:wasGeneratedBy ?runB .
+      FILTER ((STR(?inputKey) = "flow_cap_max" && STR(?resultKey) = "flow_cap") ||
+              (STR(?inputKey) = "storage_cap_max" && STR(?resultKey) = "storage_cap"))
+      BIND(STR(?inputKey) AS ?inputVariable)
+      BIND(STR(?resultKey) AS ?resultVariable)
+      ?inputDatum oc:reportedNumericValue ?inputB ; obo:IAO_0000136 ?inputQuantity .
+      ?resultDatum oc:reportedNumericValue ?resultB ; obo:IAO_0000136 ?resultQuantity .
+      ?inputQuantity a oeo:OEO_00000350 ; oeo:OEO_00040010 ?inputUnit .
+      ?resultQuantity a oeo:OEO_00000350 ; oeo:OEO_00040010 ?resultUnit .
+      ?inputUnit a ?unitClass ; rdfs:label ?inputLabel .
+      ?resultUnit a ?unitClass ; rdfs:label ?resultLabel .
+      BIND(STR(?inputLabel) AS ?unitLabel)
+      FILTER (STR(?resultLabel) = ?unitLabel)
+      FILTER ((?unitClass = oeo:OEO_00390000 && ?unitLabel = "kW") ||
+              (?unitClass = oeo:OEO_00390001 && ?unitLabel = "MW") ||
+              (?unitClass = obo:UO_0000224 && ?unitLabel = "kWh") ||
+              (?unitClass = oeo:OEO_00050008 && ?unitLabel = "MWh"))
+      OPTIONAL { ?inputRecord oc:carrierIndex ?inputCarrierB }
+      OPTIONAL { ?resultRecord oc:carrierIndex ?resultCarrierB }
+      OPTIONAL { ?inputRecord oc:costIndex ?inputCostB }
+      OPTIONAL { ?resultRecord oc:costIndex ?resultCostB }
+      FILTER NOT EXISTS { ?inputRecord oc:timeIndexLabel ?inputTime }
+      FILTER NOT EXISTS { ?resultRecord oc:timeIndexLabel ?resultTime }
+    }
+  }
+  ?runA oc:usesConfiguration ?cfgA ; oc:executionStatus ?statusA ; obo:BFO_0000050 ?study .
+  ?runB oc:usesConfiguration ?cfgB ; oc:executionStatus ?statusB ; obo:BFO_0000050 ?study .
+  FILTER (?runA != ?runB && STR(?statusA) = "solved" && STR(?statusB) = "solved")
+  ?study oc:referenceScenario ?reference ; oeo:OEO_00020226 ?reference, ?alternative .
+  ?cfgA oc:implementsScenario ?reference ; oc:hasTemporalDescription ?horizonA .
+  ?cfgB oc:implementsScenario ?alternative ; oc:hasTemporalDescription ?horizonB .
+  FILTER (?reference != ?alternative)
+  ?horizonA oc:firstIndexLabel ?first ; oc:lastIndexLabel ?last ; oc:indexCount ?count .
+  ?horizonB oc:firstIndexLabel ?firstB ; oc:lastIndexLabel ?lastB ; oc:indexCount ?countB .
+  FILTER (STR(?first) = STR(?firstB) && STR(?last) = STR(?lastB) && ?count = ?countB)
+  FILTER (?horizonA = ?horizonB || EXISTS {
+    ?horizonA oc:sourceRevision ?weightsA, ?resolutionA .
+    ?horizonB oc:sourceRevision ?weightsB, ?resolutionB .
+    ?weightsA oc:sourcePath ?weightsPathA ; oc:contentSHA256 ?weightsHash .
+    ?weightsB oc:sourcePath ?weightsPathB ; oc:contentSHA256 ?weightsHashB .
+    ?resolutionA oc:sourcePath ?resolutionPathA ; oc:contentSHA256 ?resolutionHash .
+    ?resolutionB oc:sourcePath ?resolutionPathB ; oc:contentSHA256 ?resolutionHashB .
+    FILTER(STR(?weightsHash) = STR(?weightsHashB) && STR(?resolutionHash) = STR(?resolutionHashB))
+    FILTER(STRENDS(STR(?weightsPathA), "inputs_timestep_weights.csv"))
+    FILTER(STRENDS(STR(?weightsPathB), "inputs_timestep_weights.csv"))
+    FILTER(STRENDS(STR(?resolutionPathA), "inputs_timestep_resolution.csv"))
+    FILTER(STRENDS(STR(?resolutionPathB), "inputs_timestep_resolution.csv"))
+  })
+  ?comparison a oc:ComponentCorrespondence ; oc:sourceComponent ?componentA ;
+      oc:targetComponent ?componentB ; prov:wasAttributedTo ?supplier .
+  ?componentA oc:inConfiguration ?cfgA . ?componentB oc:inConfiguration ?cfgB .
+
+  FILTER ((!BOUND(?inputCarrierA) && !BOUND(?inputCarrierB)) || ?inputCarrierA = ?inputCarrierB)
+  FILTER ((!BOUND(?resultCarrierA) && !BOUND(?resultCarrierB)) || ?resultCarrierA = ?resultCarrierB)
+  FILTER ((!BOUND(?inputCostA) && !BOUND(?inputCostB)) || ?inputCostA = ?inputCostB)
+  FILTER ((!BOUND(?resultCostA) && !BOUND(?resultCostB)) || ?resultCostA = ?resultCostB)
+  BIND(?inputCarrierA AS ?inputCarrier)
+  BIND(?resultCarrierA AS ?resultCarrier)
+}
+ORDER BY ?comparison ?runA ?runB ?inputVariable ?resultCarrier

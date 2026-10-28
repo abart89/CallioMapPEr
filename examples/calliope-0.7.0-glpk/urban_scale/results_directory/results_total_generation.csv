@@ -1,0 +1,12 @@
+techs,carriers,total_generation
+N1_to_X2,heat,6852.027921747793
+N1_to_X3,heat,4430.267359404032
+X1_to_N1,heat,6961.11031829157
+X1_to_X2,electricity,8357.458045940577
+X1_to_X3,electricity,868.1210200904002
+boiler,heat,1423.2949935236068
+chp,electricity,9214.089204627966
+chp,heat,7371.27136370238
+pv,electricity,1271.8675796452012
+supply_gas,gas,24425.30224055435
+supply_grid_power,electricity,127.06373673965741

@@ -1,0 +1,24 @@
+recursive-include calliomapper/resources *
+recursive-include calliomapper/templates *.yaml
+recursive-include calliomapper/query_files *.rq
+recursive-include examples *.yaml *.csv *.md *.py *.json *.nc
+recursive-include docs *.md *.svg
+recursive-include notebooks *.ipynb *.md
+recursive-include tests *.py *.yaml *.md
+include Makefile
+include LICENSE NOTICE CHANGELOG.md CONTRIBUTING.md
+include .gitignore
+recursive-include .github/workflows *.yml
+include scripts/sync_ontology_resources.py
+include scripts/check_owl.py
+include scripts/check_installation.py
+include scripts/check_notebooks.py
+include scripts/prepare_stable_examples.py
+include examples/CALLIOPE-LICENSE-v0.7.0.dev7
+include examples/calliope-0.7.0/CALLIOPE-LICENSE
+include examples/calliope-0.7.0/preparation-requirements.txt
+recursive-include examples/calliope-0.7.0 *.log
+recursive-include scripts *.java
+include examples/calliope-0.7.0-glpk/CALLIOPE-LICENSE
+include examples/calliope-0.7.0-glpk/preparation-requirements.txt
+recursive-include examples/calliope-0.7.0-glpk *.log *.lp *.raw *.glp

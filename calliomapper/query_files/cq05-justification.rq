@@ -1,0 +1,17 @@
+PREFIX oc: <https://w3id.org/ontocal/>
+PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dct: <http://purl.org/dc/terms/>
+# Missing rationale is an unbound value; two supplied accounts remain two rows.
+SELECT ?assignment ?assumption ?statement ?reason ?reasonText ?supplier ?assumptionSupplier ?source WHERE {
+ ?assignment oc:implementsAssumption ?assumption .
+ ?assumption rdfs:comment ?statement .
+ OPTIONAL { ?assumption prov:wasAttributedTo ?assumptionSupplier }
+ OPTIONAL {
+   ?assumption oc:hasRationale ?reason .
+   ?reason rdfs:comment ?reasonText ; prov:wasAttributedTo ?supplier .
+   OPTIONAL { ?reason dct:references ?source }
+ }
+} ORDER BY ?assignment ?reason

@@ -1,0 +1,8 @@
+nodes,techs,costs,cost_investment
+region1,ccgt,monetary,22500000.0
+region1,region1_to_region2,monetary,323047.294117647
+region1_1,csp,monetary,61655438.60401345
+region1_2,csp,monetary,0.0
+region1_3,csp,monetary,5954386.721258034
+region2,battery,monetary,1047849.216
+region2,region1_to_region2,monetary,323047.294117647

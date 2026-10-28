@@ -1,0 +1,24 @@
+{
+  "source": {
+    "path": "prov-o-20130430.owl",
+    "url": "https://www.w3.org/ns/prov-o-20130430.owl",
+    "sha256": "71ecff298c82b8c12aca0714a7bcbfd0b798cda9a7b3c89d9aeb0ef358cb79d0",
+    "triples": 1146
+  },
+  "candidate": {
+    "path": "derived/prov-o-dl.ttl",
+    "ontology_iri": "urn:ontocal:dependency:prov-o-20130430-dl",
+    "version_iri": "urn:ontocal:dependency:prov-o-20130430-dl:1",
+    "sha256": "9f961573661eb8cff8982dcc26e13961cc99e14c109c7d4442619c50cfeb183d",
+    "triples": 1144
+  },
+  "changes": {
+    "removed_annotation_declarations": "<http://www.w3.org/ns/prov#specializationOf> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .\n<http://www.w3.org/ns/prov#wasRevisionOf> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .\n",
+    "relocated_source_metadata": "<http://www.w3.org/ns/prov-o#> <http://www.w3.org/ns/prov#specializationOf> <http://www.w3.org/ns/prov-o> .\n<http://www.w3.org/ns/prov-o#> <http://www.w3.org/ns/prov#wasRevisionOf> <http://www.w3.org/ns/prov-o-20120312> .\n",
+    "removed_header_triples": "<http://www.w3.org/ns/prov#> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .\n<http://www.w3.org/ns/prov-o#> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .\n<http://www.w3.org/ns/prov-o#> <http://www.w3.org/2000/01/rdf-schema#comment> \"This document is published by the Provenance Working Group (http://www.w3.org/2011/prov/wiki/Main_Page). \\n\\nIf you wish to make comments regarding this document, please send them to public-prov-comments@w3.org (subscribe public-prov-comments-request@w3.org, archives http://lists.w3.org/Archives/Public/public-prov-comments/). All feedback is welcome.\"@en .\n<http://www.w3.org/ns/prov-o#> <http://www.w3.org/2000/01/rdf-schema#label> \"W3C PROVenance Interchange Ontology (PROV-O)\"@en .\n<http://www.w3.org/ns/prov-o#> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://www.w3.org/TR/prov-o/> .\n<http://www.w3.org/ns/prov-o#> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://www.w3.org/ns/prov> .\n<http://www.w3.org/ns/prov-o#> <http://www.w3.org/2002/07/owl#versionIRI> <http://www.w3.org/ns/prov-o-20130430> .\n<http://www.w3.org/ns/prov-o#> <http://www.w3.org/2002/07/owl#versionInfo> \"Recommendation version 2013-04-30\"@en .\n",
+    "added_header_triples": "<http://purl.org/dc/terms/source> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .\n<urn:ontocal:dependency:prov-o-20130430-dl> <http://purl.org/dc/terms/source> <http://www.w3.org/ns/prov-o-20130430> .\n<urn:ontocal:dependency:prov-o-20130430-dl> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .\n<urn:ontocal:dependency:prov-o-20130430-dl> <http://www.w3.org/2000/01/rdf-schema#comment> \"Derived from the unchanged W3C PROV-O recommendation. Two duplicate AnnotationProperty declarations are removed; two source-ontology provenance statements are preserved in a separate metadata graph. All vocabulary RDF triples outside the documented changes are retained. This is not a claim of equivalence with the complete original RDF graph.\"@en .\n<urn:ontocal:dependency:prov-o-20130430-dl> <http://www.w3.org/2000/01/rdf-schema#comment> \"This document is published by the Provenance Working Group (http://www.w3.org/2011/prov/wiki/Main_Page). \\n\\nIf you wish to make comments regarding this document, please send them to public-prov-comments@w3.org (subscribe public-prov-comments-request@w3.org, archives http://lists.w3.org/Archives/Public/public-prov-comments/). All feedback is welcome.\"@en .\n<urn:ontocal:dependency:prov-o-20130430-dl> <http://www.w3.org/2000/01/rdf-schema#label> \"PROV-O 2013-04-30 derived OWL 2 DL candidate for OntoCal\"@en .\n<urn:ontocal:dependency:prov-o-20130430-dl> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://www.w3.org/TR/prov-o/> .\n<urn:ontocal:dependency:prov-o-20130430-dl> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://www.w3.org/ns/prov> .\n<urn:ontocal:dependency:prov-o-20130430-dl> <http://www.w3.org/2002/07/owl#versionIRI> <urn:ontocal:dependency:prov-o-20130430-dl:1> .\n<urn:ontocal:dependency:prov-o-20130430-dl> <http://www.w3.org/2002/07/owl#versionInfo> \"Candidate derivation 1; pending review; not an official W3C release\"@en .\n",
+    "removed_triples_count": 12,
+    "added_triples_count": 10
+  },
+  "preservation_check": "Every RDF triple outside the exact documented changes remains present; all original vocabulary class/object/datatype RDF axioms retained. This does not assert full-original semantic equivalence."
+}

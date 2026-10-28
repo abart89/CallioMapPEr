@@ -1,0 +1,13 @@
+techs,base_tech
+N1_to_X2,transmission
+N1_to_X3,transmission
+X1_to_N1,transmission
+X1_to_X2,transmission
+X1_to_X3,transmission
+boiler,conversion
+chp,conversion
+demand_electricity,demand
+demand_heat,demand
+pv,supply
+supply_gas,supply
+supply_grid_power,supply

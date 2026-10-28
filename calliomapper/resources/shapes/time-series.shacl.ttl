@@ -1,0 +1,92 @@
+@prefix oc: <https://w3id.org/ontocal/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix oeo: <https://openenergyplatform.org/ontology/oeo/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Load together with capacity.shacl.ttl. These constraints cover the selected
+# external series, three exported values and summary, not every temporal pattern.
+oc:TimeSeriesShape a sh:NodeShape ; sh:targetClass oc:TimeSeriesRecord ;
+    sh:property oc:RequiredComponent ;
+    sh:property [ sh:path oc:inConfiguration ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oc:ConfigurationSpecification ] ;
+    sh:property [ sh:path oc:sourceKey ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:carrierIndex ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:sourceRevision ; sh:minCount 1 ; sh:maxCount 1 ; sh:node oc:FixedArtifactRevisionShape ] ;
+    sh:property [ sh:path oc:sourceLocator ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:hasIndexDescription ; sh:minCount 1 ; sh:maxCount 1 ; sh:node oc:TemporalIndexDescriptionShape ] ;
+    sh:property [ sh:path prov:wasGeneratedBy ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oeo:OEO_00000275 ] ;
+    sh:sparql oc:MatchingComponentConfiguration ;
+    sh:sparql [ sh:message "The source model execution must use the series configuration." ;
+      sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+      PREFIX prov: <http://www.w3.org/ns/prov#>
+      SELECT $this WHERE { $this oc:inConfiguration ?configuration ; prov:wasGeneratedBy ?run .
+        FILTER NOT EXISTS { ?run oc:usesConfiguration ?configuration } }""" ] .
+
+oc:FixedArtifactRevisionShape a sh:NodeShape ;
+    sh:class prov:Entity ;
+    sh:property [ sh:path prov:specializationOf ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ; sh:class prov:Entity ] ;
+    sh:property [ sh:path oc:sourcePath ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:contentSHA256 ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] .
+
+oc:TemporalIndexDescriptionShape a sh:NodeShape ;
+    sh:class oeo:OEO_00000119 ;
+    sh:property [ sh:path oc:firstIndexLabel ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:lastIndexLabel ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:indexCount ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:integer ; sh:minInclusive 1 ] .
+
+oc:SelectedTimestepShape a sh:NodeShape ; sh:targetSubjectsOf oc:inSeries ;
+    sh:class oc:ResultRecord ;
+    sh:property [ sh:path oc:inSeries ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oc:TimeSeriesRecord ] ;
+    sh:property [ sh:path oc:timeIndexLabel ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:sparql [ sh:message "A selected value must retain its series component, configuration, carrier, source key and source execution." ;
+      sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+      PREFIX prov: <http://www.w3.org/ns/prov#>
+      SELECT $this WHERE { $this oc:inSeries ?series ; oc:forComponent ?component ;
+        oc:inConfiguration ?configuration ; oc:carrierIndex ?carrier ; oc:sourceKey ?key ; prov:wasGeneratedBy ?run .
+        FILTER NOT EXISTS { ?series oc:forComponent ?component ; oc:inConfiguration ?configuration ;
+          oc:carrierIndex ?carrier ; oc:sourceKey ?key ; prov:wasGeneratedBy ?run } }""" ] ;
+    sh:sparql [ sh:message "Two distinct selected records must not duplicate the same series and timestep coordinate." ;
+      sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+      SELECT $this WHERE { $this oc:inSeries ?series ; oc:timeIndexLabel ?label .
+        ?other oc:inSeries ?series ; oc:timeIndexLabel ?label . FILTER ($this != ?other) }""" ] .
+
+oc:AggregatedResultShape a sh:NodeShape ; sh:targetClass oc:AggregatedResultRecord ;
+    sh:property oc:RequiredComponent ;
+    sh:property [ sh:path oc:inConfiguration ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oc:ConfigurationSpecification ] ;
+    sh:property [ sh:path oc:sourceKey ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:carrierIndex ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:hasDatum ; sh:minCount 1 ; sh:maxCount 1 ; sh:node oc:DatumShape ] ;
+    sh:property [ sh:path oc:summarisesSeries ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oc:TimeSeriesRecord ] ;
+    sh:property [ sh:path oc:hasIndexDescription ; sh:minCount 1 ; sh:maxCount 1 ; sh:node oc:TemporalIndexDescriptionShape ] ;
+    sh:property oc:RequiredAggregationMethod ;
+    sh:property [ sh:path prov:wasGeneratedBy ; sh:minCount 1 ; sh:maxCount 1 ; sh:class prov:Activity ] ;
+    sh:sparql oc:MatchingComponentConfiguration ;
+    sh:sparql [ sh:message "The summary must retain its source series component, configuration, carrier and source key." ;
+      sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+      SELECT $this WHERE { $this oc:summarisesSeries ?series ; oc:forComponent ?component ;
+        oc:inConfiguration ?configuration ; oc:carrierIndex ?carrier ; oc:sourceKey ?key .
+        FILTER NOT EXISTS { ?series oc:forComponent ?component ; oc:inConfiguration ?configuration ;
+          oc:carrierIndex ?carrier ; oc:sourceKey ?key } }""" ] ;
+    sh:sparql [ sh:message "The summary aggregation must be distinct from the source optimisation and use the recorded series." ;
+      sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+      PREFIX prov: <http://www.w3.org/ns/prov#>
+      SELECT $this WHERE { $this oc:summarisesSeries ?series ; prov:wasGeneratedBy ?aggregation .
+        ?series prov:wasGeneratedBy ?run .
+        FILTER (?aggregation = ?run || NOT EXISTS { ?aggregation prov:used ?series }) }""" ] ;
+    sh:sparql [ sh:message "The aggregation must use the fixed source array and the method's supporting artifact revisions." ;
+      sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+      PREFIX prov: <http://www.w3.org/ns/prov#>
+      SELECT $this WHERE { $this oc:summarisesSeries ?series ; prov:wasGeneratedBy ?aggregation ;
+        oc:hasAggregationMethod ?method .
+        { ?series oc:sourceRevision ?revision } UNION { ?method oc:sourceRevision ?revision }
+        FILTER NOT EXISTS { ?aggregation prov:used ?revision } }""" ] .
+
+oc:RequiredAggregationMethod a sh:PropertyShape ; sh:path oc:hasAggregationMethod ;
+    sh:minCount 1 ; sh:maxCount 1 ; sh:node oc:AggregationMethodShape ;
+    sh:message "A summary requires an explicit aggregation method, including its formula and duration treatment." .
+
+oc:AggregationMethodShape a sh:NodeShape ;
+    sh:class oeo:OEO_00000119 ;
+    sh:property [ sh:path oc:aggregationFormula ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:durationTreatment ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:sourceRevision ; sh:minCount 1 ; sh:node oc:FixedArtifactRevisionShape ] .

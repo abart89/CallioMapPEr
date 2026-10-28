@@ -1,0 +1,19 @@
+PREFIX oc: <https://w3id.org/ontocal/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+# A source revision identifies represented file content. It does not assert that
+# the file caused the information; that distinct claim uses wasDerivedFrom.
+SELECT DISTINCT ?entity ?source ?sourceRelation ?activity ?agent WHERE {
+  {
+    ?entity prov:wasDerivedFrom ?source . BIND("wasDerivedFrom" AS ?sourceRelation)
+  } UNION {
+    ?entity oc:sourceRevision ?source . BIND("sourceRevision" AS ?sourceRelation)
+  } UNION {
+    ?entity prov:wasGeneratedBy ?activity .
+    FILTER NOT EXISTS { ?entity prov:wasDerivedFrom ?anySource }
+    FILTER NOT EXISTS { ?entity oc:sourceRevision ?anyRevision }
+  }
+  OPTIONAL {
+    ?entity prov:wasGeneratedBy ?activity .
+    OPTIONAL { ?activity prov:wasAssociatedWith ?agent }
+  }
+} ORDER BY ?entity ?source ?activity ?agent

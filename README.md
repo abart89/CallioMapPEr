@@ -1,242 +1,141 @@
 # CallioMapper
 
-[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![Ontology: OEO](https://img.shields.io/badge/ontology-OEO%20Aligned-green.svg)](https://openenergy-platform.org/ontology/oeo/)
-[![Framework: LinkML](https://img.shields.io/badge/schema-LinkML-orange.svg)](https://linkml.io/)
-[![Validation: pySHACL](https://img.shields.io/badge/validation-SHACL-purple.svg)](https://github.com/RDFLib/pySHACL)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](#license)
-[![Status: Active Development](https://img.shields.io/badge/status-active%20development-yellow.svg)](#current-status--roadmap)
+CallioMapper turns selected information from a saved Calliope modelling exercise into an RDF knowledge graph. Researchers can query model structure, inputs and results alongside the configurations, executions and source files they belong to. They can also supply context that the numerical files do not contain, such as a study question, the meaning of a future scenario or the reason for a parameter choice.
 
-> **Zero-configuration Semantic Knowledge Graphs for Calliope Energy Models. Fully aligned with the Open Energy Ontology (OEO).**
+The representation uses **OntoCal**, with terms from the Open Energy Ontology (OEO) and PROV-O. Model components are represented as information about an energy system. A component is connected to a physical asset only when an explicit, evidenced correspondence is supplied.
 
-**CallioMapper** is an open-source Python library that transforms [Calliope v0.7](https://www.callio.pe/) energy system models into structured, linked-data knowledge graphs — without requiring the modeler to know anything about ontology engineering.
+**Version `0.1.0rc2` is a release candidate for research trials.** The primary target is saved CSV exports from stable **Calliope 0.7.0**. The included national and urban examples provide tested cases; they do not establish compatibility with every Calliope feature or custom mathematical model. Historical **0.7.0.dev7** examples remain covered by regression tests. Other Calliope formats, NetCDF, unsolved models and failed-run exports are not supported by this reader. See the [evaluation and its limits](docs/evaluation.md) and [change history](CHANGELOG.md).
 
-It accomplishes three things:
+![CallioMapper reads saved Calliope files and optional supplied research context, uses OntoCal to describe them, and produces a graph for querying, comparison and integration.](docs/images/workflow.svg)
 
-1. **Structural Autonomy** — Auto-maps every node, carrier, and technology in a solved model to their OEO-aligned semantic counterparts, with no human intervention.
-2. **Epistemic Traceability** — Built-in PROV-O pipeline for attaching funding, authorship, and scenario derivation metadata to the exact model entities they describe.
-3. **From SPARQL back to Pandas** — The output is a standard N-Quads file that plugs directly into SPARQL queries and back into Pandas DataFrames, so energy modelers never have to leave their existing workflow.
+## Install locally
 
----
+Use Python 3.10 or later. The source tests pass on Python 3.10.21 and 3.13.2; the public notebooks were executed on 3.13.2. From a cloned or downloaded copy of this repository:
 
-## Why?
-
-Energy system models like Calliope are routinely used for sensitivity studies and scenario families — dozens or hundreds of runs that explore different technology mixes, cost assumptions, or policy constraints. The results end up scattered across NetCDF files and YAML directories, with no structured way to ask cross-run questions like *"in which runs did installed gas capacity exceed 5 GW?"* or *"which runs share the same solar cost assumption?"* The answer today is a custom script per study.
-
-At the same time, the research community is converging on a consensus (Lombardi et al., 2025) that open models are necessary but not sufficient: what matters is *practical reproducibility* — transparency about modeling assumptions that a reviewer or collaborator can actually inspect, not just a PDF supplement.
-
-CallioMapper is a practical response to both problems. By translating a solved Calliope model into a Knowledge Graph, it turns model archives into queryable databases and turns parameter provenance into machine-readable PROV-O triples that can accompany a journal submission or a Zenodo deposit. The base layer requires no effort from the modeler — no restructuring of input files, no ontology knowledge. The epistemic extension adds structured metadata with three fields in a YAML template.
-
-The output is also designed to be compatible with the [Open Energy Knowledge Graph (OEKG)](https://openenergy-platform.org/), the community infrastructure for structured energy model metadata — reducing the friction of contributing model descriptions to the platform.
-
----
-
-## What It Looks Like
-
-### 1. Input: Solved Calliope Definition (`attrs.yaml`)
-```yaml
-nodes:
-  region1:
-    techs: [demand_power, ccgt]
-    latitude: 40.0
-    longitude: -2.0
-techs:
-  ccgt:
-    base_tech: supply
-    carrier_out: power
+```sh
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install .
 ```
 
-### 2. Output: OEO-Aligned Semantic Knowledge Graph (`.nq`)
-```turtle
-# Structural & entity classification in <run-id>/core
-<https://w3id.org/ontocal/runs/001/region1> a ontocal:CalliopeNetworkNode ;
-    ontocal:name "region1" ;
-    ontocal:latitude 40.0 ;
-    ontocal:longitude -2.0 ;
-    ontocal:has_assigned_technology <https://w3id.org/ontocal/runs/001/ccgt> .
+Alternatively, install a locally supplied release-candidate wheel:
 
-<https://w3id.org/ontocal/runs/001/ccgt> a ontocal:CalliopeSupplyTechnology ;
-    ontocal:name "ccgt" ;
-    ontocal:carrier_out ontocal:power .
+```sh
+python -m pip install /path/to/calliomapper-0.1.0rc2-py3-none-any.whl
 ```
 
-### 3. Query: Direct SPARQL Querying
-```sparql
-PREFIX ontocal: <https://w3id.org/ontocal/>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+The examples and notebooks below are repository files, so run them from the repository directory even when the package was installed from a wheel. These instructions do not require a PyPI release. On Windows, activate the virtual environment using its `Scripts` directory instead.
 
-SELECT ?node_name ?tech_name
-WHERE {
-    ?node a ontocal:CalliopeNetworkNode ;
-          ontocal:name ?node_name ;
-          ontocal:has_assigned_technology ?tech .
-    ?tech a ontocal:CalliopeSupplyTechnology ;
-          ontocal:name ?tech_name .
-}
-```
+CallioMapper does not require Calliope, a solver, Java or ROBOT for ordinary use. It reads files that already exist; it does not rebuild or solve the model.
 
----
+## Try it in Python
 
-## Ontology Alignment
-
-CallioMapper provides first-class alignment between Calliope v0.7 concepts and top-level/domain ontologies (Basic Formal Ontology, Information Artifact Ontology, Open Energy Ontology, and PROV-O):
-
-| Calliope Concept | OntoCal Class (`ontocal:`) | OEO Parent Alignment (`oeo:`) | Upper Ontology Base |
-| :--- | :--- | :--- | :--- |
-| **Network Node** | `CalliopeNetworkNode` | `oeo:OEO_00000276` *(model component)* | `bfo:0000029` *(site)* |
-| **Supply Tech** | `CalliopeSupplyTechnology` | `oeo:energy_transformation_process` | `bfo:0000015` *(process)* |
-| **Demand Tech** | `CalliopeDemandTechnology` | `oeo:energy_transformation_process` | `bfo:0000015` *(process)* |
-| **Storage Tech** | `CalliopeStorageTechnology` | `oeo:energy_transformation_process` | `bfo:0000015` *(process)* |
-| **Transmission Tech** | `CalliopeTransmissionTechnology` | `oeo:energy_transformation_process` | `bfo:0000015` *(process)* |
-| **Energy Carrier** | `CalliopeEnergyCarrier` | `oeo:energy_carrier` | `bfo:0000040` *(material entity)* |
-| **Scenario** | `CalliopeScenario` | `oeo:OEO_00140093` *(scenario)* | `iao:0000030` *(ICE)* |
-| **Optimisation Run** | `CalliopeOptimisationRun` | `oeo:OEO_00000305` *(optimisation)* | `bfo:0000015` *(process)* |
-| **Provenance Metadata** | Epistemic Sidecar | `prov:wasAttributedTo`, `prov:wasDerivedFrom` | `PROV-O` |
-
----
-
-## Architecture
-
-The pipeline is composed of three mappers orchestrated by a single `Translator` class:
-
-```
-Calliope results_directory/
-    ├─ attrs.yaml          ──► CoreMapper       ─┐
-    ├─ results_*.csv       ──► ResultsMapper    ──┼──► Translator ──► validated .nq
-    └─ epistemic_ext.yaml  ──► EpistemicEngine  ─┘
-```
-
-### Components
-
-- **`CoreMapper`** — Reads the solver-normalized `attrs.yaml` from the `results_directory/`. This is the stable, post-solve snapshot of the model definition, independent of how the user organized their input files. Maps nodes, technologies, and carriers to OEO-aligned classes via auto-generated Pydantic objects. Produces the `core` named graph.
-- **`EpistemicEngine`** *(optional)* — Ingests a user-filled YAML sidecar and generates PROV-O provenance triples at model-level and per-entity level. Produces the `provenance` named graph.
-- **`ResultsMapper`** — Reads the `results_*.csv` files from the `results_directory/` and emits aggregate RDF observations (carrier flows, installed capacities, costs) linked to structural entities.
-- **`Translator`** — Orchestrates all three mappers, runs `pyshacl` validation before any output is returned, and serializes the final graph to `.nq`.
-
-### Named Graph Partitioning (N-Quads output)
-
-Each model run produces a `.nq` file with distinct named graphs:
-
-| Named graph | Contents |
-| :--- | :--- |
-| `<run-id>/core` | Nodes, technologies, carriers, and solved output variables mapped to OEO classes |
-| `<run-id>/provenance` | PROV-O triples from the epistemic extension (authorship, funder, derivations) |
-
-### Schema Pipeline (YAML-First)
-
-```
-ontocal_core.yaml      (LinkML schema — source of truth, committed to repo)
-      ↓  make generate
-calliomapper/generated/ontocal_core.py    (Pydantic classes — auto-generated)
-ontocal/ontocal_core_shapes.ttl          (SHACL shapes — auto-generated)
-ontocal/ontocal_core.ttl                 (OWL/Turtle — for Protégé/ontologists)
-```
-
-Run `make generate` to regenerate all schema artifacts after editing the LinkML schema.
-
----
-
-## Installation & Setup
-
-### Prerequisites
-- Python 3.12 or higher
-
-### Install from Source
-```bash
-# Clone the repository
-git clone https://github.com/abart89/CallioMapPEr.git
-cd CallioMapPEr
-
-# Install in editable mode with development dependencies
-pip install -e ".[dev]"
-```
-
-### Running Tests & Schema Generation
-```bash
-# Run unit and validation test suite
-make test
-
-# Regenerate schema artifacts from LinkML
-make generate
-```
-
----
-
-## Quickstart
-
-### 1. Translate a solved model (CLI)
-
-Point `translate` at the `results_directory/` that Calliope writes after solving:
-
-```bash
-calliomapper translate examples/national_scale/results_directory/ --out my_model.nq
-```
-
-### 2. Add epistemic metadata (optional)
-
-Generate a blank provenance template, fill it in, then pass it at translation time:
-
-```bash
-calliomapper init-extension
-calliomapper translate examples/national_scale/results_directory/ --extension epistemic_extension.yaml --out my_model.nq
-```
-
-### 3. Query the graph (SPARQL to Pandas)
-
-Run a preset SPARQL query against the output graph and get a CSV back:
-
-```bash
-calliomapper query my_model.nq --preset installed_capacity --out results.csv
-```
-
-### 4. Python API
+The saved national example can be translated and queried without an optimisation run:
 
 ```python
 from calliomapper import Translator
+from calliomapper.queries import run_query
 
-t = Translator(
-    results_dir="examples/national_scale/results_directory/",
-    extension="epistemic_extension.yaml",               # optional
-    run_id="https://w3id.org/ontocal/runs/my-run-001",  # optional
+translator = Translator(
+    "examples/calliope-0.7.0-glpk/national_scale/results_directory"
 )
+translator.save("build/national.nq")
+dataset = translator.translate()  # Returns the graph already created by save().
 
-# Returns validated rdflib.Dataset (raises ValidationError if SHACL fails)
-graph = t.translate()
-
-# Save to standard N-Quads
-t.save("output/my_model.nq")
+answers = run_query(
+    dataset, "installed_capacity", bindings={"technology": "ccgt"}
+)
+columns = ("node", "technology", "carrier", "value", "unit")
+rows = [
+    {column: str(answer[column]) if answer[column] is not None else None
+     for column in columns}
+    for answer in answers
+]
+print(rows)
 ```
 
----
+The returned row describes the capacity in the saved result:
 
-## Current Status & Roadmap
+| node | technology | carrier | value | unit |
+|---|---|---|---|---|
+| region1 | ccgt | power | 30000.0 | `None` |
 
-CallioMapper is organized in structured development phases:
+`None` means that this export has not supplied a concrete unit interpretation; it does not mean the value is dimensionless. Removing the technology filter returns fifteen capacity records. `run_query()` returns an RDFLib query result; the example converts selected columns to ordinary Python dictionaries and needs no pandas dependency.
 
-| Phase / Milestone | Scope | Status |
-| :--- | :--- | :--- |
-| **Phase 0: Core Structural Mapping** | Node/Tech dispatch, LinkML schema, SHACL validation gate, automated test suite | **Complete (22 tests passing)** |
-| **Phase 1: Verification Infrastructure** | Semantic SPARQL question catalogue & verification suite against reference fixtures | **In Progress** |
-| **Phase 2: Epistemic & Provenance** | PROV-O metadata sidecar engine for author, funder, and scenario derivations | **In Progress** |
-| **Phase 3: Results & Analytics** | Solved variable loading (`results_*.csv`), SOSA observations, and SPARQL-to-Pandas export | **Planned** |
+The save operation writes three files:
 
----
+- **`national.nq`** contains the graph in N-Quads format, which retains separately identified graphs for source and computed statements, supplied context and export provenance.
+- **`national.nq.manifest.json`** is a small companion file recording the identifier namespace, configuration and execution fingerprints, and package and ontology versions. Keeping it allows later exports to reuse identifiers for unchanged model components, configurations and executions. The RDF graph remains readable without it.
+- **`national.nq.report.json`** records what was extracted, what was omitted and why, source-file checksums, available version evidence and validation results.
 
-## Examples
+For a guided introduction, install the optional notebook dependencies and open JupyterLab:
 
-See `examples/national_scale/` and `examples/urban_scale/` for pre-solved Calliope v0.7 fixtures used as development references. Interactive Jupyter demonstration notebooks will be available as the results and query layers are completed.
+```sh
+python -m pip install '.[notebooks]'
+jupyter lab notebooks
+```
 
----
+Open the notebooks in order:
 
-## References & Academic Background
+1. [Read saved results and query the graph](notebooks/01_saved_results.ipynb).
+2. [Supply research context and inspect what it adds](notebooks/02_supplied_context.ipynb).
+3. [Compare represented results and combine separately identified graphs](notebooks/03_comparison_and_integration.ipynb).
 
-- **Calliope Framework:** Pfenninger, S., & Pickering, B. (2018). *Calliope: a multi-scale energy systems modelling framework.* Journal of Open Source Software, 3(29), 825. [doi:10.21105/joss.00825](https://doi.org/10.21105/joss.00825)
-- **Open Energy Ontology (OEO):** Booshehri, M., Emele, L., Flügge, M., et al. (2021). *Introducing the Open Energy Ontology: Enhanced Representation of Energy Systems.* Energy and AI, 5, 100074. [doi:10.1016/j.egyai.2021.100074](https://doi.org/10.1016/j.egyai.2021.100074)
-- **Reproducibility in Energy Modeling:** Lombardi, F., Pickering, B., Colombo, E., & Pfenninger, S. (2025). *Practical reproducibility in energy system optimization models.*
-- **FAIR Principles for Research Software:** Chue Hong, N. P., et al. (2022). *FAIR Principles for Research Software (FAIR4RS Principles).* [doi:10.15497/RDA/00068](https://doi.org/10.15497/RDA/00068)
+## What is represented
 
----
+The default export includes these groups. `structure` is always included; the other groups can be selected with the `groups` argument.
 
-## License
+| Group | Information represented |
+|---|---|
+| `structure` | Active nodes and technology components, carriers, transmission endpoints, configuration and execution identities. |
+| `capacities` | Selected effective capacity bounds and efficiencies, calculated flow capacity and storage capacity. |
+| `energy` | References to saved output series and, when the saved mathematics supports the interpretation, weighted energy totals over their saved time coverage. |
+| `costs` | Selected capacity-cost inputs and saved component costs, with their cost-category coordinates. |
 
-This project is licensed under the [MIT License](LICENSE).
+For example, `Translator(path, groups={"structure", "capacities"})` creates a smaller graph. Complete time series remain in their source files by default. Individual timesteps can be selected explicitly, as described in the [usage guide](docs/usage.md). This release translates a stated set of variables rather than every array or equation in a model.
+
+Missing units and currencies are not guessed. The included national example supports the documented energy calculation. The urban example contains custom mathematics, so automatic energy totals are omitted with an explanation; its series references, capacities and costs remain available. A successful export therefore does not imply that every research question can be answered.
+
+## Add information that the saved files do not contain
+
+An optional YAML annotation file supplies study and scenario descriptions, assumptions, reasons, dataset history and physical correspondences. It records who supplied the statements and their evidence status.
+
+```python
+translator = Translator(
+    "examples/calliope-0.7.0-glpk/national_scale/results_directory",
+    annotations="examples/calliope-0.7.0-glpk/annotations/national.yaml",
+    identity_file="build/national.nq.manifest.json",
+)
+translator.save("build/national-annotated.nq")
+reasons = run_query(translator.translate(), "cq05")
+```
+
+The example includes **synthetic tutorial context**, not the original model authors' study history. Its capacity-unit interpretation has separately identified evidence in the source comments. The [annotation guide](examples/annotations/README.md) describes the supported fields. The [competency-question guide](docs/questions.md) states which questions require additional information from the user.
+
+Extracted facts, computed summaries and supplied context have different sources of evidence. Validation checks how the claims are represented; it does not establish that a supplied scientific claim is true or recover unrecorded reasoning.
+
+## Use the command line
+
+The same workflow is available without writing Python:
+
+```sh
+calliomapper translate examples/calliope-0.7.0-glpk/national_scale/results_directory --out build/national.nq
+calliomapper query build/national.nq --preset installed_capacity --out build/capacities.csv
+calliomapper init-annotations --out annotations.yaml
+```
+
+The input directory must contain `attrs.yaml` and the saved `inputs_*.csv` and `results_*.csv` files. Its name is arbitrary. Calliope writes these files through an explicit CSV save operation; simply solving a model does not create this directory automatically.
+
+## Ontology dependencies and evidence
+
+OntoCal is maintained separately as a Turtle ontology. The package includes a fixed snapshot and validation resources, so an OntoCal checkout is not required. Historical LinkML files under `ontocal/` are not used by this implementation.
+
+The bundled OEO and PROV-O dependency copies contain documented local changes needed for their combined OWL interpretation. They have separate ontology identifiers and are **not official OEO or W3C releases**. Upstream files, transformation records and hashes are retained. Read the [dependency explanation](docs/dependencies.md) before reusing these copies in another ontology environment.
+
+The stable examples were prepared using Calliope 0.7.0 and GLPK 5.0. GLPK was used only for that preparation; normal graph generation and tests read the saved outputs. Stable Calliope's ordinary CSV export omits the recorded initialisation-version field. Its configured target version helps identify the format but does not prove which executable produced the results. Graphs and reports preserve that uncertainty. The [example preparation record](examples/calliope-0.7.0-glpk/README.md) provides independent software-version evidence for the included examples.
+
+- [Usage, supported variables and identifier handling](docs/usage.md)
+- [Questions and required information](docs/questions.md)
+- [Evaluation procedure and recorded results](docs/evaluation.md)
+- [Changes in this release](CHANGELOG.md)
+- [Contributing and reporting problems](CONTRIBUTING.md)

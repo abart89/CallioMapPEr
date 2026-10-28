@@ -1,0 +1,30 @@
+Solver command line: ['/private/tmp/calliomapper-glpk/bin/glpsol', '--write', '/private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-n0tcau_x/solver-logs/tmpw4njg1_u.glpk.raw', '--wglp', '/private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-n0tcau_x/solver-logs/tmphprwvg74.glpk.glp', '--cpxlp', '/private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-n0tcau_x/solver-logs/tmpf4xs2ell.pyomo.lp']
+
+GLPSOL--GLPK LP/MIP Solver 5.0
+Parameter(s) specified in the command line:
+ --write /private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-n0tcau_x/solver-logs/tmpw4njg1_u.glpk.raw
+ --wglp /private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-n0tcau_x/solver-logs/tmphprwvg74.glpk.glp
+ --cpxlp /private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-n0tcau_x/solver-logs/tmpf4xs2ell.pyomo.lp
+Reading problem data from '/private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-n0tcau_x/solver-logs/tmpf4xs2ell.pyomo.lp'...
+4139 rows, 3448 columns, 10522 non-zeros
+27856 lines were read
+Writing problem data to '/private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-n0tcau_x/solver-logs/tmphprwvg74.glpk.glp'...
+22814 lines were written
+GLPK Simplex Optimizer 5.0
+4139 rows, 3448 columns, 10522 non-zeros
+Preprocessing...
+3275 rows, 2503 columns, 8260 non-zeros
+Scaling...
+ A: min|aij| =  8.571e-04  max|aij| =  7.000e+00  ratio =  8.167e+03
+GM: min|aij| =  5.038e-01  max|aij| =  1.985e+00  ratio =  3.941e+00
+EQ: min|aij| =  2.605e-01  max|aij| =  1.000e+00  ratio =  3.839e+00
+Constructing initial basis...
+Size of triangular part is 3275
+*     0: obj =   1.730912999e+10 inf =   0.000e+00 (195)
+*  1256: obj =   8.424825652e+02 inf =   2.834e-13 (0) 9
+OPTIMAL LP SOLUTION FOUND
+Time used:   0.0 secs
+Memory used: 4.9 Mb (5159371 bytes)
+Writing basic solution to '/private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-n0tcau_x/solver-logs/tmpw4njg1_u.glpk.raw'...
+7596 lines were written
+

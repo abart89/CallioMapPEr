@@ -1,0 +1,16 @@
+nodes,techs,__active
+region1,ccgt,1.0
+region1,demand_power,1.0
+region1,region1_to_region1_1,1.0
+region1,region1_to_region1_2,1.0
+region1,region1_to_region1_3,1.0
+region1,region1_to_region2,1.0
+region1_1,csp,1.0
+region1_1,region1_to_region1_1,1.0
+region1_2,csp,1.0
+region1_2,region1_to_region1_2,1.0
+region1_3,csp,1.0
+region1_3,region1_to_region1_3,1.0
+region2,battery,1.0
+region2,demand_power,1.0
+region2,region1_to_region2,1.0

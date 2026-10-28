@@ -1,0 +1,26 @@
+CallioMapper
+
+CallioMapper software is distributed under the Apache License, Version 2.0.
+The package license does not replace the terms or attribution of third-party
+material included in the distribution.
+
+Calliope examples
+-----------------
+The national-scale and urban-scale example models and their data originate
+from the Calliope project and its contributors, under Apache-2.0. Their
+licenses, version references and provenance records accompany the examples.
+See examples/README.md and examples/calliope-0.7.0-glpk/README.md.
+
+Pfenninger, S. and Pickering, B. (2018). Calliope: a multi-scale energy systems
+modelling framework. Journal of Open Source Software, 3(29), 825.
+https://doi.org/10.21105/joss.00825
+
+Ontology resources
+------------------
+The bundled OntoCal draft uses OEO, PROV-O and their documented dependencies.
+Upstream ontology headers, attribution metadata, OEO's CC0 notice and reuse
+records are retained under calliomapper/resources/dependencies. Consult those
+records for the relevant contributions and terms. The project's local OEO and
+PROV-O derivatives are identified separately and are not official upstream
+releases. The transformation records accompany them; docs/dependencies.md
+explains their use and limits.

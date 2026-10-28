@@ -1,0 +1,32 @@
+Solver command line: ['/private/tmp/calliomapper-glpk/bin/glpsol', '--write', '/private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-tfztf7vj/solver-logs/tmp1q6ufctj.glpk.raw', '--wglp', '/private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-tfztf7vj/solver-logs/tmp54k8mlcw.glpk.glp', '--cpxlp', '/private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-tfztf7vj/solver-logs/tmp1qpy60rg.pyomo.lp']
+
+GLPSOL--GLPK LP/MIP Solver 5.0
+Parameter(s) specified in the command line:
+ --write /private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-tfztf7vj/solver-logs/tmp1q6ufctj.glpk.raw
+ --wglp /private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-tfztf7vj/solver-logs/tmp54k8mlcw.glpk.glp
+ --cpxlp /private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-tfztf7vj/solver-logs/tmp1qpy60rg.pyomo.lp
+Reading problem data from '/private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-tfztf7vj/solver-logs/tmp1qpy60rg.pyomo.lp'...
+6367 rows, 5066 columns, 17267 non-zeros
+43379 lines were read
+Writing problem data to '/private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-tfztf7vj/solver-logs/tmp54k8mlcw.glpk.glp'...
+35932 lines were written
+GLPK Simplex Optimizer 5.0
+6367 rows, 5066 columns, 17267 non-zeros
+Preprocessing...
+5358 rows, 3960 columns, 14650 non-zeros
+Scaling...
+ A: min|aij| =  1.851e-03  max|aij| =  4.000e+00  ratio =  2.161e+03
+GM: min|aij| =  5.041e-01  max|aij| =  1.984e+00  ratio =  3.936e+00
+EQ: min|aij| =  2.541e-01  max|aij| =  1.000e+00  ratio =  3.936e+00
+Constructing initial basis...
+Size of triangular part is 5358
+*     0: obj =   4.081863230e+12 inf =   0.000e+00 (232)
+Perturbing LP to avoid stalling [282]...
+Removing LP perturbation [2377]...
+*  2377: obj =   2.770487977e+05 inf =   7.515e-10 (0) 19
+OPTIMAL LP SOLUTION FOUND
+Time used:   0.1 secs
+Memory used: 7.8 Mb (8196591 bytes)
+Writing basic solution to '/private/var/folders/1s/cpks0wwn0f79zb2lb1kd3f0r0000gp/T/calliomapper-solver-tfztf7vj/solver-logs/tmp1q6ufctj.glpk.raw'...
+11442 lines were written
+

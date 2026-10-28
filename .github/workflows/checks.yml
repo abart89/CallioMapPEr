@@ -1,0 +1,35 @@
+name: Package and tutorials
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.13']
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install package and test tools
+        run: python -m pip install '.[dev]'
+      - name: Check saved-file translation and questions
+        run: python -m pytest tests/ -q
+      - name: Install notebook tools
+        if: matrix.python-version == '3.13'
+        run: python -m pip install '.[notebooks]'
+      - name: Execute public tutorials
+        if: matrix.python-version == '3.13'
+        run: python scripts/check_notebooks.py
+      - name: Build distributions
+        if: matrix.python-version == '3.13'
+        run: python -m build

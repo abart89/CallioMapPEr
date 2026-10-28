@@ -1,0 +1,265 @@
+@prefix oc: <https://w3id.org/ontocal/> .
+@prefix oeo: <https://openenergyplatform.org/ontology/oeo/> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+oc: a owl:Ontology ;
+    owl:versionIRI <https://w3id.org/ontocal/draft/2026-10-22-stage1> ;
+    owl:versionInfo "Stage 1 consolidated draft; human review pending" ;
+    rdfs:comment "Authoritative editable OntoCal draft. Covers selected model structure and quantities, configurations and executions, retained series, recorded scientific context, integration and qualified physical correspondence. The dependency derivatives are explicit review candidates, not unchanged publisher releases. Namespace publication is not implied." ;
+    owl:imports <urn:ontocal:dependency:oeo-2.12.0-dl>,
+                <urn:ontocal:dependency:prov-o-20130430-dl> .
+
+oc:ConfigurationSpecification a owl:Class ;
+    rdfs:label "configuration specification" ;
+    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:comment "Information specifying resolved model structure and settings. Its existence does not entail that a calculation has occurred or that an OEO future scenario has been supplied." .
+
+oc:CalliopeNetworkNode a owl:Class ;
+    rdfs:label "Calliope network node representation" ;
+    rdfs:subClassOf oeo:OEO_00000276, obo:IAO_0000030, prov:Entity ;
+    rdfs:comment "A node in the resolved mathematical representation, not a physical location or region inferred from its name." .
+
+oc:CalliopeTechnology a owl:Class ;
+    rdfs:label "Calliope technology representation" ;
+    rdfs:subClassOf oeo:OEO_00000276, obo:IAO_0000030, prov:Entity ;
+    rdfs:comment "A technology component in a resolved configuration. User technology names identify individuals, not automatically new ontology classes." .
+
+oc:CalliopeSupplyTechnology a owl:Class ;
+    rdfs:label "Calliope supply technology representation" ;
+    rdfs:subClassOf oc:CalliopeTechnology ;
+    rdfs:comment "A technology represented using Calliope base_tech supply. This classification says nothing by itself about a physical plant or fuel." .
+
+oc:InputAssignment a owl:Class ;
+    rdfs:label "input assignment" ;
+    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:comment "Information assigning a datum to a model setting and component in one configuration. The datum can be reused through distinct assignments. The assignment itself does not entail an execution." .
+
+oc:ResultRecord a owl:Class ;
+    rdfs:label "result record" ;
+    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:comment "A contextual record of a calculation result, retaining its component, configuration, coordinates and generating execution. Different executions retain distinct records even for equal numerical content." .
+
+oc:ComponentCorrespondence a owl:Class ;
+    rdfs:label "component correspondence assertion" ;
+    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:comment "A recorded assertion identifying two components for a stated comparison, with its basis and attribution. It does not assert identity, numerical comparability or correspondence to a real facility." .
+
+oc:inConfiguration a owl:ObjectProperty ;
+    rdfs:label "in configuration" ;
+    rdfs:domain obo:IAO_0000030 ; rdfs:range oc:ConfigurationSpecification ;
+    rdfs:comment "Identifies the configuration context of a component or assignment/result record." .
+
+oc:usesConfiguration a owl:ObjectProperty ;
+    rdfs:label "uses configuration" ;
+    rdfs:subPropertyOf prov:used ; rdfs:domain prov:Activity ;
+    rdfs:range oc:ConfigurationSpecification ;
+    rdfs:comment "Relates an actual execution to the configuration it uses. Do not assert this relation merely for a prospective configuration." .
+
+oc:atNode a owl:ObjectProperty ;
+    rdfs:label "at model node" ;
+    rdfs:domain oc:CalliopeTechnology ; rdfs:range oc:CalliopeNetworkNode ;
+    rdfs:comment "Places a technology representation at a model node; it is not a physical-location assertion." .
+
+oc:forComponent a owl:ObjectProperty ;
+    rdfs:label "for component" ;
+    rdfs:domain obo:IAO_0000030 ; rdfs:range oeo:OEO_00000276 ;
+    rdfs:subPropertyOf obo:IAO_0000136 ;
+    rdfs:comment "Identifies the component described by a contextual assignment or result record." .
+
+oc:hasDatum a owl:ObjectProperty ;
+    rdfs:label "has datum" ;
+    rdfs:domain obo:IAO_0000030 ; rdfs:range obo:IAO_0000030 ;
+    rdfs:comment "Connects a contextual record to reusable numerical information. Its domain and range impose neither a physical quantity nor an actual calculation." .
+
+oc:implementsScenario a owl:ObjectProperty ;
+    rdfs:label "implements scenario" ;
+    rdfs:subPropertyOf obo:IAO_0000136 ;
+    rdfs:domain oc:ConfigurationSpecification ; rdfs:range oeo:OEO_00000364 ;
+    rdfs:comment "A supplied assertion that a configuration records a numerical or structural implementation of an OEO future scenario. It does not reconstruct unrecorded modeller intent." .
+
+oc:implementsAssumption a owl:ObjectProperty ;
+    rdfs:label "implements assumption" ;
+    rdfs:subPropertyOf obo:IAO_0000136 ;
+    rdfs:domain obo:IAO_0000030 ; rdfs:range oeo:OEO_00000063 ;
+    rdfs:comment "A supplied assertion that an informational choice implements a recorded scenario assumption. The number alone does not establish this relationship." .
+
+oc:hasRationale a owl:ObjectProperty ;
+    rdfs:label "has recorded rationale" ;
+    rdfs:domain obo:IAO_0000030 ; rdfs:range obo:IAO_0000030 ;
+    rdfs:comment "Links information expressing an assumption or choice to a recorded explanation. Attribution and supporting sources are described on that explanation; this is not proof of adequacy or causation." .
+
+oc:sourceComponent a owl:ObjectProperty ;
+    rdfs:label "source component in correspondence" ;
+    rdfs:domain oc:ComponentCorrespondence ; rdfs:range oeo:OEO_00000276 ;
+    rdfs:comment "The first component in a directed comparison assertion." .
+oc:targetComponent a owl:ObjectProperty ;
+    rdfs:label "target component in correspondence" ;
+    rdfs:domain oc:ComponentCorrespondence ; rdfs:range oeo:OEO_00000276 ;
+    rdfs:comment "The second component in a directed comparison assertion. No symmetry, transitivity or identity is entailed." .
+
+oc:hasTemporalDescription a owl:ObjectProperty ;
+    rdfs:label "has temporal description" ;
+    rdfs:domain oc:ConfigurationSpecification ; rdfs:range oeo:OEO_00000119 ;
+    rdfs:comment "Links a configuration to a data descriptor recording its model-time index information. The descriptor is not a BFO temporal region." .
+
+oc:reportedNumericValue a owl:DatatypeProperty ;
+    rdfs:label "reported numerical value" ;
+    rdfs:domain obo:IAO_0000030 ; rdfs:range xsd:decimal ;
+    rdfs:comment "A numerical value recorded in the selected source, explicitly derived from that source, or supplied in an explicitly synthetic example. Unlike OEO has number, this property does not imply a quantity value or an unknown existing unit. A supported quantity interpretation is additionally represented using OEO." .
+oc:sourceKey a owl:DatatypeProperty ;
+    rdfs:label "source key" ; rdfs:range xsd:string ;
+    rdfs:comment "A source vocabulary key such as flow_cap_max or ccgt, interpreted within recorded source context rather than as a global identifier." .
+oc:carrierIndex a owl:DatatypeProperty ;
+    rdfs:label "carrier index" ; rdfs:range xsd:string ;
+    rdfs:comment "The exact carrier coordinate of a selected source array record. Its label does not establish a physical carrier type." .
+oc:sourcePath a owl:DatatypeProperty ;
+    rdfs:label "snapshot-relative source path" ; rdfs:range xsd:string ;
+    rdfs:comment "A file path relative to the fixed examples/calliope snapshot; not an identity rule for the described entity." .
+oc:sourceLocator a owl:DatatypeProperty ;
+    rdfs:label "source locator" ; rdfs:range xsd:string ;
+    rdfs:comment "A human-readable row, key or line selector in the referenced source." .
+oc:firstIndexLabel a owl:DatatypeProperty ;
+    rdfs:label "first temporal index label" ; rdfs:range xsd:string ;
+    rdfs:comment "The first source coordinate, preserved without adding a timezone or interpreting it as a physical interval boundary." .
+oc:lastIndexLabel a owl:DatatypeProperty ;
+    rdfs:label "last temporal index label" ; rdfs:range xsd:string ;
+    rdfs:comment "The last source coordinate; not automatically the exclusive end of the represented interval." .
+oc:indexCount a owl:DatatypeProperty ;
+    rdfs:label "temporal index count" ; rdfs:range xsd:integer ;
+    rdfs:comment "The number of temporal coordinates in the selected source array." .
+oc:evidenceStatus a owl:AnnotationProperty ;
+    rdfs:label "example evidence status" ;
+    rdfs:comment "Documents source-grounded, interpreted or synthetic example content. It has no logical classification consequences." .
+
+
+oc:TimeSeriesRecord a owl:Class ;
+    rdfs:label "time-series record" ;
+    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:comment "Information identifying a numerical series, its component and configuration context, source revision, and temporal index description. The complete numerical array may remain in an external file. For an output series, generation refers to the logical result information produced by the model execution, not the later creation of RDF metadata describing it. This record is not the temporal region described by the indices, and its existence does not require one RDF individual per value." .
+
+oc:AggregatedResultRecord a owl:Class ;
+    rdfs:label "aggregated result record" ;
+    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:comment "A contextual record of a numerical summary derived from a series using a recorded method and scope. Its generating activity is the aggregation; the source model execution is retained through the series. It is not classified as a direct result of the source optimisation." .
+
+oc:sourceRevision a owl:ObjectProperty ;
+    rdfs:label "has source revision" ;
+    rdfs:domain obo:IAO_0000030 ; rdfs:range prov:Entity ;
+    rdfs:comment "Identifies a fixed source artifact whose selected content is represented by this information. The revision has its own identifier and evidence such as a content digest; a file path alone does not establish identity. This relation does not assert the causal direction of file serialization." .
+
+oc:hasIndexDescription a owl:ObjectProperty ;
+    rdfs:label "has temporal index description" ;
+    rdfs:domain obo:IAO_0000030 ; rdfs:range oeo:OEO_00000119 ;
+    rdfs:comment "Relates information to a descriptor of its selected temporal coordinates. The descriptor is an information artifact, not a BFO temporal region. Sharing a descriptor is appropriate only when the described selection is the same." .
+
+oc:inSeries a owl:ObjectProperty ;
+    rdfs:label "in numerical series" ;
+    rdfs:domain obo:IAO_0000030 ; rdfs:range oc:TimeSeriesRecord ;
+    rdfs:comment "Connects a selected numerical record to the series of which it represents one indexed value. Selected records need not exhaust the externally retained series." .
+
+oc:summarisesSeries a owl:ObjectProperty ;
+    rdfs:label "summarises numerical series" ;
+    rdfs:subPropertyOf prov:wasDerivedFrom ;
+    rdfs:domain oc:AggregatedResultRecord ; rdfs:range oc:TimeSeriesRecord ;
+    rdfs:comment "Identifies the series from whose values a summary was derived. The summary's temporal index description specifies the aggregation scope, which must not be inferred from the number of individually exported records." .
+
+oc:hasAggregationMethod a owl:ObjectProperty ;
+    rdfs:label "has aggregation method description" ;
+    rdfs:domain oc:AggregatedResultRecord ; rdfs:range oeo:OEO_00000119 ;
+    rdfs:comment "Links a summary to its explicit numerical operation, weighting and duration treatment. A method description is not the process that executes the aggregation." .
+
+oc:contentSHA256 a owl:DatatypeProperty ;
+    rdfs:label "SHA-256 content digest" ; rdfs:range xsd:string ;
+    rdfs:comment "The SHA-256 digest of the referenced artifact's bytes. It supports checking a fixed revision; this property is not an OWL identity key." .
+
+oc:timeIndexLabel a owl:DatatypeProperty ;
+    rdfs:label "temporal index label" ; rdfs:range xsd:string ;
+    rdfs:comment "An exact source coordinate for a selected value, without introducing a timezone, an interval boundary or a wall-clock execution time." .
+
+oc:aggregationFormula a owl:DatatypeProperty ;
+    rdfs:label "aggregation formula" ; rdfs:range xsd:string ;
+    rdfs:comment "An explicit expression identifying the summary operation and weights. The formula is documentation; its numerical application is checked by the evaluation implementation." .
+
+oc:durationTreatment a owl:DatatypeProperty ;
+    rdfs:label "treatment of timestep duration" ; rdfs:range xsd:string ;
+    rdfs:comment "Explains whether and how a summary calculation uses timestep durations, including when the underlying values already represent energy over each timestep." .
+
+
+@prefix oc: <https://w3id.org/ontocal/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+oc:CalliopeStorageTechnology a owl:Class ; rdfs:subClassOf oc:CalliopeTechnology ;
+    rdfs:label "Calliope storage technology representation" ;
+    rdfs:comment "A technology occurrence classified by Calliope base_tech storage. A supply technology with include_storage remains a supply technology; storage behaviour alone does not change its base technology classification." .
+oc:CalliopeDemandTechnology a owl:Class ; rdfs:subClassOf oc:CalliopeTechnology ;
+    rdfs:label "Calliope demand technology representation" ;
+    rdfs:comment "A technology occurrence classified by Calliope base_tech demand, not the physical consumer or consumption process." .
+oc:CalliopeConversionTechnology a owl:Class ; rdfs:subClassOf oc:CalliopeTechnology ;
+    rdfs:label "Calliope conversion technology representation" ;
+    rdfs:comment "A technology occurrence classified by Calliope base_tech conversion. Its source carrier labels and carrier-indexed quantities remain explicit; the class does not classify a physical conversion plant." .
+oc:CalliopeTransmissionTechnology a owl:Class ; rdfs:subClassOf oc:CalliopeTechnology ;
+    rdfs:label "Calliope transmission technology representation" ;
+    rdfs:comment "One endpoint occurrence of a Calliope transmission technology in a resolved configuration. Two endpoint occurrences of the same source technology retain separate identities and node-indexed quantities." .
+oc:carrierIn a owl:DatatypeProperty ; rdfs:domain oc:CalliopeTechnology ; rdfs:range xsd:string ;
+    rdfs:label "input carrier source label" ;
+    rdfs:comment "An exact Calliope carrier label marked true in the resolved carrier_in array for the technology occurrence. The label is not an assertion of a physical carrier class." .
+oc:carrierOut a owl:DatatypeProperty ; rdfs:domain oc:CalliopeTechnology ; rdfs:range xsd:string ;
+    rdfs:label "output carrier source label" ;
+    rdfs:comment "An exact Calliope carrier label marked true in the resolved carrier_out array for the technology occurrence." .
+oc:remoteNode a owl:ObjectProperty ; rdfs:domain oc:CalliopeTransmissionTechnology ; rdfs:range oc:CalliopeNetworkNode ;
+    rdfs:label "other model node of transmission occurrence" ;
+    rdfs:comment "Identifies the other endpoint of the source transmission connection for an occurrence situated at one model node. This relation does not assert actual flow direction, a physical connection or a flow value." .
+oc:costIndex a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:label "cost category index" ;
+    rdfs:comment "The exact costs coordinate of the selected array record. A category called monetary does not identify a currency, currency year, exchange rate or price basis." .
+oc:quantityDimension a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:label "reported quantity dimension" ;
+    rdfs:comment "A documented dimension or quantity category interpreted from the fixed Calliope mathematical metadata, such as power, energy, dimensionless or cost / power. This string does not establish a physical unit, currency or numerical comparability." .
+
+
+@prefix oc: <https://w3id.org/ontocal/> .
+@prefix oeo: <https://openenergyplatform.org/ontology/oeo/> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix a: <https://example.org/ontocal/export-a/> .
+@prefix b: <https://example.org/ontocal/export-b/> .
+@prefix c: <https://example.org/ontocal/context/> .
+@prefix cat: <https://example.org/ontocal/catalogue/> .
+
+oc:PhysicalCorrespondenceAssertion a owl:Class ;
+    rdfs:label "physical correspondence assertion" ;
+    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:comment "An attributed assertion relating a model component to a stated physical referent or to a description of an aggregate or hypothetical arrangement. Its kind, scope and evidence must be supplied. The assertion is information; it neither identifies the component with its target nor entails that a hypothetical physical object exists." .
+oc:correspondenceTarget a owl:ObjectProperty ;
+    rdfs:label "correspondence target" ;
+    rdfs:domain oc:PhysicalCorrespondenceAssertion ; rdfs:range obo:BFO_0000001 ;
+    rdfs:comment "The entity identified by a qualified physical correspondence assertion. An actual asset can be a material entity, an aggregate can be described by an information artifact, and a hypothetical target is an information description. The property deliberately imposes no physical classification on its target." .
+oc:correspondenceKind a owl:DatatypeProperty ;
+    rdfs:label "kind of physical correspondence" ; rdfs:domain oc:PhysicalCorrespondenceAssertion ; rdfs:range xsd:string ;
+    rdfs:comment "Application-profile designation: actual, aggregate or hypothetical. This records the supplied claim; it is not independent verification of physical existence." .
+oc:correspondenceScope a owl:DatatypeProperty ;
+    rdfs:label "scope of physical correspondence" ; rdfs:domain oc:PhysicalCorrespondenceAssertion ; rdfs:range xsd:string ;
+    rdfs:comment "The stated aspect and limits of a component's correspondence to its target, such as capacity-only aggregation or a proposed design." .
+oc:executionStatus a owl:DatatypeProperty ;
+    rdfs:label "reported execution status" ; rdfs:domain prov:Activity ; rdfs:range xsd:string ;
+    rdfs:comment "Explicitly reported execution outcome. The initial profile uses solved, infeasible and failed. A failed or infeasible attempt may generate diagnostics, but it must not acquire an ordinary solved ResultRecord. Missing status remains unknown." .
+oc:referenceScenario a owl:ObjectProperty ;
+    rdfs:label "designated reference scenario" ; rdfs:domain oeo:OEO_00010252 ; rdfs:range oeo:OEO_00000364 ;
+    rdfs:comment "Records the reference scenario designated for this particular study. OEO reference scenario supplies the shared classification; this relation records its scope rather than making reference status absolute across studies." .
+# Metadata is reused for explicitly asserted discovery, not as logical domain axioms.
+dct:title a owl:AnnotationProperty .
+dct:description a owl:AnnotationProperty .
+dct:spatial a owl:AnnotationProperty .
+dct:publisher a owl:AnnotationProperty .
+dct:references a owl:AnnotationProperty .
+dct:identifier a owl:AnnotationProperty .

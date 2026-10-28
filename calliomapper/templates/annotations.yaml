@@ -1,0 +1,31 @@
+# Optional context for one saved Calliope export.
+# Start with this valid empty document. Add only records you can support.
+# See examples/annotations/README.md for fields and a complete worked example.
+schema_version: 1
+agents: []
+sources: []
+scenarios: []
+assumptions: []
+units: []
+datasets: []
+physical_correspondences: []
+component_correspondences: []
+
+# Example of the minimum contributor declaration (replace with your information):
+# default_supplier: modeller
+# default_evidence_status: Supplied by the modeller; see the cited evidence.
+# agents:
+#   - id: modeller
+#     label: Your name or organisation
+#     kind: person
+#
+# A future scenario and the numerical configuration are different things.
+# scenarios:
+#   - id: reference_future
+#     label: Describe the future being investigated
+#     description: State its meaning in words.
+#     implemented_by_configuration: true
+#
+# An input selector uses names and coordinates from the saved export:
+# {group: inputs, variable: flow_cap_max, node: region1, technology: ccgt}
+# An annotation targeting a quantity requires that quantity to be exported.

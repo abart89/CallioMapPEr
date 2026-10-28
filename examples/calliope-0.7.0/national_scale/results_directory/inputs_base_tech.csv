@@ -1,0 +1,9 @@
+techs,base_tech
+battery,storage
+ccgt,supply
+csp,supply
+demand_power,demand
+region1_to_region1_1,transmission
+region1_to_region1_2,transmission
+region1_to_region1_3,transmission
+region1_to_region2,transmission

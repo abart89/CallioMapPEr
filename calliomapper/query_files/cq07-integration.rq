@@ -1,0 +1,19 @@
+PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX dct: <http://purl.org/dc/terms/>
+# Shared vocabulary is queried directly without inference or OntoCal predicates.
+# Context and graph provenance may be supplied in separate named graphs.
+SELECT DISTINCT ?dataset ?export ?catalogue ?model ?run ?result ?study ?studyTitle
+       ?publisher ?exportAuthor ?translation WHERE {
+  GRAPH ?export {
+    ?run a oeo:OEO_00000275 ; obo:RO_0000057 ?model ; oeo:OEO_00140094 ?result .
+    ?model a oeo:OEO_00000274 .
+  }
+  ?run prov:used ?dataset ; obo:BFO_0000050 ?study .
+  ?study dct:title ?studyTitle .
+  ?export prov:wasGeneratedBy ?translation .
+  OPTIONAL { ?export prov:wasAttributedTo ?exportAuthor }
+  GRAPH ?catalogue { ?dataset dct:publisher ?publisher }
+  FILTER (?catalogue != ?export)
+} ORDER BY ?dataset ?export ?run ?result

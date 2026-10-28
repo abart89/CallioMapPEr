@@ -1,40 +1,40 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "calliomapper"
-version = "0.0.1"
-description = "Transforms Calliope v0.7 energy models into linked-data knowledge graphs using the Open Energy Ontology."
+version = "0.1.0rc2"
+description = "Represent saved Calliope modelling artifacts and supplied research context using OntoCal."
+readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 dependencies = [
-    "calliope>=0.7.0.dev1",
-    "rdflib>=7.0",
-    "linkml>=1.7",
-    "linkml-runtime>=1.7",
-    "pyshacl>=0.25",
-    "pydantic>=2.0",
-    "xarray",
-    "netCDF4",
-    "pyyaml",
+    "rdflib>=7.1,<8",
+    "pyshacl>=0.31,<0.32",
+    "PyYAML>=6,<7",
 ]
 
 [project.scripts]
 calliomapper = "calliomapper.cli:main"
 
+[project.urls]
+Repository = "https://github.com/abart89/CallioMapPEr"
+Documentation = "https://github.com/abart89/CallioMapPEr#readme"
+Issues = "https://github.com/abart89/CallioMapPEr/issues"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["calliomapper*"]
+exclude = ["calliomapper.generated*"]
 
-[tool.pytest.ini_options]
-filterwarnings = [
-    "ignore::Warning:requests",
-]
+[tool.setuptools.package-data]
+calliomapper = ["resources/**/*", "resources/*", "templates/*.yaml", "query_files/*.rq"]
 
 [project.optional-dependencies]
-dev = [
-    "pytest",
-    "pytest-cov",
-    "owlready2>=0.40",
-]
+dev = ["pytest>=8", "build>=1"]
+notebooks = ["jupyterlab>=4,<5", "nbclient>=0.10,<1", "nbformat>=5,<6", "ipykernel>=6,<8", "pandas>=2,<4"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

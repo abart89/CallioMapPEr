@@ -1,0 +1,11 @@
+techs,lifetime
+N1_to_X2,25.0
+N1_to_X3,25.0
+X1_to_N1,25.0
+X1_to_X2,25.0
+X1_to_X3,25.0
+boiler,25.0
+chp,25.0
+pv,25.0
+supply_gas,25.0
+supply_grid_power,25.0

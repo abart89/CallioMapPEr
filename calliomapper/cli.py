@@ -1,53 +1,70 @@
-"""
-Command Line Interface for CallioMapper.
-
-Embodies the "Single-Click" and "Graceful Degradation" philosophy.
-"""
-
+"""Commands for saved-result translation, annotation templates and RDF queries."""
 import argparse
-import sys
+import csv
+from importlib.resources import files
 from pathlib import Path
-from calliomapper.translator import Translator
+import sys
+import yaml
+from rdflib import Dataset
+from calliomapper.translator import Translator, DEFAULT_GROUPS
 
-def main():
-    parser = argparse.ArgumentParser(description="CallioMapper: Semantic Energy Model Translation")
-    subparsers = parser.add_subparsers(dest="command", required=True)
 
-    # `translate` command
-    parser_translate = subparsers.add_parser("translate", help="Translate a Calliope solved instance directory to an N-Quads knowledge graph (Core).")
-    parser_translate.add_argument("results_directory", type=str, help="Path to the Calliope solve outputs.")
-    parser_translate.add_argument("--extension", type=str, help="Path to PROV-O epistemic extension YAML (optional).")
-    parser_translate.add_argument("--out", type=str, required=True, help="Output .nq file path.")
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Represent a saved Calliope modelling exercise using OntoCal.")
+    commands = parser.add_subparsers(dest="command", required=True)
+    translate = commands.add_parser("translate", help="Read a solved CSV export without running Calliope.")
+    translate.add_argument("results_directory", type=Path)
+    translate.add_argument("--out", type=Path, required=True)
+    translate.add_argument("--annotations", type=Path)
+    translate.add_argument("--groups", nargs="+", choices=sorted(DEFAULT_GROUPS))
+    translate.add_argument("--time-points", type=Path, help="YAML list selecting individual saved timestep values.")
+    translate.add_argument("--namespace", help="An identifier namespace controlled by the graph producer.")
+    translate.add_argument("--identity-file", type=Path, help="Reuse the namespace in this CallioMapper manifest.")
+    template = commands.add_parser("init-annotations", help="Write an empty annotation template.")
+    template.add_argument("--out", type=Path, default=Path("annotations.yaml"))
+    query = commands.add_parser("query", help="Run a documented query and write its actual answers as CSV.")
+    query.add_argument("graph_files", nargs="+", type=Path)
+    query.add_argument("--preset", required=True)
+    query.add_argument("--out", type=Path)
+    args = parser.parse_args(argv)
+    try:
+        if args.command == "translate":
+            selections = yaml.safe_load(args.time_points.read_text()) if args.time_points else None
+            translator = Translator(args.results_directory, annotations=args.annotations, groups=args.groups,
+                                    time_points=selections, namespace=args.namespace, identity_file=args.identity_file)
+            translator.save(args.out)
+            print(f"Wrote {args.out}; SHACL validation passed.")
+            print(f"Details and omissions: {args.out}.report.json")
+            if not translator.report["real_fixture_tested_version"]:
+                print("This saved-file format has not yet been verified against a genuine saved acceptance example.", file=sys.stderr)
+        elif args.command == "init-annotations":
+            with args.out.open("x") as output:
+                output.write(files("calliomapper").joinpath("templates/annotations.yaml").read_text())
+            print(f"Wrote {args.out}")
+        else:
+            from calliomapper.queries import run_query, QUERY_REQUIREMENTS
+            dataset = Dataset(default_union=True)
+            for path in args.graph_files:
+                dataset.parse(str(path), format="nquads")
+            result = run_query(dataset, args.preset)
+            stream = args.out.open("w", newline="") if args.out else sys.stdout
+            try:
+                writer = csv.writer(stream)
+                writer.writerow(result.vars)
+                count = 0
+                for row in result:
+                    writer.writerow([str(value) if value is not None else "" for value in row])
+                    count += 1
+            finally:
+                if args.out:
+                    stream.close()
+            requirement = QUERY_REQUIREMENTS.get(args.preset.lower().replace("-", ""), "")
+            print(f"{count} answer rows. {requirement}", file=sys.stderr)
+        return 0
+    except (ValueError, OSError, yaml.YAMLError) as error:
+        print(f"CallioMapper: {error}", file=sys.stderr)
+        return 1
 
-    # `init-extension` command
-    parser_init = subparsers.add_parser("init-extension", help="Generate a blank epistemic extension template in the current directory.")
-
-    # `query` command
-    parser_query = subparsers.add_parser("query", help="Execute a canned SPARQL query against an N-Quads file and export to CSV.")
-    parser_query.add_argument("graph_file", type=str, help="Path to the .nq graph file.")
-    parser_query.add_argument("--preset", type=str, choices=["installed_capacity", "system_costs"], required=True, help="The canned query to run.")
-    parser_query.add_argument("--out", type=str, help="Output CSV path. Defaults to stdout.")
-
-    args = parser.parse_args()
-
-    if args.command == "translate":
-        print(f"Translating {args.results_directory}...")
-        try:
-            t = Translator(results_dir=args.results_directory, extension=args.extension)
-            t.save(args.out)
-            print(f"Graph successfully written to {args.out}")
-        except Exception as e:
-            print(f"Translation failed: {e}")
-            sys.exit(1)
-            
-    elif args.command == "init-extension":
-        # Placeholder for writing the template
-        print("Generated 'epistemic_extension_template.yaml' in the current directory.")
-        
-    elif args.command == "query":
-        print(f"Running '{args.preset}' query against {args.graph_file}...")
-        # Placeholder for dispatching to calliomapper.queries
-        print(f"Done.")
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

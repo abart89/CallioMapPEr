@@ -1,0 +1,8 @@
+nodes,techs,flow_cap_max
+region1,ccgt,30000.0
+region1,region1_to_region2,10000.0
+region1_1,csp,10000.0
+region1_2,csp,10000.0
+region1_3,csp,10000.0
+region2,battery,1000.0
+region2,region1_to_region2,10000.0

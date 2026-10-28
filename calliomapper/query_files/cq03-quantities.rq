@@ -1,0 +1,31 @@
+PREFIX oc: <https://w3id.org/ontocal/>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+# Numerical information with unknown units remains visible.
+# A summary's source execution and its generating aggregation are distinct.
+SELECT DISTINCT ?record ?configuration ?node ?technology ?kind ?role ?variable
+       ?carrier ?costCategory ?timestep ?value ?dimension ?unit ?execution ?generationActivity
+WHERE {
+  VALUES ?kind { oc:InputAssignment oc:ResultRecord oc:AggregatedResultRecord }
+  ?record a ?kind ; oc:inConfiguration ?configuration ; oc:forComponent ?component ;
+      oc:sourceKey ?variable ; oc:hasDatum ?datum .
+  ?component oc:sourceKey ?technology ; oc:atNode/oc:sourceKey ?node .
+  ?datum oc:reportedNumericValue ?value .
+  BIND(IF(?kind = oc:InputAssignment, "input", IF(?kind = oc:ResultRecord, "result", "summary")) AS ?role)
+  OPTIONAL { ?record oc:carrierIndex ?carrier }
+  OPTIONAL { ?record oc:costIndex ?costCategory }
+  OPTIONAL { ?record oc:timeIndexLabel ?timestep }
+  OPTIONAL { ?record oc:quantityDimension ?dimension }
+  OPTIONAL {
+    ?datum obo:IAO_0000136 ?quantity .
+    ?quantity a oeo:OEO_00000350 ; oeo:OEO_00040010/rdfs:label ?unit
+  }
+  OPTIONAL { ?record prov:wasGeneratedBy ?generationActivity }
+  OPTIONAL { ?record oc:summarisesSeries/prov:wasGeneratedBy ?sourceRun }
+  OPTIONAL { ?datum oeo:OEO_00020189 ?inputRun . ?inputRun oc:usesConfiguration ?configuration }
+  BIND(IF(?kind = oc:InputAssignment, ?inputRun,
+       IF(?kind = oc:AggregatedResultRecord, ?sourceRun, ?generationActivity)) AS ?execution)
+}
+ORDER BY ?configuration ?node ?technology ?variable ?carrier ?timestep

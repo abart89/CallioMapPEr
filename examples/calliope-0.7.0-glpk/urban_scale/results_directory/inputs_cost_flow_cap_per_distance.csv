@@ -1,0 +1,6 @@
+techs,costs,cost_flow_cap_per_distance
+N1_to_X2,monetary,0.3
+N1_to_X3,monetary,0.3
+X1_to_N1,monetary,0.3
+X1_to_X2,monetary,0.01
+X1_to_X3,monetary,0.01

@@ -1,149 +1,46 @@
-"""
-Tests for CoreMapper using the real ontocal_core schema.
-"""
-
 from pathlib import Path
-
 import pytest
-from rdflib import BNode, Dataset, Graph, URIRef, Literal
-from rdflib.namespace import RDF, RDFS
+from rdflib import RDF, RDFS
+from calliomapper.mapper.core import MappingContext, add_structure
+from calliomapper.source import SavedModel
+from calliomapper.vocabulary import OC, OEO, OBO
 
-from calliomapper import Translator
-from calliomapper.mapper.core import CoreMapper
-from calliomapper.ontocal.namespaces import ONTOCAL
-from calliomapper.utils.io import serialize_nq  # noqa: F401
-from calliomapper.utils.validation import ValidationError, validate
-
-SHAPES = Path(__file__).parent.parent / "ontocal" / "ontocal_core_shapes.ttl"
-RUN_ID = "https://w3id.org/ontocal/runs/test-run-001"
+ROOT = Path(__file__).resolve().parents[1]
 
 
-# ---------------------------------------------------------------------------
-# CoreMapper unit tests
-# ---------------------------------------------------------------------------
+@pytest.mark.parametrize('directory', ['calliope-0.7.0-glpk/', 'calliope-0.7.0/', ''])
+def test_effective_urban_structure_and_explicit_shared_typing(directory):
+    ctx = MappingContext(SavedModel(ROOT / 'examples' / directory / 'urban_scale/results_directory'), 'urn:test:urban:')
+    add_structure(ctx)
+    assert len(ctx.nodes) == 4
+    assert len(ctx.components) == 26
+    chp = ctx.components['X1', 'chp']
+    assert (chp, RDF.type, OC.CalliopeConversionTechnology) in ctx.graph
+    assert (chp, RDF.type, OEO.OEO_00000276) in ctx.graph
+    assert (chp, RDF.type, OBO.IAO_0000030) in ctx.graph
+    assert {str(v) for v in ctx.graph.objects(chp, OC.carrierOut)} == {'electricity', 'heat'}
+    assert len(list(ctx.graph.triples((None, OC.remoteNode, None)))) == 10
+    assert not list(ctx.graph.subjects(RDF.type, OBO.BFO_0000040))
 
 
-class TestCoreMapper:
-    def test_single_entity_type_triple(self):
-        g = CoreMapper(RUN_ID).map(nodes={"region_a": {}})
-        entity = URIRef(RUN_ID + "/region_a")
-        assert (entity, RDF.type, ONTOCAL.CalliopeNetworkNode) in g
-
-    def test_single_entity_label_triple(self):
-        g = CoreMapper(RUN_ID).map(nodes={"region_a": {"name": "Region A"}})
-        entity = URIRef(RUN_ID + "/region_a")
-        labels = list(g.objects(entity, ONTOCAL.name))
-        assert len(labels) == 1
-        assert str(labels[0]) == "Region A"
-
-    def test_label_falls_back_to_key_name(self):
-        g = CoreMapper(RUN_ID).map(nodes={"wind_onshore": {}})
-        entity = URIRef(RUN_ID + "/wind_onshore")
-        assert str(list(g.objects(entity, ONTOCAL.name))[0]) == "wind_onshore"
-
-    def test_multiple_nodes_and_techs(self):
-        g = CoreMapper(RUN_ID).map(
-            nodes={"region_a": {}, "region_b": {}},
-            techs={
-                "wind": {"base_tech": "supply", "carrier_out": "electricity"},
-                "demand_elec": {"base_tech": "demand", "carrier_in": "electricity"}
-            },
-        )
-        assert len(list(g.subjects(RDF.type, ONTOCAL.CalliopeNetworkNode))) == 2
-        assert len(list(g.subjects(RDF.type, ONTOCAL.CalliopeSupplyTechnology))) == 1
-        assert len(list(g.subjects(RDF.type, ONTOCAL.CalliopeDemandTechnology))) == 1
-
-    def test_graph_identifier_default(self):
-        g = CoreMapper(RUN_ID).map(nodes={"region_a": {}})
-        assert str(g.identifier) == RUN_ID + "/core"
-
-    def test_graph_identifier_custom(self):
-        custom = RUN_ID + "/scenario-high-renewables"
-        g = CoreMapper(RUN_ID, graph_id=custom).map(nodes={"region_a": {}})
-        assert str(g.identifier) == custom
-
-    def test_custom_graph_id_does_not_affect_entity_uris(self):
-        # Entity URIs are always anchored to run_id, not graph_id
-        custom = RUN_ID + "/scenario-high-renewables"
-        g = CoreMapper(RUN_ID, graph_id=custom).map(nodes={"region_a": {}})
-        entity = URIRef(RUN_ID + "/region_a")
-        assert (entity, RDF.type, ONTOCAL.CalliopeNetworkNode) in g
-
-    def test_empty_input_produces_empty_graph(self):
-        g = CoreMapper(RUN_ID).map()
-        assert len(g) == 0
+@pytest.mark.parametrize('directory', ['calliope-0.7.0-glpk/', 'calliope-0.7.0/', ''])
+def test_technology_definition_is_separate_information(directory):
+    ctx = MappingContext(SavedModel(ROOT / 'examples' / directory / 'national_scale/results_directory'), 'urn:test:national:')
+    add_structure(ctx)
+    from calliomapper.vocabulary import PROV
+    component = ctx.components['region1', 'ccgt']
+    definition = ctx.graph.value(component, PROV.wasDerivedFrom)
+    assert definition != component
+    assert (definition, RDF.type, OBO.IAO_0000030) in ctx.graph
+    assert (definition, RDF.type, OC.CalliopeTechnology) not in ctx.graph
 
 
-# ---------------------------------------------------------------------------
-# SHACL validation
-# ---------------------------------------------------------------------------
-
-
-class TestSHACLValidation:
-    def test_valid_graph_passes(self):
-        g = CoreMapper(RUN_ID).map(nodes={"region_a": {}})
-        cg = Dataset()
-        cg.add_graph(g)
-        # Note: if shape validation requires missing properties on the actual shapes, 
-        # it might fail. But ontocal_core currently seems to pass for pure Node triples.
-        validate(cg, SHAPES)  # must not raise
-
-    def test_invalid_graph_raises(self):
-        # Adding an unknown property violates the sh:closed true constraint
-        bad = Graph(identifier=URIRef(RUN_ID + "/bad"))
-        uri = URIRef(RUN_ID + "/bad_node")
-        bad.add((uri, RDF.type, ONTOCAL.CalliopeNetworkNode))
-        bad.add((uri, ONTOCAL.invalidProperty, Literal("x")))
-        cg = Dataset()
-        cg.add_graph(bad)
-        with pytest.raises(ValidationError):
-            validate(cg, SHAPES)
-
-
-# ---------------------------------------------------------------------------
-# Round-trip: dict → RDF → SHACL validation → .nq → reload
-# ---------------------------------------------------------------------------
-
-
-class TestRoundTrip:
-    def test_translator_produces_nq_file(self, tmp_path):
-        out = tmp_path / "test_output.nq"
-        Translator(
-            nodes={"test_node": {"name": "Test Node"}},
-            run_id=RUN_ID,
-        ).save(out)
-        assert out.exists()
-        assert out.stat().st_size > 0
-
-    def test_nq_file_is_valid_rdf(self, tmp_path):
-        out = tmp_path / "test_output.nq"
-        Translator(
-            nodes={"test_node": {"name": "Test Node"}},
-            run_id=RUN_ID,
-        ).save(out)
-        loaded = Dataset()
-        loaded.parse(str(out), format="nquads")
-        entity = URIRef(RUN_ID + "/test_node")
-        # Search across all named graphs in the dataset
-        assert any(
-            (entity, RDF.type, ONTOCAL.CalliopeNetworkNode) in g
-            for g in loaded.graphs()
-        )
-
-    def test_nq_contains_default_named_graph(self, tmp_path):
-        out = tmp_path / "test_output.nq"
-        Translator(nodes={"test_node": {}}, run_id=RUN_ID).save(out)
-        loaded = Dataset()
-        loaded.parse(str(out), format="nquads")
-        graph_names = [str(g.identifier) for g in loaded.graphs()]
-        assert RUN_ID + "/core" in graph_names
-
-    def test_nq_contains_custom_named_graph(self, tmp_path):
-        out = tmp_path / "test_output.nq"
-        custom = RUN_ID + "/scenario-high-renewables"
-        Translator(nodes={"test_node": {}}, run_id=RUN_ID, graph_id=custom).save(out)
-        loaded = Dataset()
-        loaded.parse(str(out), format="nquads")
-        graph_names = [str(g.identifier) for g in loaded.graphs()]
-        assert custom in graph_names
-        assert RUN_ID + "/core" not in graph_names
+def test_stable_structure_records_actual_files_and_unknown_executable_version():
+    from calliomapper.vocabulary import PROV
+    ctx = MappingContext(SavedModel(ROOT / 'examples/calliope-0.7.0/urban_scale/results_directory'), 'urn:test:stable:')
+    add_structure(ctx)
+    source_paths = {str(value) for value in ctx.graph.objects(None, OC.sourcePath)}
+    assert {'inputs_active.csv', 'inputs_link_from.csv', 'inputs_link_to.csv'} <= source_paths
+    assert 'inputs_definition_matrix.csv' not in source_paths
+    software = ctx.graph.value(ctx.execution, PROV.wasAssociatedWith)
+    assert str(ctx.graph.value(software, RDFS.label)) == 'Calliope (producing version not recorded in saved export)'

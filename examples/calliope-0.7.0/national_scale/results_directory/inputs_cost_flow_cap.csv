@@ -1,0 +1,4 @@
+costs,techs,cost_flow_cap
+monetary,ccgt,750.0
+monetary,csp,1000.0
+monetary,region1_to_region2,200.0

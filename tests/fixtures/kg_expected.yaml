@@ -1,11 +1,10 @@
-# KG Expected Answers
+# Historical expected answers from the earlier prototype.
 #
-# Machine-readable ground truth for verify_kg.py assertions.
-# Scalar answers live inline in kg_questions.md.
-# This file holds lists, sets, and structured parameter data.
-#
-# Keys match the references in kg_questions.md (e.g. "kg_expected > national_scale.structural.nodes").
-# Do not edit manually unless the fixture models change — derive from attrs.yaml.
+# The current test suite does not read this file. Its values are preserved as a
+# record of the earlier model inspection, including the unfinished urban
+# node-to-technology section. The former verify_kg.py and kg_questions.md
+# workflow is not part of the current package.
+# See tests/fixtures/README.md for the current saved examples and tests.
 
 national_scale:
 

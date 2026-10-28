@@ -1,0 +1,30 @@
+LP has 4139 rows; 3448 cols; 10522 nonzeros
+Coefficient ranges:
+  Matrix  [9e-04, 7e+00]
+  Cost    [2e-05, 1e+06]
+  Bound   [5e+01, 2e+03]
+  RHS     [2e-02, 1e+03]
+WARNING: Problem has some excessively small costs
+WARNING: Problem has some excessively large costs
+WARNING:    Consider scaling the objective by 1e-1, or setting the user_objective_scale option to -1
+Presolving model
+2151 rows, 2262 cols, 6348 nonzeros 0s
+Dependent equations search running on 576 equations with time limit of 1000.00s
+Dependent equations search removed 0 rows and 0 nonzeros in 0.00s (limit = 1000.00s)
+2007 rows, 2022 cols, 6108 nonzeros 0s
+Presolve reductions: rows 2007(-2132); columns 2022(-1426); nonzeros 6108(-4414) 
+Solving the presolved LP
+Using dual simplex solver
+  Iteration        Objective     Infeasibilities num(sum)
+          0    -3.1695599769e+00 Ph1: 154(154); Du: 77(3.16956) 0.0s
+       1033     8.4233719671e+02 Pr: 0(0) 0.0s
+       1033     8.4233719671e+02 Pr: 0(0) 0.0s
+
+Performed postsolve
+Solving the original LP from the solution after postsolve
+
+Model status        : Optimal
+Simplex   iterations: 1033
+Objective value     :  8.4233719671e+02
+P-D objective error :  4.7210058310e-16
+HiGHS run time      :          0.01

@@ -1,0 +1,9 @@
+techs,one_way
+battery,False
+ccgt,False
+csp,False
+demand_power,False
+region1_to_region1_1,False
+region1_to_region1_2,False
+region1_to_region1_3,False
+region1_to_region2,False

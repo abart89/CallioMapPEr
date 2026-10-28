@@ -1,0 +1,8 @@
+techs,carriers,total_generation
+battery,power,15808.142800000005
+ccgt,power,3408773.843940608
+csp,power,725942.3477074283
+region1_to_region1_1,power,712417.9966486047
+region1_to_region1_2,power,0.0
+region1_to_region1_3,power,13524.351058823535
+region1_to_region2,power,289822.554900831

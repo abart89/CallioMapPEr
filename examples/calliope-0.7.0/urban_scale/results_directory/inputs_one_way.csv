@@ -1,0 +1,13 @@
+techs,one_way
+N1_to_X2,False
+N1_to_X3,False
+X1_to_N1,False
+X1_to_X2,False
+X1_to_X3,False
+boiler,False
+chp,False
+demand_electricity,False
+demand_heat,False
+pv,False
+supply_gas,False
+supply_grid_power,False

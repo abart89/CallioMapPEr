@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """
+Historical, unmaintained validator for the earlier LinkML prototype.
+
+Its original dependencies and paths are not provided by the current package.
+Use `python -m pytest tests/` for current checks and scripts/check_owl.py for
+OWL checks of generated examples with the bundled OntoCal resources.
+
 Standalone validator for ontocal/ontocal_core.yaml.
 
 Checks:

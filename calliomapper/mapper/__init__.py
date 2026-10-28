@@ -1,2 +1,1 @@
-# mapper subpackage
-# Contains the three mapping components: structural, epistemic, results.
+"""Mappings for saved structure, selected numerical arrays and supplied context."""

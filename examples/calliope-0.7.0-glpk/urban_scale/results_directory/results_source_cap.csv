@@ -1,0 +1,8 @@
+nodes,techs,source_cap
+X1,pv,0.0
+X1,supply_gas,644.31283483665
+X1,supply_grid_power,33.6201473134811
+X2,pv,49.3181072146799
+X2,supply_gas,226.859377644823
+X3,pv,38.9499999
+X3,supply_gas,0.0183529411764706

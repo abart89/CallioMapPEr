@@ -1,0 +1,98 @@
+# Demonstration context for the saved stable 0.7.0 national example.
+# This is not a reconstruction of the example authors' intentions.
+# The two unit interpretations have separately identified source-comment evidence.
+schema_version: 1
+default_supplier: demonstration_contributor
+default_evidence_status: Synthetic supplied context for this tutorial; not an empirical claim.
+agents:
+  - id: demonstration_contributor
+    label: Fictional tutorial contributor
+    kind: person
+sources:
+  - id: invented_report
+    title: Invented capacity-planning note for the annotation demonstration
+    locator: This annotation file; no empirical report exists.
+  - id: capacity_comment
+    title: Calliope national example capacity-unit comment and mathematical bound
+    locator: >-
+      examples/calliope-0.7.0-glpk/national_scale/source/model_config/techs.yaml, techs.ccgt.flow_cap_max:
+      40000 # kW; saved attrs.yaml math.build.variables.flow_cap.bounds.max
+      refers to flow_cap_max. The 30000 override and result are interpreted
+      using the same unit. This is an interpretation, not a CSV unit field.
+scenarios:
+  - id: reference_future
+    label: Illustrative future with a capacity restriction
+    description: >-
+      A fictional planning future in which the represented CCGT capacity is
+      restricted. This story is supplied for the tutorial; it is not extracted
+      from the example's scenario labels or model-time dates.
+    implemented_by_configuration: true
+    evidence: [invented_report]
+study:
+  id: demonstration_study
+  title: Illustrative capacity-planning exercise
+  question: How does the represented CCGT capacity relate to the imposed bound?
+  scenarios: [reference_future]
+  reference_scenario: reference_future
+  evidence: [invented_report]
+assumptions:
+  - id: capacity_assumption
+    statement: In this invented future, the region1 CCGT capacity is limited to 30000 kW.
+    scenario: reference_future
+    targets:
+      - {group: inputs, variable: flow_cap_max, node: region1, technology: ccgt}
+    evidence: [invented_report]
+    reasons:
+      - id: capacity_reason
+        statement: >-
+          The fictional contributor chose this limit to demonstrate a capacity
+          restriction. It is not an explanation supplied by the example authors.
+        evidence: [invented_report]
+  - id: unexplained_efficiency_assumption
+    statement: The saved battery charging efficiency is retained in this illustrative future.
+    scenario: reference_future
+    targets:
+      - {group: inputs, variable: flow_in_eff, node: region2, technology: battery}
+    # No reason is supplied. The graph must preserve that absence.
+units:
+  - id: bound_unit_interpretation
+    target: {group: inputs, variable: flow_cap_max, node: region1, technology: ccgt}
+    unit_class: https://openenergyplatform.org/ontology/oeo/OEO_00390000
+    label: kW
+    evidence: [capacity_comment]
+    evidence_status: >-
+      Interpretation grounded in the original example's kW comment and the
+      saved capacity bound, supplied here by the tutorial contributor.
+  - id: result_unit_interpretation
+    target: {group: results, variable: flow_cap, node: region1, technology: ccgt, carriers: power}
+    unit_class: https://openenergyplatform.org/ontology/oeo/OEO_00390000
+    label: kW
+    evidence: [capacity_comment]
+    evidence_status: >-
+      Interpretation grounded in the original example's kW comment and the
+      saved capacity bound, supplied here by the tutorial contributor.
+datasets:
+  - id: supplied_capacity_dataset
+    title: Fictional planning-capacity dataset, revision 2
+    revision_uri: https://example.org/calliomapper/tutorial/dataset/capacity/revision-2
+    family_uri: https://example.org/calliomapper/tutorial/dataset/capacity
+    previous_revision_uri: https://example.org/calliomapper/tutorial/dataset/capacity/revision-1
+    evidence: [invented_report]
+    targets:
+      - {group: inputs, variable: flow_cap_max, node: region1, technology: ccgt}
+    preparation:
+      id: invented_preparation
+      description: >-
+        Invented preparation activity demonstrating how a modeller can record
+        the origin of an input. This activity was not observed or executed.
+      inputs: [invented_report]
+physical_correspondences:
+  - id: proposed_plant_correspondence
+    component: {node: region1, technology: ccgt}
+    kind: hypothetical
+    target_uri: https://example.org/calliomapper/tutorial/proposed-plant-description
+    target_label: Description of an invented proposed plant
+    scope: >-
+      Illustrative capacity representation only. This does not assert that
+      a plant exists or that region1 is a known physical location.
+    evidence: [invented_report]

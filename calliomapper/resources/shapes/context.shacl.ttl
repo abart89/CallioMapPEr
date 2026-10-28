@@ -1,0 +1,64 @@
+@prefix oc: <https://w3id.org/ontocal/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix oeo: <https://openenergyplatform.org/ontology/oeo/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Optional context is not required on every model. Supplied claims must be qualified.
+oc:RecordedRationaleShape a sh:NodeShape ; sh:targetObjectsOf oc:hasRationale ;
+    sh:property [ sh:path rdfs:comment ; sh:minCount 1 ; sh:datatype xsd:string ] ;
+    sh:property oc:RationaleAttribution .
+oc:RationaleAttribution a sh:PropertyShape ; sh:path prov:wasAttributedTo ; sh:minCount 1 ;
+    sh:class prov:Agent ; sh:message "A supplied rationale must identify its supplier." .
+oc:StudyReferenceShape a sh:NodeShape ; sh:targetSubjectsOf oc:referenceScenario ;
+    sh:property [ sh:path oc:referenceScenario ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oeo:OEO_00000364 ] ;
+    sh:sparql [ sh:message "The designated reference must be a scenario investigated by this study." ;
+        sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+        PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+        SELECT $this WHERE { $this oc:referenceScenario ?scenario .
+          FILTER NOT EXISTS { $this oeo:OEO_00020226 ?scenario } }""" ] .
+oc:ReportedExecutionStatusShape a sh:NodeShape ; sh:targetSubjectsOf oc:executionStatus ;
+    sh:property [ sh:path oc:executionStatus ; sh:minCount 1 ; sh:maxCount 1 ; sh:in ("solved" "infeasible" "failed") ] ;
+    sh:sparql oc:NoSolvedResultFromFailedExecution .
+oc:NoSolvedResultFromFailedExecution a sh:SPARQLConstraint ;
+    sh:message "An infeasible or failed execution cannot generate an ordinary solved ResultRecord." ;
+    sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        SELECT $this WHERE { $this oc:executionStatus ?status .
+          FILTER (?status IN ("infeasible", "failed"))
+          ?result a oc:ResultRecord ; prov:wasGeneratedBy $this . }""" .
+oc:PhysicalCorrespondenceShape a sh:NodeShape ; sh:targetClass oc:PhysicalCorrespondenceAssertion ;
+    sh:property [ sh:path oc:forComponent ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oeo:OEO_00000276 ] ;
+    sh:property [ sh:path oc:correspondenceTarget ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path oc:correspondenceKind ; sh:minCount 1 ; sh:maxCount 1 ; sh:in ("actual" "aggregate" "hypothetical") ] ;
+    sh:property [ sh:path oc:correspondenceScope ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] ;
+    sh:property [ sh:path prov:wasAttributedTo ; sh:minCount 1 ; sh:class prov:Agent ] ;
+    sh:property oc:CorrespondenceEvidence ;
+    sh:sparql [ sh:message "An actual correspondence target must explicitly be identified as a material entity." ;
+        sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+        PREFIX obo: <http://purl.obolibrary.org/obo/>
+        SELECT $this WHERE { $this oc:correspondenceKind "actual" ; oc:correspondenceTarget ?target .
+          FILTER NOT EXISTS { ?target a obo:BFO_0000040 } }""" ] ;
+    sh:sparql [ sh:message "An aggregate or hypothetical target must be an information description." ;
+        sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+        PREFIX obo: <http://purl.obolibrary.org/obo/>
+        SELECT $this WHERE { $this oc:correspondenceKind ?kind ; oc:correspondenceTarget ?target .
+          FILTER (?kind IN ("aggregate", "hypothetical"))
+          FILTER NOT EXISTS { ?target a obo:IAO_0000030 } }""" ] ;
+    sh:sparql oc:NoPhysicalHypothesis ;
+    sh:sparql [ sh:message "A model component and physical correspondence target must retain distinct identifiers." ;
+        sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        SELECT $this WHERE { $this oc:forComponent ?component ; oc:correspondenceTarget ?target .
+          FILTER (?component = ?target || EXISTS { ?component owl:sameAs|^owl:sameAs ?target }) }""" ] .
+oc:CorrespondenceEvidence a sh:PropertyShape ; sh:path prov:wasDerivedFrom ;
+    sh:minCount 1 ; sh:class prov:Entity ; sh:message "A supplied correspondence must identify its recorded evidence source." .
+oc:NoPhysicalHypothesis a sh:SPARQLConstraint ;
+    sh:message "A hypothetical target description must not be asserted as a material entity or power plant." ;
+    sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+        PREFIX obo: <http://purl.obolibrary.org/obo/>
+        PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+        SELECT $this WHERE { $this oc:correspondenceKind "hypothetical" ; oc:correspondenceTarget ?target .
+          ?target a ?physicalType . FILTER (?physicalType IN (obo:BFO_0000040, oeo:OEO_00000031)) }""" .

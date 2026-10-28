@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650" role="img" aria-labelledby="workflow-title workflow-description">
+  <title id="workflow-title">From Calliope exports to a knowledge graph</title>
+  <desc id="workflow-description">CallioMapper automatically reads a saved Calliope export containing model structure, inputs, calculated results and recorded execution metadata. Researchers can optionally supply annotated study context, future scenarios, assumptions, reasons, contributors and evidence. OntoCal supplies the vocabulary and validation rules, reusing OEO and PROV-O. CallioMapper maps selected information to RDF and checks required data and relationships. Its outputs are a knowledge graph, an identifier manifest and an export report. These support queries, comparison and integration according to the information supplied. CallioMapper reads existing results; it does not run the optimisation.</desc>
+  <defs>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9 Z" fill="#39739c"/>
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9 Z" fill="#95631e"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9 Z" fill="#766092"/>
+    </marker>
+    <marker id="arrow-navy" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9 Z" fill="#284c67"/>
+    </marker>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; }
+      .body { font-size: 16px; fill: #334a5a; }
+      .heading { font-size: 20px; font-weight: 700; }
+      .connector { fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <rect width="1000" height="650" rx="20" fill="#ffffff"/>
+  <text x="32" y="36" font-size="25" font-weight="700" fill="#173854">From Calliope exports to a knowledge graph</text>
+  <text x="32" y="62" font-size="16" fill="#526878">Read existing results and add context when it is available.</text>
+
+  <rect x="32" y="90" width="290" height="172" rx="14" fill="#edf5fb" stroke="#b6cfdf" stroke-width="1.5"/>
+  <rect x="49" y="110" width="4" height="36" rx="2" fill="#39739c"/>
+  <text x="65" y="125" class="heading" fill="#235679">Saved Calliope export</text>
+  <text x="65" y="148" font-size="15" fill="#45677e">CSV arrays + attrs.yaml</text>
+  <text x="52" y="184" class="body">Model structure</text>
+  <text x="52" y="209" class="body">Inputs and calculated results</text>
+  <text x="52" y="234" class="body">Recorded execution metadata</text>
+
+  <rect x="355" y="90" width="290" height="172" rx="14" fill="#fff7e9" stroke="#dfcca8" stroke-width="1.5"/>
+  <rect x="372" y="110" width="4" height="36" rx="2" fill="#95631e"/>
+  <text x="388" y="125" class="heading" fill="#79511c">User-supplied context</text>
+  <text x="388" y="148" font-size="15" fill="#79613a">Optional YAML annotations</text>
+  <text x="375" y="184" class="body">Study and future scenarios</text>
+  <text x="375" y="209" class="body">Assumptions and reasons</text>
+  <text x="375" y="234" class="body">Contributors and evidence</text>
+
+  <rect x="678" y="90" width="290" height="172" rx="14" fill="#f4f0fa" stroke="#d0c2df" stroke-width="1.5"/>
+  <rect x="695" y="110" width="4" height="36" rx="2" fill="#766092"/>
+  <text x="711" y="125" class="heading" fill="#62467f">OntoCal</text>
+  <text x="711" y="148" font-size="15" fill="#725f87">Vocabulary + validation rules</text>
+  <text x="698" y="184" class="body">Classes and relationships</text>
+  <text x="698" y="209" class="body">Required data and connections</text>
+  <text x="698" y="234" class="body">Reuses OEO and PROV-O</text>
+
+  <path d="M 177 262 V 294 H 360 V 325" class="connector" stroke="#39739c" marker-end="url(#arrow-blue)"/>
+  <text x="268" y="284" text-anchor="middle" font-size="13" fill="#235679">Automatic extraction</text>
+  <path d="M 500 262 V 325" class="connector" stroke="#95631e" stroke-dasharray="6 5" marker-end="url(#arrow-amber)"/>
+  <text x="514" y="298" font-size="13" fill="#79511c">If supplied</text>
+  <path d="M 823 262 V 294 H 640 V 325" class="connector" stroke="#766092" marker-end="url(#arrow-purple)"/>
+  <text x="732" y="284" text-anchor="middle" font-size="13" fill="#62467f">Guides representation</text>
+
+  <rect x="280" y="326" width="440" height="100" rx="16" fill="#173854"/>
+  <text x="500" y="359" text-anchor="middle" font-size="25" font-weight="700" fill="#ffffff">CallioMapper</text>
+  <text x="500" y="385" text-anchor="middle" font-size="16" fill="#edf4f8">Maps selected information to RDF</text>
+  <text x="500" y="408" text-anchor="middle" font-size="16" fill="#edf4f8">Checks required data and relationships</text>
+
+  <path d="M 500 426 V 463" class="connector" stroke="#284c67" marker-end="url(#arrow-navy)"/>
+  <rect x="280" y="464" width="440" height="86" rx="16" fill="#edf7f3" stroke="#a7c9bb" stroke-width="1.5"/>
+  <text x="500" y="498" text-anchor="middle" font-size="23" font-weight="700" fill="#235746">RDF knowledge graph</text>
+  <text x="500" y="524" text-anchor="middle" font-size="16" fill="#3e6054">With an identifier manifest and export report</text>
+  <path d="M 500 550 V 576" class="connector" stroke="#284c67" marker-end="url(#arrow-navy)"/>
+  <text x="500" y="603" text-anchor="middle" font-size="22" font-weight="700" fill="#173854">Query · Compare · Integrate</text>
+  <text x="500" y="627" text-anchor="middle" font-size="15" fill="#526878">Answers depend on the information supplied.</text>
+</svg>

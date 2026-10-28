@@ -1,0 +1,3 @@
+techs,costs,carriers,nodes,cost_flow_out
+chp,monetary,electricity,X1,0.004
+pv,monetary,electricity,X2,-0.0203

@@ -1,0 +1,19 @@
+{
+  "build_commands": [
+    "make -j4",
+    "make install"
+  ],
+  "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+  "configuration": [
+    "./configure",
+    "--prefix=<temporary-install-directory>",
+    "--disable-shared"
+  ],
+  "executable_sha256": "aec63e0621b16e2da747ba192cf177f829a66943edfaddecd7f1fc7bbb4f6395",
+  "license": "GNU General Public License version 3 or later, as reported by glpsol --version.",
+  "name": "GNU GLPK",
+  "scope": "Built locally in a temporary directory for these saved executions. No GLPK executable or library is distributed in this repository.",
+  "source_archive_sha256": "4a1013eebb50f728fc601bdd833b0b2870333c3b3e5a816eeba921d95bec6f15",
+  "source_url": "https://ftp.gnu.org/gnu/glpk/glpk-5.0.tar.gz",
+  "version": "5.0"
+}

@@ -1,0 +1,5 @@
+nodes,techs,costs,cost_investment_storage_cap
+region1_1,csp,monetary,12306924.72807725
+region1_2,csp,monetary,0.0
+region1_3,csp,monetary,1265020.9107611899
+region2,battery,monetary,1047849.216

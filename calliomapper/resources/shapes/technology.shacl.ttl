@@ -1,0 +1,44 @@
+@prefix oc: <https://w3id.org/ontocal/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Load with capacity.shacl.ttl. This profile covers the selected resolved Calliope
+# technology occurrences, not every foreign OEO model component in a combined graph.
+oc:CarrierLabelsShape a sh:NodeShape ; sh:targetClass oc:CalliopeTechnology ;
+    sh:property [ sh:path oc:carrierIn ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:carrierOut ; sh:datatype xsd:string ] .
+oc:InputCarrierShape a sh:NodeShape ; sh:targetClass oc:CalliopeDemandTechnology, oc:CalliopeStorageTechnology, oc:CalliopeConversionTechnology, oc:CalliopeTransmissionTechnology ;
+    sh:property [ sh:path oc:carrierIn ; sh:minCount 1 ; sh:datatype xsd:string ] .
+oc:OutputCarrierShape a sh:NodeShape ; sh:targetClass oc:CalliopeStorageTechnology, oc:CalliopeConversionTechnology, oc:CalliopeTransmissionTechnology ;
+    sh:property [ sh:path oc:carrierOut ; sh:minCount 1 ; sh:datatype xsd:string ] .
+oc:TransmissionShape a sh:NodeShape ; sh:targetClass oc:CalliopeTransmissionTechnology ;
+    sh:property [ sh:path oc:remoteNode ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oc:CalliopeNetworkNode ] ;
+    sh:sparql oc:TransmissionConfiguration ;
+    sh:sparql oc:DistinctTransmissionEndpoints .
+oc:TransmissionConfiguration a sh:SPARQLConstraint ;
+    sh:message "The remote node must belong to the transmission occurrence's configuration." ;
+    sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+      SELECT $this WHERE { $this oc:inConfiguration ?configuration ; oc:remoteNode ?remote .
+        FILTER NOT EXISTS { ?remote oc:inConfiguration ?configuration } }""" .
+oc:DistinctTransmissionEndpoints a sh:SPARQLConstraint ;
+    sh:message "A selected transmission occurrence must connect distinct model nodes." ;
+    sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+      SELECT $this WHERE { $this oc:atNode ?node ; oc:remoteNode ?node }""" .
+oc:QuantityCoordinatesShape a sh:NodeShape ; sh:targetClass oc:InputAssignment, oc:ResultRecord ;
+    sh:property [ sh:path oc:carrierIndex ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:costIndex ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:timeIndexLabel ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path oc:quantityDimension ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:sparql oc:CostCoordinateRequired ;
+    sh:sparql oc:NoInventedCarrierCoordinate .
+oc:CostCoordinateRequired a sh:SPARQLConstraint ;
+    sh:message "The selected cost variables require their costs coordinate." ;
+    sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+      SELECT $this WHERE { $this oc:sourceKey ?key .
+        FILTER (?key IN ("cost", "cost_flow_cap", "cost_storage_cap"))
+        FILTER NOT EXISTS { $this oc:costIndex ?cost } }""" .
+oc:NoInventedCarrierCoordinate a sh:SPARQLConstraint ;
+    sh:message "The saved storage_cap and cost arrays do not have a carrier coordinate." ;
+    sh:select """PREFIX oc: <https://w3id.org/ontocal/>
+      SELECT $this WHERE { $this oc:sourceKey ?key ; oc:carrierIndex ?carrier .
+        FILTER (?key IN ("storage_cap", "cost")) }""" .

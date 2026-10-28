@@ -1,0 +1,13 @@
+PREFIX oc: <https://w3id.org/ontocal/>
+PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+SELECT ?configuration ?component ?node ?technology ?technologyType ?carrierIn ?carrierOut ?remoteNode
+WHERE {
+  VALUES ?type { oc:CalliopeSupplyTechnology oc:CalliopeStorageTechnology oc:CalliopeDemandTechnology
+                 oc:CalliopeConversionTechnology oc:CalliopeTransmissionTechnology }
+  ?component a oeo:OEO_00000276, ?type ; oc:inConfiguration ?configuration ; oc:sourceKey ?technology ; oc:atNode/oc:sourceKey ?node .
+  BIND(STRAFTER(STR(?type), "https://w3id.org/ontocal/") AS ?technologyType)
+  OPTIONAL { ?component oc:carrierIn ?carrierIn }
+  OPTIONAL { ?component oc:carrierOut ?carrierOut }
+  OPTIONAL { ?component oc:remoteNode/oc:sourceKey ?remoteNode }
+}
+ORDER BY ?configuration ?node ?technology ?carrierIn ?carrierOut

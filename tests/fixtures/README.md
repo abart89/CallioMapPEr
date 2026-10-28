@@ -1,19 +1,28 @@
-# Test Fixtures
+# Saved examples and test data
 
-Calliope model fixtures used for reproducible testing.
+The current tests read the national-scale and urban-scale CSV exports under
+[`examples/calliope-0.7.0-glpk/`](../../examples/calliope-0.7.0-glpk/README.md). Each export
+contains `attrs.yaml`, effective input arrays and saved numerical results from
+a genuine Calliope 0.7.0 execution. The preparation manifest records source and
+result checksums, software versions and execution metadata.
 
-## Fixture Sources
+The original `0.7.0.dev7` exports remain under
+[`examples/national_scale/`](../../examples/national_scale/) and
+[`examples/urban_scale/`](../../examples/urban_scale/). Tests retain explicit
+checks of that earlier format. Their preservation and attribution are described
+in the [example documentation](../../examples/README.md).
 
-- `national_scale/` — Calliope's built-in national scale example. Primary test fixture for M1–M3.
-- `urban_scale/` — Calliope's built-in urban scale example. Used for M4 integration validation.
+Routine tests read saved CSV files; they do not load NetCDF files, instantiate
+Calliope models or run an optimiser. Tests also construct small synthetic
+exports and RDF graphs in temporary directories to check invalid input,
+identifiers, annotations and query behaviour. Those invented cases are not
+represented as real model executions.
 
-## Adding Fixtures
+`kg_expected.yaml` in this directory is a historical reference from the earlier
+prototype. The current test suite does not read it. Current expectations are
+defined in the tests and checked against the appropriate saved example or
+explicitly synthetic case.
 
-Pre-solved `results.nc` files should be committed here so tests do not require a live
-Calliope solve. Generate them once with:
-
-```bash
-calliope run --save_netcdf tests/fixtures/national_scale/results.nc national_scale
-```
-
-Do not commit large NetCDF files (>10MB) — store them in Git LFS or generate them in CI.
+To prepare a new genuine example, follow the optional regeneration procedure in
+the [stable example documentation](../../examples/calliope-0.7.0-glpk/README.md).
+Keep existing snapshots unchanged and record a new execution separately.
