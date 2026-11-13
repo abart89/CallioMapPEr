@@ -26,7 +26,7 @@ QUERY_REQUIREMENTS = {
         "missing_information": "Unsupported or omitted structural information has no matching row.",
     },
     "cq02": {
-        "saved_information": "Execution, configuration, solver and modelled-time metadata where recorded.",
+        "saved_information": "Execution, configuration, software and modelled-time metadata where recorded.",
         "additional_information": "Study question, study scope and future-scenario meaning must be supplied when absent from the saved files.",
         "missing_information": "Executions remain visible; unavailable context fields are empty.",
     },
@@ -37,12 +37,12 @@ QUERY_REQUIREMENTS = {
     },
     "cq04": {
         "saved_information": "Source-file references, recorded execution and automatic graph-generation provenance.",
-        "additional_information": "Earlier dataset preparation, responsibility and derivation require recorded or supplied evidence.",
+        "additional_information": "Earlier dataset preparation, source authors and responsibility require recorded or supplied evidence. Software participation does not establish responsibility.",
         "missing_information": "Known links remain visible with empty unavailable fields. A sourceRevision link identifies represented file content, not causal derivation.",
     },
     "cq05": {
         "saved_information": "The selected input assignment to which an assumption refers.",
-        "additional_information": "An attributed assumption and its connection to an input must be supplied. Reasons and citations are optional supplied records.",
+        "additional_information": "An assumption and its connection to an input must be supplied, identifying a contributor to creating that information or its supplier. Reasons, citations and known source authors are optional; the query keeps these roles separate.",
         "missing_information": "No assumption means no answer. An assumption without a reason remains visible with empty reason fields.",
     },
     "cq06": {

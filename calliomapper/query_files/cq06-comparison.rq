@@ -1,7 +1,6 @@
 PREFIX oc: <https://w3id.org/ontocal/>
 PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
-PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 # Compare the evaluated capacity-bound/capacity-result pairs only.
 # A shared descriptor asserts common time coverage. Independent descriptions
@@ -18,7 +17,7 @@ WHERE {
       ?inputRecord a oc:InputAssignment ; oc:inConfiguration ?cfgA ; oc:forComponent ?componentA ;
           oc:sourceKey ?inputKey ; oc:hasDatum ?inputDatum .
       ?resultRecord a oc:ResultRecord ; oc:inConfiguration ?cfgA ; oc:forComponent ?componentA ;
-          oc:sourceKey ?resultKey ; oc:hasDatum ?resultDatum ; prov:wasGeneratedBy ?runA .
+          oc:sourceKey ?resultKey ; oc:hasDatum ?resultDatum ; oeo:OEO_00020190 ?runA .
       FILTER ((STR(?inputKey) = "flow_cap_max" && STR(?resultKey) = "flow_cap") ||
               (STR(?inputKey) = "storage_cap_max" && STR(?resultKey) = "storage_cap"))
       BIND(STR(?inputKey) AS ?inputVariable)
@@ -50,7 +49,7 @@ WHERE {
       ?inputRecord a oc:InputAssignment ; oc:inConfiguration ?cfgB ; oc:forComponent ?componentB ;
           oc:sourceKey ?inputKey ; oc:hasDatum ?inputDatum .
       ?resultRecord a oc:ResultRecord ; oc:inConfiguration ?cfgB ; oc:forComponent ?componentB ;
-          oc:sourceKey ?resultKey ; oc:hasDatum ?resultDatum ; prov:wasGeneratedBy ?runB .
+          oc:sourceKey ?resultKey ; oc:hasDatum ?resultDatum ; oeo:OEO_00020190 ?runB .
       FILTER ((STR(?inputKey) = "flow_cap_max" && STR(?resultKey) = "flow_cap") ||
               (STR(?inputKey) = "storage_cap_max" && STR(?resultKey) = "storage_cap"))
       BIND(STR(?inputKey) AS ?inputVariable)
@@ -99,7 +98,8 @@ WHERE {
     FILTER(STRENDS(STR(?resolutionPathB), "inputs_timestep_resolution.csv"))
   })
   ?comparison a oc:ComponentCorrespondence ; oc:sourceComponent ?componentA ;
-      oc:targetComponent ?componentB ; prov:wasAttributedTo ?supplier .
+      oc:targetComponent ?componentB .
+  FILTER EXISTS { ?comparison (oc:suppliedBy|oeo:OEO_00140008) ?identifiedPersonOrganisationOrSoftware }
   ?componentA oc:inConfiguration ?cfgA . ?componentB oc:inConfiguration ?cfgB .
 
   FILTER ((!BOUND(?inputCarrierA) && !BOUND(?inputCarrierB)) || ?inputCarrierA = ?inputCarrierB)

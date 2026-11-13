@@ -1,7 +1,6 @@
 PREFIX oc: <https://w3id.org/ontocal/>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
-PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 # Numerical information with unknown units remains visible.
 # A summary's source execution and its generating aggregation are distinct.
@@ -22,8 +21,8 @@ WHERE {
     ?datum obo:IAO_0000136 ?quantity .
     ?quantity a oeo:OEO_00000350 ; oeo:OEO_00040010/rdfs:label ?unit
   }
-  OPTIONAL { ?record prov:wasGeneratedBy ?generationActivity }
-  OPTIONAL { ?record oc:summarisesSeries/prov:wasGeneratedBy ?sourceRun }
+  OPTIONAL { ?record oeo:OEO_00020190 ?generationActivity }
+  OPTIONAL { ?record oc:summarisesSeries/oeo:OEO_00020190 ?sourceRun }
   OPTIONAL { ?datum oeo:OEO_00020189 ?inputRun . ?inputRun oc:usesConfiguration ?configuration }
   BIND(IF(?kind = oc:InputAssignment, ?inputRun,
        IF(?kind = oc:AggregatedResultRecord, ?sourceRun, ?generationActivity)) AS ?execution)

@@ -2,7 +2,6 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix oeo: <https://openenergyplatform.org/ontology/oeo/> .
 @prefix obo: <http://purl.obolibrary.org/obo/> .
-@prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 # Common constraints for explicitly represented OntoCal records. External OEO entities are not implicitly enrolled in this application profile.
@@ -60,12 +59,12 @@ oc:ResultShape a sh:NodeShape ; sh:targetClass oc:ResultRecord ;
           FILTER NOT EXISTS { $this oc:carrierIndex ?carrier } }""" ] ;
     sh:property [ sh:path oc:carrierIndex ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
     sh:sparql [ sh:message "The generating execution must use the result's configuration." ;
-        sh:select """PREFIX oc: <https://w3id.org/ontocal/>
-        PREFIX prov: <http://www.w3.org/ns/prov#>
-        SELECT $this WHERE { $this oc:inConfiguration ?c ; prov:wasGeneratedBy ?run .
+        sh:select """PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+PREFIX oc: <https://w3id.org/ontocal/>
+        SELECT $this WHERE { $this oc:inConfiguration ?c ; oeo:OEO_00020190 ?run .
           FILTER NOT EXISTS { ?run oc:usesConfiguration ?c } }""" ] .
-oc:OneGeneratingExecution a sh:PropertyShape ; sh:path prov:wasGeneratedBy ;
-    sh:minCount 1 ; sh:maxCount 1 ; sh:class prov:Activity ;
+oc:OneGeneratingExecution a sh:PropertyShape ; sh:path oeo:OEO_00020190 ;
+    sh:minCount 1 ; sh:maxCount 1 ; sh:class obo:BFO_0000015 ;
     sh:message "Each result record must retain exactly one generating execution." .
 
 oc:ExecutionShape a sh:NodeShape ; sh:targetSubjectsOf oc:usesConfiguration ;
@@ -74,13 +73,16 @@ oc:ExecutionShape a sh:NodeShape ; sh:targetSubjectsOf oc:usesConfiguration ;
 oc:CorrespondenceShape a sh:NodeShape ; sh:targetClass oc:ComponentCorrespondence ;
     sh:property [ sh:path oc:sourceComponent ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oeo:OEO_00000276 ] ;
     sh:property [ sh:path oc:targetComponent ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oeo:OEO_00000276 ] ;
-    sh:property [ sh:path prov:wasAttributedTo ; sh:minCount 1 ; sh:class prov:Agent ] .
+    sh:property oc:ComponentCorrespondenceAttribution .
+oc:ComponentCorrespondenceAttribution a sh:PropertyShape ;
+    sh:path [ sh:alternativePath (oeo:OEO_00140008 oc:suppliedBy) ] ; sh:minCount 1 ;
+    sh:class obo:BFO_0000002 ;
+    sh:message "A component comparison record must identify a contributor to creating the record or its supplier." .
 
 
 oc:MatchingExecutionOutput a sh:SPARQLConstraint ;
     sh:message "The result datum must be an information output of the recorded generating execution." ;
     sh:select """PREFIX oc: <https://w3id.org/ontocal/>
-        PREFIX prov: <http://www.w3.org/ns/prov#>
         PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
-        SELECT $this WHERE { $this oc:hasDatum ?datum ; prov:wasGeneratedBy ?run .
+        SELECT $this WHERE { $this oc:hasDatum ?datum ; oeo:OEO_00020190 ?run .
           FILTER NOT EXISTS { ?run oeo:OEO_00140094 ?datum } }""" .

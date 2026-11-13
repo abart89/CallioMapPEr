@@ -1,6 +1,51 @@
 # Installation and saved-example evaluation
 
-## Current release candidate: 0.1.0rc2
+## Current local candidate: 0.1.0rc3
+
+The 13 November candidate adopts the OEO-based OntoCal draft `https://w3id.org/ontocal/draft/2026-11-13-stage1`. Its bundled OEO 2.12.0 file is unchanged; PROV-O is not imported. The generated representation and annotation interface have changed, so this candidate received fresh checks rather than inheriting the results of rc2.
+
+| Check | Result on 13 November 2026 |
+|---|---|
+| Source tests on Python 3.10.21 and 3.13.2 | All 147 passed on each version |
+| Three public notebooks on Python 3.13.2 | All 20 code cells executed successfully |
+| Clean wheel installation on Python 3.13.2 | All nine workflow groups passed; all eleven bundled-resource hashes matched |
+| Clean source-distribution installation on Python 3.10.21 | All nine workflow groups passed; all eleven bundled-resource hashes matched |
+| OWL checks on three generated graphs | All ten command stages passed; fourteen local class definitions remained usable, twelve selected logical expectations matched, and two deliberately contradictory cases were rejected |
+| New GitHub-hosted verification or publication | Not performed for this local candidate |
+
+The source tests include the stable national and urban saved examples and the preserved earlier outputs. They test explicit annotation roles: supplier-only information remains valid, contributor-only records are accepted, and a cited report can have an author different from the person creating the annotation. Process responsibility must be supplied explicitly; participation or supply of a description does not establish it. Schema 1 is rejected with migration guidance. Tests also verify that known software-version information remains visible and repeated citation paths do not duplicate an explanation answer.
+
+The notebooks read the existing saved models, inspect generated graphs and execute the queries. The context notebook demonstrates a fictional source-report author, a contributor to an explanation and a supplier as three separately identified roles. The integration notebook also retrieves useful model, calculation, result, study and catalogue information using OEO, its foundations and Dublin Core alone. Its full competency-question answer can additionally use local supplier attribution. The notebook environment used nbclient 0.11.0, nbformat 5.11.1, ipykernel 7.2.0 and pandas 3.0.1; these optional tools are separate from ordinary package requirements.
+
+The clean installation checks installed the wheel and source distribution into separate environments. They confirmed the imported package location, verified the eleven copied ontology resources, and exercised translation, annotations, queries and invalid-data rejection. They did not obtain runtime code from an editable checkout. The final distributions exclude obsolete generated Python modules and the earlier PROV and modified-OEO dependency files. Calliope, xarray and LinkML were not installed in these runtime-check environments.
+
+The formal check used three generated graphs: the national model with its preserved supplier-only tutorial annotations, the default urban model, and a national export with additional explicitly fictional report authorship, contribution and process-responsibility information. These three graphs are test exports, not three newly solved scenarios. The reasoner found no contradiction between their statements and the bundled definitions. A separate check found no local class whose definition made it impossible to have members. The deliberately wrong statements tested that an execution cannot also be a material object, and that a hypothetical asset description cannot also be material. These procedures detect specified formal mistakes; they do not establish the scientific truth of the supplied annotations.
+
+The underlying Calliope sources and saved numerical outputs remain unchanged. The package reads existing CSV files and does not reconstruct a model or run a solver. Earlier preparation records below identify the Calliope and GLPK executions that produced those files.
+
+### Repeating the current verification
+
+With the development and notebook dependencies installed, run:
+
+```sh
+python -m pytest
+python scripts/check_notebooks.py --output build/evaluation/2026-11-13-oeo/notebooks
+python scripts/check_owl.py --out build/evaluation/2026-11-13-oeo/owl
+```
+
+The OWL command requires Java and ROBOT separately. The recorded run used ROBOT 1.9.7 and HermiT with the fixed local imports. The ordinary Python libraries were RDFLib 7.6.0, pySHACL 0.31.0 and PyYAML 6.0.3.
+
+Build a wheel and source distribution, install each into a fresh environment, then run the installed-package check with that environment's Python:
+
+```sh
+/path/to/clean-environment/bin/python -I scripts/check_installation.py \
+  --examples examples/calliope-0.7.0-glpk \
+  --output /path/to/a/new/installation-check-directory
+```
+
+The local evaluation records are under `build/evaluation/2026-11-13-oeo/`: the notebook report, OWL report, test logs, and separate `wheel-install/` and `source-install/` reports. They record exact versions, commands and file hashes and are regenerated by the checks. This is an internal candidate; no new push, hosted CI result or public release is implied. The historical results below retain their original versions and are not additional passes for rc3.
+
+## Earlier release candidate: 0.1.0rc2
 
 This candidate makes GLPK the solver used to prepare the primary examples and
 updates the public notebooks to read those saved results. It also adds the README

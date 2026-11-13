@@ -1,19 +1,30 @@
 PREFIX oc: <https://w3id.org/ontocal/>
-PREFIX prov: <http://www.w3.org/ns/prov#>
-# A source revision identifies represented file content. It does not assert that
-# the file caused the information; that distinct claim uses wasDerivedFrom.
-SELECT DISTINCT ?entity ?source ?sourceRelation ?activity ?agent WHERE {
+PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX dct: <http://purl.org/dc/terms/>
+# A source revision identifies represented file content. A source citation does
+# not establish a preparation process or responsibility for that process.
+SELECT DISTINCT ?entity ?source ?sourceRelation ?sourceAuthor ?activity ?personOrganisationOrSoftware ?recordedRole WHERE {
   {
-    ?entity prov:wasDerivedFrom ?source . BIND("wasDerivedFrom" AS ?sourceRelation)
+    ?entity dct:source ?source . BIND("source citation" AS ?sourceRelation)
   } UNION {
-    ?entity oc:sourceRevision ?source . BIND("sourceRevision" AS ?sourceRelation)
+    ?entity oc:sourceRevision ?source . BIND("represented file revision" AS ?sourceRelation)
   } UNION {
-    ?entity prov:wasGeneratedBy ?activity .
-    FILTER NOT EXISTS { ?entity prov:wasDerivedFrom ?anySource }
+    ?entity oeo:OEO_00020190 ?activity .
+    FILTER NOT EXISTS { ?entity dct:source ?anySource }
     FILTER NOT EXISTS { ?entity oc:sourceRevision ?anyRevision }
   }
+  OPTIONAL { ?source oeo:OEO_00000506 ?sourceAuthor . FILTER(BOUND(?sourceRelation)) }
   OPTIONAL {
-    ?entity prov:wasGeneratedBy ?activity .
-    OPTIONAL { ?activity prov:wasAssociatedWith ?agent }
+    ?entity oeo:OEO_00020190 ?activity .
+    OPTIONAL {
+      { ?activity oc:hasResponsibleAgent ?personOrganisationOrSoftware .
+        BIND("responsible person or organisation" AS ?recordedRole)
+      } UNION {
+        ?activity obo:RO_0000057 ?personOrganisationOrSoftware .
+        ?personOrganisationOrSoftware a obo:IAO_0000010 .
+        BIND("software used" AS ?recordedRole)
+      }
+    }
   }
-} ORDER BY ?entity ?source ?activity ?agent
+} ORDER BY ?entity ?source ?activity ?recordedRole ?personOrganisationOrSoftware

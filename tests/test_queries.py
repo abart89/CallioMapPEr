@@ -6,12 +6,20 @@ import pytest
 from rdflib import Dataset, Graph, Literal, Namespace, RDF, RDFS, URIRef, XSD
 
 from calliomapper.queries import QUERY_REQUIREMENTS, run_query
-from calliomapper.vocabulary import OC, OEO, OBO, PROV, DCT
+from calliomapper.vocabulary import OC, OEO, OBO, DCT
 
 A = Namespace("https://example.org/query-test/a/")
 B = Namespace("https://example.org/query-test/b/")
 C = Namespace("https://example.org/query-test/context/")
 CAT = Namespace("https://example.org/query-test/catalogue/")
+
+
+def test_same_report_cited_two_ways_does_not_duplicate_answer(dataset):
+    context = dataset.graph(URIRef("urn:query-test:context"))
+    context.add((A.reason, DCT.source, C.report))
+    rows = [row for row in run_query(dataset, "cq05") if row.reason == A.reason]
+    assert len(rows) == 1
+    assert rows[0].source == C.report
 
 
 @pytest.fixture
@@ -37,8 +45,8 @@ def dataset():
             (namespace.run, OC.executionStatus, Literal("solved")),
             (namespace.run, OBO.RO_0000057, namespace.model),
             (namespace.run, OEO.OEO_00140094, namespace.resultDatum),
-            (namespace.run, PROV.wasAssociatedWith, namespace.solver),
-            (namespace.solver, RDF.type, PROV.SoftwareAgent),
+            (namespace.run, OBO.RO_0000057, namespace.solver),
+            (namespace.solver, RDF.type, OBO.IAO_0000010),
             (namespace.configuration, OC.hasTemporalDescription, C.horizon),
             (namespace.bound, RDF.type, OC.InputAssignment),
             (namespace.bound, OC.inConfiguration, namespace.configuration),
@@ -56,7 +64,7 @@ def dataset():
             (namespace.result, OC.sourceKey, Literal("flow_cap")),
             (namespace.result, OC.carrierIndex, Literal("electricity")),
             (namespace.result, OC.hasDatum, namespace.resultDatum),
-            (namespace.result, PROV.wasGeneratedBy, namespace.run),
+            (namespace.result, OEO.OEO_00020190, namespace.run),
             (namespace.resultDatum, OC.reportedNumericValue, Literal(Decimal(result_number))),
             (namespace.resultDatum, OBO.IAO_0000136, namespace.resultQuantity),
             (namespace.resultQuantity, RDF.type, OEO.OEO_00000350),
@@ -69,14 +77,14 @@ def dataset():
         # Supplied context deliberately lives outside the numerical export graph.
         for triple in [
             (namespace.run, OBO.BFO_0000050, C.study),
-            (namespace.run, PROV.used, CAT.weatherRevision2),
+            (namespace.run, OEO.OEO_00140093, CAT.weatherRevision2),
             (namespace.configuration, OC.implementsScenario, scenario),
             (namespace.bound, OC.implementsAssumption, namespace.assumption),
             (namespace.assumption, RDFS.comment, Literal(f"Synthetic bound {input_number}")),
-            (namespace.assumption, PROV.wasAttributedTo, namespace.author),
-            (graph.identifier, PROV.wasGeneratedBy, namespace.translation),
-            (namespace.translation, PROV.wasAssociatedWith, namespace.exportSoftware),
-            (graph.identifier, PROV.wasAttributedTo, namespace.author),
+            (namespace.assumption, OC.suppliedBy, namespace.author),
+            (graph.identifier, OEO.OEO_00020190, namespace.translation),
+            (namespace.translation, OBO.RO_0000057, namespace.exportSoftware),
+            (graph.identifier, OC.suppliedBy, namespace.author),
         ]:
             context.add(triple)
     for triple in [
@@ -93,18 +101,18 @@ def dataset():
         (C.correspondence, RDF.type, OC.ComponentCorrespondence),
         (C.correspondence, OC.sourceComponent, A.component),
         (C.correspondence, OC.targetComponent, B.component),
-        (C.correspondence, PROV.wasAttributedTo, A.author),
+        (C.correspondence, OC.suppliedBy, A.author),
         (A.assumption, OC.hasRationale, A.reason),
         (A.reason, RDFS.comment, Literal("An explicitly invented justification.")),
-        (A.reason, PROV.wasAttributedTo, A.author),
+        (A.reason, OC.suppliedBy, A.author),
         (A.reason, DCT.references, C.report),
         (C.physicalClaim, RDF.type, OC.PhysicalCorrespondenceAssertion),
         (C.physicalClaim, OC.forComponent, A.component),
         (C.physicalClaim, OC.correspondenceKind, Literal("hypothetical")),
         (C.physicalClaim, OC.correspondenceTarget, C.proposedAssetDescription),
         (C.physicalClaim, OC.correspondenceScope, Literal("Illustrative capacity only")),
-        (C.physicalClaim, PROV.wasAttributedTo, A.author),
-        (C.physicalClaim, PROV.wasDerivedFrom, C.report),
+        (C.physicalClaim, OC.suppliedBy, A.author),
+        (C.physicalClaim, DCT.source, C.report),
     ]:
         context.add(triple)
     catalogue.add((CAT.weatherRevision2, DCT.publisher, CAT.publisher))
@@ -193,8 +201,8 @@ def test_source_revision_without_recorded_generation_does_not_invent_an_activity
     context.add((A.inputDatum, OC.sourceRevision, A.fileRevision))
     rows = list(run_query(dataset, "cq04", {"entity": A.inputDatum}))
     assert len(rows) == 1
-    assert rows[0].activity is None and rows[0].agent is None
-    assert str(rows[0].sourceRelation) == "sourceRevision"
+    assert rows[0].activity is None and rows[0].personOrganisationOrSoftware is None
+    assert str(rows[0].sourceRelation) == "represented file revision"
 
 
 def test_capacity_and_cost_aliases_are_filtered_without_inventing_totals(dataset):

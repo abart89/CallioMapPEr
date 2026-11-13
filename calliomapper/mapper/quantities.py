@@ -6,7 +6,7 @@ import json
 
 from rdflib import Literal, RDF, RDFS, XSD
 
-from calliomapper.vocabulary import OC, OEO, OBO, PROV
+from calliomapper.vocabulary import OC, OEO, OBO, DCT
 
 
 VARIABLES = {
@@ -128,7 +128,6 @@ def _record(ctx, group, variable, row, key, component, series=None):
     already_present = (record, OC.hasDatum, datum) in graph
     for entity in (record, datum):
         graph.add((entity, RDF.type, OBO.IAO_0000030))
-        graph.add((entity, RDF.type, PROV.Entity))
         graph.add((entity, OC.sourceRevision, revision))
     graph.add((record, RDF.type, OC.InputAssignment if group == "inputs" else OC.ResultRecord))
     graph.add((datum, RDF.type, OBO.IAO_0000027))
@@ -143,12 +142,11 @@ def _record(ctx, group, variable, row, key, component, series=None):
         graph.add((datum, RDF.type, OEO.OEO_00030029))
         graph.add((datum, OEO.OEO_00020189, ctx.execution))
         graph.add((ctx.execution, OEO.OEO_00140093, datum))
-        graph.add((ctx.execution, PROV.used, datum))
     else:
         graph.add((datum, RDF.type, OEO.OEO_00020013))
         graph.add((datum, OEO.OEO_00020190, ctx.execution))
         graph.add((ctx.execution, OEO.OEO_00140094, datum))
-        graph.add((record, PROV.wasGeneratedBy, ctx.execution))
+        graph.add((record, OEO.OEO_00020190, ctx.execution))
         if series is not None:
             graph.add((record, OC.inSeries, series))
     counts = ctx.report.setdefault("numerical_records", {})
@@ -229,14 +227,14 @@ def _series(ctx, rows, aggregate=True):
         revision = ctx.revision("results_flow_out.csv")
         labels = [row["timesteps"] for row in values]
         graph = ctx.graph
-        for kind in (OC.TimeSeriesRecord, OBO.IAO_0000030, PROV.Entity):
+        for kind in (OC.TimeSeriesRecord, OBO.IAO_0000030):
             graph.add((series, RDF.type, kind))
         _context(ctx, series, "flow_out", coordinates, component)
         graph.add((series, OC.sourceRevision, revision))
-        graph.add((series, PROV.wasGeneratedBy, ctx.execution))
+        graph.add((series, OEO.OEO_00020190, ctx.execution))
         graph.add((series, OC.sourceLocator, _text(f"nodes={node}; techs={technology}; carriers={carrier}; timesteps=all saved coordinates; column=flow_out")))
         graph.add((series, OC.hasIndexDescription, coverage))
-        for kind in (OEO.OEO_00000119, OBO.IAO_0000030, PROV.Entity):
+        for kind in (OEO.OEO_00000119, OBO.IAO_0000030):
             graph.add((coverage, RDF.type, kind))
         graph.add((coverage, OC.firstIndexLabel, _text(labels[0])))
         graph.add((coverage, OC.lastIndexLabel, _text(labels[-1])))
@@ -270,29 +268,28 @@ def _summary(ctx, series, coverage, revision, component, coordinates, total):
     method = ctx.iri("aggregation-method", str(summary))
     for entity in (summary, datum, method):
         graph.add((entity, RDF.type, OBO.IAO_0000030))
-        graph.add((entity, RDF.type, PROV.Entity))
     graph.add((summary, RDF.type, OC.AggregatedResultRecord))
     _context(ctx, summary, "flow_out", coordinates, component)
     graph.add((summary, OC.quantityDimension, _text("energy")))
     graph.add((summary, OC.summarisesSeries, series))
-    graph.add((summary, PROV.wasDerivedFrom, series))
+    graph.add((summary, DCT.source, series))
     graph.add((summary, OC.hasIndexDescription, coverage))
     graph.add((summary, OC.hasAggregationMethod, method))
     graph.add((summary, OC.hasDatum, datum))
     graph.add((datum, OC.reportedNumericValue, Literal(total, datatype=XSD.decimal)))
-    graph.add((summary, PROV.wasGeneratedBy, activity))
-    graph.add((activity, RDF.type, PROV.Activity))
+    graph.add((summary, OEO.OEO_00020190, activity))
     graph.add((activity, RDF.type, OBO.BFO_0000015))
-    graph.add((activity, PROV.used, series))
-    graph.add((activity, PROV.used, revision))
-    graph.add((activity, PROV.generated, summary))
+    graph.add((activity, RDF.type, OEO.OEO_00000124))
+    graph.add((activity, OEO.OEO_00140093, series))
+    graph.add((activity, OEO.OEO_00140093, revision))
+    graph.add((activity, OEO.OEO_00140094, summary))
     graph.add((method, RDF.type, OEO.OEO_00000119))
     graph.add((method, OC.aggregationFormula, _text("sum_i flow_out[i] * timestep_weights[i]")))
     graph.add((method, OC.durationTreatment, _text("flow_out already represents energy per timestep; duration is not multiplied again. The sum covers the complete saved index with recorded weights, without annualisation.")))
     for filename in ("inputs_timestep_weights.csv", "inputs_timestep_resolution.csv", "attrs.yaml"):
         source = ctx.revision(filename)
         graph.add((method, OC.sourceRevision, source))
-        graph.add((activity, PROV.used, source))
+        graph.add((activity, OEO.OEO_00140093, source))
     ctx.report["energy_summaries"] = ctx.report.get("energy_summaries", 0) + 1
 
 

@@ -1,2 +1,0 @@
-<http://www.w3.org/ns/prov-o#> <http://www.w3.org/ns/prov#specializationOf> <http://www.w3.org/ns/prov-o> .
-<http://www.w3.org/ns/prov-o#> <http://www.w3.org/ns/prov#wasRevisionOf> <http://www.w3.org/ns/prov-o-20120312> .

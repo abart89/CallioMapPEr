@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650" role="img" aria-labelledby="workflow-title workflow-description">
   <title id="workflow-title">From Calliope exports to a knowledge graph</title>
-  <desc id="workflow-description">CallioMapper automatically reads a saved Calliope export containing model structure, inputs, calculated results and recorded execution metadata. Researchers can optionally supply annotated study context, future scenarios, assumptions, reasons, contributors and evidence. OntoCal supplies the vocabulary and validation rules, reusing OEO and PROV-O. CallioMapper maps selected information to RDF and checks required data and relationships. Its outputs are a knowledge graph, an identifier manifest and an export report. These support queries, comparison and integration according to the information supplied. CallioMapper reads existing results; it does not run the optimisation.</desc>
+  <desc id="workflow-description">CallioMapper automatically reads a saved Calliope export containing model structure, inputs, calculated results and recorded execution metadata. Researchers can optionally supply annotated study context, future scenarios, assumptions, reasons, contributors and evidence. OntoCal supplies the vocabulary and validation rules, reusing unchanged OEO and its foundational definitions. CallioMapper maps selected information to RDF and checks required data and relationships. Its outputs are a knowledge graph, an identifier manifest and an export report. These support queries, comparison and integration according to the information supplied. CallioMapper reads existing results; it does not run the optimisation.</desc>
   <defs>
     <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 1 1 L 9 5 L 1 9 Z" fill="#39739c"/>
@@ -48,7 +48,7 @@
   <text x="711" y="148" font-size="15" fill="#725f87">Vocabulary + validation rules</text>
   <text x="698" y="184" class="body">Classes and relationships</text>
   <text x="698" y="209" class="body">Required data and connections</text>
-  <text x="698" y="234" class="body">Reuses OEO and PROV-O</text>
+  <text x="698" y="234" class="body">Reuses unchanged OEO</text>
 
   <path d="M 177 262 V 294 H 360 V 325" class="connector" stroke="#39739c" marker-end="url(#arrow-blue)"/>
   <text x="268" y="284" text-anchor="middle" font-size="13" fill="#235679">Automatic extraction</text>

@@ -27,20 +27,41 @@ def test_effective_urban_structure_and_explicit_shared_typing(directory):
 def test_technology_definition_is_separate_information(directory):
     ctx = MappingContext(SavedModel(ROOT / 'examples' / directory / 'national_scale/results_directory'), 'urn:test:national:')
     add_structure(ctx)
-    from calliomapper.vocabulary import PROV
+    from calliomapper.vocabulary import DCT, OBO
     component = ctx.components['region1', 'ccgt']
-    definition = ctx.graph.value(component, PROV.wasDerivedFrom)
+    definition = ctx.graph.value(component, DCT.source)
     assert definition != component
     assert (definition, RDF.type, OBO.IAO_0000030) in ctx.graph
     assert (definition, RDF.type, OC.CalliopeTechnology) not in ctx.graph
 
 
 def test_stable_structure_records_actual_files_and_unknown_executable_version():
-    from calliomapper.vocabulary import PROV
+    from calliomapper.vocabulary import DCT, OBO
     ctx = MappingContext(SavedModel(ROOT / 'examples/calliope-0.7.0/urban_scale/results_directory'), 'urn:test:stable:')
     add_structure(ctx)
     source_paths = {str(value) for value in ctx.graph.objects(None, OC.sourcePath)}
     assert {'inputs_active.csv', 'inputs_link_from.csv', 'inputs_link_to.csv'} <= source_paths
     assert 'inputs_definition_matrix.csv' not in source_paths
-    software = ctx.graph.value(ctx.execution, PROV.wasAssociatedWith)
+    software, = [participant for participant in ctx.graph.objects(ctx.execution, OBO.RO_0000057)
+                 if (participant, RDF.type, OBO.IAO_0000010) in ctx.graph]
     assert str(ctx.graph.value(software, RDFS.label)) == 'Calliope (producing version not recorded in saved export)'
+
+
+@pytest.mark.parametrize('directory, expected_version', [
+    ('', '0.7.0.dev7'),
+    ('calliope-0.7.0/', None),
+    ('calliope-0.7.0-glpk/', None),
+])
+def test_context_query_reports_only_the_recorded_executable_version(directory, expected_version):
+    from calliomapper.queries import run_query
+    source = SavedModel(ROOT / 'examples' / directory / 'national_scale/results_directory')
+    ctx = MappingContext(source, 'urn:test:software-version:')
+    add_structure(ctx)
+    answer, = run_query(ctx.graph, 'cq02')
+    assert answer.software is not None
+    assert source.recorded_version == expected_version
+    if expected_version is None:
+        assert source.configured_version == source.version == '0.7.0'
+        assert answer.softwareVersion is None
+    else:
+        assert str(answer.softwareVersion) == expected_version

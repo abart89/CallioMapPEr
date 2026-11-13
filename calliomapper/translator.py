@@ -12,7 +12,7 @@ from calliomapper.mapper.core import MappingContext, add_structure
 from calliomapper.mapper.quantities import add_quantities
 from calliomapper.source import SavedModel, FIXTURE_TESTED_VERSIONS
 from calliomapper.utils.validation import validate
-from calliomapper.vocabulary import OC, PROV, DCT, ONTOLOGY_VERSION, PACKAGE_VERSION
+from calliomapper.vocabulary import OC, OEO, OBO, DCT, ONTOLOGY_VERSION, PACKAGE_VERSION
 
 DEFAULT_GROUPS = frozenset({"structure", "capacities", "energy", "costs"})
 
@@ -68,10 +68,10 @@ class Translator:
             graph = dataset.graph(ctx.iri("graph", str(ctx.export_activity), name))
             for triple in triples:
                 graph.add(triple)
-            provenance.add((graph.identifier, RDF.type, PROV.Entity))
-            provenance.add((graph.identifier, PROV.wasGeneratedBy, ctx.export_activity))
+            provenance.add((graph.identifier, RDF.type, OBO.IAO_0000030))
+            provenance.add((graph.identifier, OEO.OEO_00020190, ctx.export_activity))
             provenance.add((graph.identifier, DCT.conformsTo, URIRef(ONTOLOGY_VERSION)))
-        provenance.add((ctx.export_activity, PROV.endedAtTime, Literal(datetime.now(timezone.utc), datatype=XSD.dateTime)))
+        provenance.add((ctx.export_activity, OC.endedAtTime, Literal(datetime.now(timezone.utc), datatype=XSD.dateTime)))
         if self.annotations is not None:
             provenance.add((ctx.export_activity, OC.evidenceStatus, Literal("Includes user-supplied annotations; their validation does not establish scientific adequacy.")))
         shacl_report = validate(dataset)

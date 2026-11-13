@@ -137,7 +137,7 @@ def main():
     template = output / "annotations.yaml"
     run(["init-annotations", "--out", template])
     original = template.read_bytes()
-    assert b"schema_version: 1" in original
+    assert b"schema_version: 2" in original
     run(["init-annotations", "--out", template], expected=1)
     assert template.read_bytes() == original
     checks.append("Installed annotation template is created and protected against overwrite")

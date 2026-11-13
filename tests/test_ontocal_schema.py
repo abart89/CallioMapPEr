@@ -14,4 +14,4 @@ def test_all_bundled_snapshot_hashes():
     ontology = Graph().parse(data=root.joinpath('ontocal.ttl').read_text(), format='turtle')
     assert (OC[''], OWL.versionIRI, URIRef(ONTOLOGY_VERSION)) in ontology
     assert (OC.InputAssignment, RDF.type, OWL.Class) in ontology
-    assert len(list(ontology.objects(OC[''], OWL.imports))) == 2
+    assert list(ontology.objects(OC[''], OWL.imports)) == [URIRef('https://openenergyplatform.org/ontology/oeo/releases/2.12.0/oeo.owl')]

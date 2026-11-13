@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_template_real_file_no_overwrite(tmp_path):
     path = tmp_path / 'annotations.yaml'
     assert main(['init-annotations','--out',str(path)]) == 0
-    assert 'schema_version: 1' in path.read_text()
+    assert 'schema_version: 2' in path.read_text()
     assert main(['init-annotations','--out',str(path)]) == 1
 
 

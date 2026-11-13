@@ -2,15 +2,15 @@
 
 CallioMapper turns selected information from a saved Calliope modelling exercise into an RDF knowledge graph. Researchers can query model structure, inputs and results alongside the configurations, executions and source files they belong to. They can also supply context that the numerical files do not contain, such as a study question, the meaning of a future scenario or the reason for a parameter choice.
 
-The representation uses **OntoCal**, with terms from the Open Energy Ontology (OEO) and PROV-O. Model components are represented as information about an energy system. A component is connected to a physical asset only when an explicit, evidenced correspondence is supplied.
+The representation uses **OntoCal**, with the unchanged Open Energy Ontology (OEO) 2.12.0 distribution and its foundational definitions. This version does not import PROV-O. Model components are represented as information about an energy system. A component is connected to a physical asset only when an explicit, evidenced correspondence is supplied.
 
-**Version `0.1.0rc2` is a release candidate for research trials.** The primary target is saved CSV exports from stable **Calliope 0.7.0**. The included national and urban examples provide tested cases; they do not establish compatibility with every Calliope feature or custom mathematical model. Historical **0.7.0.dev7** examples remain covered by regression tests. Other Calliope formats, NetCDF, unsolved models and failed-run exports are not supported by this reader. See the [evaluation and its limits](docs/evaluation.md) and [change history](CHANGELOG.md).
+**Version `0.1.0rc3` is a local candidate for internal research trials.** It adopts the OEO-based OntoCal representation and annotation schema 2. This update has not been published as a new release. The primary target is saved CSV exports from stable **Calliope 0.7.0**. The included national and urban examples provide tested cases; they do not establish compatibility with every Calliope feature or custom mathematical model. Historical **0.7.0.dev7** examples remain covered by regression tests. Other Calliope formats, NetCDF, unsolved models and failed-run exports are not supported by this reader. See the [evaluation and its limits](docs/evaluation.md) and [change history](CHANGELOG.md).
 
 ![CallioMapper reads saved Calliope files and optional supplied research context, uses OntoCal to describe them, and produces a graph for querying, comparison and integration.](docs/images/workflow.svg)
 
 ## Install locally
 
-Use Python 3.10 or later. The source tests pass on Python 3.10.21 and 3.13.2; the public notebooks were executed on 3.13.2. From a cloned or downloaded copy of this repository:
+Use Python 3.10 or later. The [evaluation record](docs/evaluation.md) identifies the environments tested for each candidate. From a cloned or downloaded copy of this repository:
 
 ```sh
 python -m venv .venv
@@ -21,7 +21,7 @@ python -m pip install .
 Alternatively, install a locally supplied release-candidate wheel:
 
 ```sh
-python -m pip install /path/to/calliomapper-0.1.0rc2-py3-none-any.whl
+python -m pip install /path/to/calliomapper-0.1.0rc3-py3-none-any.whl
 ```
 
 The examples and notebooks below are repository files, so run them from the repository directory even when the package was installed from a wheel. These instructions do not require a PyPI release. On Windows, activate the virtual environment using its `Scripts` directory instead.
@@ -98,7 +98,7 @@ Missing units and currencies are not guessed. The included national example supp
 
 ## Add information that the saved files do not contain
 
-An optional YAML annotation file supplies study and scenario descriptions, assumptions, reasons, dataset history and physical correspondences. It records who supplied the statements and their evidence status.
+An optional YAML annotation file supplies study and scenario descriptions, assumptions, reasons, dataset history and physical correspondences. It records who contributed to creating or supplied the statements, and their evidence status. A known author of a source report and responsibility for a study or preparation process can be recorded separately.
 
 ```python
 translator = Translator(
@@ -130,7 +130,7 @@ The input directory must contain `attrs.yaml` and the saved `inputs_*.csv` and `
 
 OntoCal is maintained separately as a Turtle ontology. The package includes a fixed snapshot and validation resources, so an OntoCal checkout is not required. Historical LinkML files under `ontocal/` are not used by this implementation.
 
-The bundled OEO and PROV-O dependency copies contain documented local changes needed for their combined OWL interpretation. They have separate ontology identifiers and are **not official OEO or W3C releases**. Upstream files, transformation records and hashes are retained. Read the [dependency explanation](docs/dependencies.md) before reusing these copies in another ontology environment.
+The bundled OEO 2.12.0 publisher file is unchanged. OntoCal uses OEO for information inputs, outputs, authors and contributors, with a few local relationships for supplier information, responsibility, revision references and process times. PROV-O is not imported. The [dependency explanation](docs/dependencies.md) describes the scope and the future PROV interoperability work. Existing schema-1 annotation files require an explicit update; the [migration instructions](examples/annotations/README.md#migrating-an-annotation-file-from-version-1) explain how to preserve their meaning.
 
 The stable examples were prepared using Calliope 0.7.0 and GLPK 5.0. GLPK was used only for that preparation; normal graph generation and tests read the saved outputs. Stable Calliope's ordinary CSV export omits the recorded initialisation-version field. Its configured target version helps identify the format but does not prove which executable produced the results. Graphs and reports preserve that uncertainty. The [example preparation record](examples/calliope-0.7.0-glpk/README.md) provides independent software-version evidence for the included examples.
 

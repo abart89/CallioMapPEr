@@ -17,6 +17,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import yaml
 
 from rdflib import Graph, RDF, URIRef
 from calliomapper import Translator
@@ -39,7 +40,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     resources = Path(str(files("calliomapper") / "resources"))
     report = {"started_at": datetime.now(timezone.utc).isoformat(), "python": sys.version,
-              "scope": "Generated national annotated and urban default graphs, with the bundled ontology/imports",
+              "scope": "Generated national supplier-only, national with explicit fictional authors/contributors, and urban default graphs, with unchanged OEO and the bundled OntoCal",
               "examples_directory": str(examples), "source_formats": {},
               "checks": [], "input_sha256": {},
               "interpretation": "False expected type checks establish non-entailment; the separate negative cases test OWL inconsistency."}
@@ -74,8 +75,25 @@ def main():
     inputs = [examples / "annotations/national.yaml", Path(__file__), ROOT / "scripts/CheckGeneratedOWL.java"]
     if (examples / "manifest.json").is_file():
         inputs.append(examples / "manifest.json")
-    for example, annotation in (("national_scale", examples / "annotations/national.yaml"), ("urban_scale", None)):
-        source = examples / example / "results_directory"
+    # These extra facts are explicitly fictional. The saved model data and the
+    # supplier-only tutorial remain unchanged.
+    role_document = yaml.safe_load((examples / "annotations/national.yaml").read_text())
+    role_document["agents"].extend([
+        {"id": "original_author", "kind": "person", "label": "Fictional original report author"},
+        {"id": "annotation_software", "kind": "software", "label": "Fictional annotation-creation software"},
+    ])
+    role_document["sources"][0]["authors"] = ["original_author"]
+    role_document["assumptions"][0]["reasons"][0]["contributor"] = ["demonstration_contributor", "annotation_software"]
+    role_document["study"]["responsible"] = "original_author"
+    role_document["study"]["participants"] = ["annotation_software"]
+    role_annotations = out / "fictional-author-and-contributor-annotations.yaml"
+    role_annotations.write_text(yaml.safe_dump(role_document, sort_keys=False))
+    inputs.append(role_annotations)
+    cases = (("national_scale", "national_scale", examples / "annotations/national.yaml"),
+             ("urban_scale", "urban_scale", None),
+             ("national_with_roles", "national_scale", role_annotations))
+    for example, source_example, annotation in cases:
+        source = examples / source_example / "results_directory"
         translator = Translator(source, annotations=annotation, namespace=f"https://example.org/ontology-check/{example}/")
         dataset = translator.translate()
         for triple in dataset.triples((None, None, None)):

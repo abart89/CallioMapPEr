@@ -2,9 +2,9 @@
 
 from datetime import datetime, timezone
 import uuid
-from rdflib import Graph, Literal, RDF, RDFS, XSD
+from rdflib import Graph, Literal, RDF, RDFS, OWL, XSD
 from calliomapper.identity import entity_iri
-from calliomapper.vocabulary import OC, OEO, OBO, PROV, DCT, PACKAGE_VERSION
+from calliomapper.vocabulary import OC, OEO, OBO, DCT, PACKAGE_VERSION
 
 
 def text(value):
@@ -15,7 +15,7 @@ class MappingContext:
     def __init__(self, source, namespace):
         self.source, self.namespace = source, namespace
         self.graph = Graph()
-        for prefix, vocabulary in (("oc", OC), ("oeo", OEO), ("obo", OBO), ("prov", PROV)):
+        for prefix, vocabulary in (("oc", OC), ("oeo", OEO), ("obo", OBO), ("dct", DCT)):
             self.graph.bind(prefix, vocabulary)
         self.model = self.iri("model", source.configuration_digest)
         self.configuration = self.iri("configuration", source.configuration_digest)
@@ -35,33 +35,33 @@ class MappingContext:
         checksum = self.source.file_hash(filename)
         artifact = self.iri("source-file", filename)
         revision = self.iri("source-revision", filename, checksum)
-        self.types(artifact, PROV.Entity)
-        self.types(revision, PROV.Entity)
-        self.graph.add((revision, PROV.specializationOf, artifact))
+        self.types(artifact, OBO.IAO_0000030)
+        self.types(revision, OBO.IAO_0000030)
+        self.graph.add((revision, DCT.isVersionOf, artifact))
         self.graph.add((revision, OC.contentSHA256, text(checksum)))
         self.graph.add((revision, OC.sourcePath, text(filename)))
-        self.graph.add((self.export_activity, PROV.used, revision))
+        self.graph.add((self.export_activity, OEO.OEO_00140093, revision))
         return revision
 
 
 def add_structure(ctx):
     graph, source = ctx.graph, ctx.source
     metadata = ctx.revision("attrs.yaml")
-    ctx.types(ctx.model, OEO.OEO_00000274, OEO.OEO_00000314, OBO.IAO_0000030, PROV.Entity)
-    ctx.types(ctx.configuration, OC.ConfigurationSpecification, OBO.IAO_0000030, PROV.Entity)
+    ctx.types(ctx.model, OEO.OEO_00000274, OEO.OEO_00000314, OBO.IAO_0000030)
+    ctx.types(ctx.configuration, OC.ConfigurationSpecification, OBO.IAO_0000030)
     model_name = source.attrs["config"].get("init", {}).get("name")
     if model_name:
         graph.add((ctx.model, RDFS.label, text(model_name)))
     graph.add((ctx.configuration, OBO.IAO_0000136, ctx.model))
     graph.add((ctx.configuration, OC.sourceRevision, metadata))
     graph.add((ctx.configuration, OC.sourceLocator, text("definition, config, math and saved inputs_*.csv arrays")))
-    ctx.types(ctx.execution, OEO.OEO_00000313, OEO.OEO_00000275, OBO.BFO_0000015, PROV.Activity)
+    ctx.types(ctx.execution, OEO.OEO_00000313, OEO.OEO_00000275, OBO.BFO_0000015)
     graph.add((ctx.execution, OC.usesConfiguration, ctx.configuration))
-    graph.add((ctx.execution, PROV.used, ctx.configuration))
+    graph.add((ctx.execution, OEO.OEO_00140093, ctx.configuration))
     graph.add((ctx.execution, OBO.RO_0000057, ctx.model))
     graph.add((ctx.execution, OC.executionStatus, Literal("solved")))
     execution_description = ctx.iri("execution-description", source.execution_digest)
-    ctx.types(execution_description, OBO.IAO_0000030, PROV.Entity)
+    ctx.types(execution_description, OBO.IAO_0000030)
     graph.add((execution_description, OBO.IAO_0000136, ctx.execution))
     graph.add((execution_description, OC.sourceRevision, metadata))
     graph.add((execution_description, OC.sourceLocator, text("runtime")))
@@ -72,27 +72,29 @@ def add_structure(ctx):
     if source_scenario is not None:
         graph.add((execution_description, DCT.description, text(f"Saved Calliope scenario selector: {source_scenario}. This label alone does not establish an OEO future scenario.")))
     timings = source.attrs["runtime"]["timings"]
-    for key, predicate in (("solve_start", PROV.startedAtTime), ("solve_complete", PROV.endedAtTime)):
+    for key, predicate in (("solve_start", OC.startedAtTime), ("solve_complete", OC.endedAtTime)):
         if key in timings:
             graph.add((ctx.execution, predicate, Literal(datetime.fromtimestamp(timings[key], timezone.utc), datatype=XSD.dateTime)))
     software = ctx.iri("software", "Calliope", source.recorded_version or "version-not-recorded")
-    ctx.types(software, PROV.SoftwareAgent, PROV.Agent)
+    ctx.types(software, OBO.IAO_0000010)
     graph.add((software, RDFS.label, text(f"Calliope {source.recorded_version}" if source.recorded_version else "Calliope (producing version not recorded in saved export)")))
-    if not source.recorded_version:
+    if source.recorded_version:
+        graph.add((software, OWL.versionInfo, text(source.recorded_version)))
+    else:
         graph.add((execution_description, DCT.description, text(f"Read using the Calliope {source.version} saved-array format, identified by {source.version_evidence}. This does not establish the actual executable version.")))
-    graph.add((ctx.execution, PROV.wasAssociatedWith, software))
-    ctx.types(ctx.export_activity, PROV.Activity, OBO.BFO_0000015)
-    graph.add((ctx.export_activity, PROV.startedAtTime, Literal(datetime.now(timezone.utc), datatype=XSD.dateTime)))
+    graph.add((ctx.execution, OBO.RO_0000057, software))
+    ctx.types(ctx.export_activity, OBO.BFO_0000015)
+    graph.add((ctx.export_activity, OC.startedAtTime, Literal(datetime.now(timezone.utc), datatype=XSD.dateTime)))
     mapper = ctx.iri("software", "CallioMapper", PACKAGE_VERSION)
-    ctx.types(mapper, PROV.SoftwareAgent, PROV.Agent)
+    ctx.types(mapper, OBO.IAO_0000010)
     graph.add((mapper, RDFS.label, text(f"CallioMapper {PACKAGE_VERSION}")))
-    graph.add((ctx.export_activity, PROV.wasAssociatedWith, mapper))
+    graph.add((ctx.export_activity, OBO.RO_0000057, mapper))
 
     active = source.active_components()
     for name in sorted({node for node, _ in active}):
         node = ctx.iri("node", source.configuration_digest, name)
         ctx.nodes[name] = node
-        ctx.types(node, OC.CalliopeNetworkNode, OEO.OEO_00000276, OBO.IAO_0000030, PROV.Entity)
+        ctx.types(node, OC.CalliopeNetworkNode, OEO.OEO_00000276, OBO.IAO_0000030)
         graph.add((node, OC.sourceKey, text(name)))
         graph.add((node, RDFS.label, text(name)))
         graph.add((node, OC.inConfiguration, ctx.configuration))
@@ -106,7 +108,7 @@ def add_structure(ctx):
     for (node_name, tech_name), effective in active.items():
         component = ctx.iri("technology", source.configuration_digest, node_name, tech_name)
         ctx.components[node_name, tech_name] = component
-        ctx.types(component, OC.CalliopeTechnology, OEO.OEO_00000276, OBO.IAO_0000030, PROV.Entity)
+        ctx.types(component, OC.CalliopeTechnology, OEO.OEO_00000276, OBO.IAO_0000030)
         base = effective["base_tech"]
         if base in base_classes:
             ctx.types(component, base_classes[base])
@@ -125,17 +127,17 @@ def add_structure(ctx):
         if base == "transmission":
             graph.add((component, OC.remoteNode, ctx.nodes[effective["remote_node"]]))
         definition = ctx.iri("technology-definition", source.configuration_digest, tech_name)
-        ctx.types(definition, OBO.IAO_0000030, PROV.Entity)
+        ctx.types(definition, OBO.IAO_0000030)
         graph.add((definition, OC.sourceKey, text(tech_name)))
         graph.add((definition, OC.sourceRevision, metadata))
         graph.add((definition, OC.sourceLocator, text(f"definition.techs.{tech_name}")))
-        graph.add((component, PROV.wasDerivedFrom, definition))
+        graph.add((component, DCT.source, definition))
     filename = "inputs_timestep_resolution.csv"
     if filename in source.files:
         rows = source.rows("inputs", "timestep_resolution")
         if rows:
             description = ctx.iri("temporal-description", source.configuration_digest)
-            ctx.types(description, OEO.OEO_00000119, OBO.IAO_0000030, PROV.Entity)
+            ctx.types(description, OEO.OEO_00000119, OBO.IAO_0000030)
             graph.add((ctx.configuration, OC.hasTemporalDescription, description))
             graph.add((description, OC.sourceRevision, ctx.revision(filename)))
             if "inputs_timestep_weights.csv" in source.files:

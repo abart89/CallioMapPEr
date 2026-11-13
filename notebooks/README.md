@@ -7,8 +7,8 @@ These notebooks are public, executable examples of using CallioMapper. They comb
 | Notebook | What you will do | Additional information required |
 |---|---|---|
 | [1. Saved results](01_saved_results.ipynb) | Translate the stable national and urban exports, query capacities and energy summaries, inspect omissions, and reuse an identifier manifest. | None beyond the included saved exports. Units remain unspecified when the files do not establish them. |
-| [2. Supplied context](02_supplied_context.ipynb) | Compare source-only answers with supplied assumptions, reasons and unit interpretations. Inspect the YAML entries and their evidence. | The included annotation document, whose invented context and source-based unit interpretations are labelled separately. |
-| [3. Comparison and integration](03_comparison_and_integration.ipynb) | Execute the maintained comparison example, inspect competency questions 6 and 7, and check that incompatible information prevents comparison. | Explicit supplied component correspondence, study/scenario context, units, and a separate synthetic catalogue. |
+| [2. Supplied context](02_supplied_context.ipynb) | Compare source-only answers with supplied assumptions, reasons and unit interpretations. Distinguish an original report's author from the contributor and supplier of a new annotation. | The version 2 annotation document, whose invented context and source-based unit interpretations are labelled separately. |
+| [3. Comparison and integration](03_comparison_and_integration.ipynb) | Inspect competency questions 6 and 7, query shared information using OEO and Dublin Core without OntoCal relationships, and check that incompatible information prevents comparison. | Explicit supplied component correspondence, study/scenario context, units, and a separate synthetic catalogue. |
 
 Each notebook can also run independently. They contain their own imports and locate the repository by walking up from the current working directory. No notebook depends on another notebook's variables or generated files.
 

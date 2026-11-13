@@ -1,7 +1,7 @@
 # Demonstration context for the saved stable 0.7.0 national example.
 # This is not a reconstruction of the example authors' intentions.
 # The two unit interpretations have separately identified source-comment evidence.
-schema_version: 1
+schema_version: 2
 default_supplier: demonstration_contributor
 default_evidence_status: Synthetic supplied context for this tutorial; not an empirical claim.
 agents:

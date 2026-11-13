@@ -1,11 +1,12 @@
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 import shutil
 import yaml
 import pytest
-from rdflib import Dataset, Graph, RDF, URIRef
+from rdflib import Dataset, Graph, RDF, URIRef, XSD
 from calliomapper import Translator
-from calliomapper.vocabulary import OC, PROV
+from calliomapper.vocabulary import OC, OEO, OBO, DCT
 from calliomapper.utils.validation import validate, ValidationError
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,6 +42,24 @@ def test_default_quantities_and_external_arrays(translated):
     assert translated.report['numerical_records']['results.storage_cap'] == 4
     assert translated.report['shacl'] == 'passed'
     assert not list(graph.triples((None, OC.implementsScenario, None)))
+
+
+def test_execution_and_export_times_are_preserved_without_prov_terms(translated):
+    graph = translated.translate()
+    ctx = translated.context
+    for source_key, predicate in (("solve_start", OC.startedAtTime), ("solve_complete", OC.endedAtTime)):
+        timestamp = graph.value(ctx.execution, predicate)
+        assert timestamp.datatype == XSD.dateTime
+        expected = datetime.fromtimestamp(translated.source.attrs["runtime"]["timings"][source_key], timezone.utc)
+        assert timestamp.toPython() == expected
+    start, end = (graph.value(ctx.export_activity, predicate) for predicate in (OC.startedAtTime, OC.endedAtTime))
+    assert start.datatype == end.datatype == XSD.dateTime
+    assert start.toPython() <= end.toPython()
+    assert not any(str(term).startswith("http://www.w3.org/ns/prov#") for triple in graph for term in triple)
+    software = {participant for participant in graph.objects(ctx.execution, OBO.RO_0000057)
+                if (participant, RDF.type, OBO.IAO_0000010) in graph}
+    assert len(software) == 1
+    assert not list(graph.objects(ctx.execution, OC.hasResponsibleAgent))
 
 
 def test_save_reuses_namespace_and_source_identities(tmp_path):

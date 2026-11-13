@@ -1,31 +1,29 @@
 @prefix oc: <https://w3id.org/ontocal/> .
 @prefix oeo: <https://openenergyplatform.org/ontology/oeo/> .
 @prefix obo: <http://purl.obolibrary.org/obo/> .
-@prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 oc: a owl:Ontology ;
-    owl:versionIRI <https://w3id.org/ontocal/draft/2026-10-22-stage1> ;
-    owl:versionInfo "Stage 1 consolidated draft; human review pending" ;
-    rdfs:comment "Authoritative editable OntoCal draft. Covers selected model structure and quantities, configurations and executions, retained series, recorded scientific context, integration and qualified physical correspondence. The dependency derivatives are explicit review candidates, not unchanged publisher releases. Namespace publication is not implied." ;
-    owl:imports <urn:ontocal:dependency:oeo-2.12.0-dl>,
-                <urn:ontocal:dependency:prov-o-20130430-dl> .
+    owl:versionIRI <https://w3id.org/ontocal/draft/2026-11-13-stage1> ;
+    owl:versionInfo "Stage 1 OEO-based candidate accepted for internal evaluation; not a public release" ;
+    rdfs:comment "OntoCal represents selected model structure and quantities, configurations and executions, retained series, recorded scientific context, integration and qualified physical correspondence. This version imports the unchanged OEO 2.12.0 publisher file without PROV-O. Known report authors and contributors to newly created records use OEO relationships. Supplying information, responsibility for a process, process times and revision metadata use the explicit OntoCal definitions below. No PROV-O equivalence is claimed. The scope is approved for internal evaluation; namespace publication is not implied." ;
+    owl:imports <https://openenergyplatform.org/ontology/oeo/releases/2.12.0/oeo.owl> .
 
 oc:ConfigurationSpecification a owl:Class ;
     rdfs:label "configuration specification" ;
-    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:subClassOf obo:IAO_0000030 ;
     rdfs:comment "Information specifying resolved model structure and settings. Its existence does not entail that a calculation has occurred or that an OEO future scenario has been supplied." .
 
 oc:CalliopeNetworkNode a owl:Class ;
     rdfs:label "Calliope network node representation" ;
-    rdfs:subClassOf oeo:OEO_00000276, obo:IAO_0000030, prov:Entity ;
+    rdfs:subClassOf oeo:OEO_00000276, obo:IAO_0000030 ;
     rdfs:comment "A node in the resolved mathematical representation, not a physical location or region inferred from its name." .
 
 oc:CalliopeTechnology a owl:Class ;
     rdfs:label "Calliope technology representation" ;
-    rdfs:subClassOf oeo:OEO_00000276, obo:IAO_0000030, prov:Entity ;
+    rdfs:subClassOf oeo:OEO_00000276, obo:IAO_0000030 ;
     rdfs:comment "A technology component in a resolved configuration. User technology names identify individuals, not automatically new ontology classes." .
 
 oc:CalliopeSupplyTechnology a owl:Class ;
@@ -35,17 +33,17 @@ oc:CalliopeSupplyTechnology a owl:Class ;
 
 oc:InputAssignment a owl:Class ;
     rdfs:label "input assignment" ;
-    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:subClassOf obo:IAO_0000030 ;
     rdfs:comment "Information assigning a datum to a model setting and component in one configuration. The datum can be reused through distinct assignments. The assignment itself does not entail an execution." .
 
 oc:ResultRecord a owl:Class ;
     rdfs:label "result record" ;
-    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:subClassOf obo:IAO_0000030 ;
     rdfs:comment "A contextual record of a calculation result, retaining its component, configuration, coordinates and generating execution. Different executions retain distinct records even for equal numerical content." .
 
 oc:ComponentCorrespondence a owl:Class ;
     rdfs:label "component correspondence assertion" ;
-    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:subClassOf obo:IAO_0000030 ;
     rdfs:comment "A recorded assertion identifying two components for a stated comparison, with its basis and attribution. It does not assert identity, numerical comparability or correspondence to a real facility." .
 
 oc:inConfiguration a owl:ObjectProperty ;
@@ -55,7 +53,7 @@ oc:inConfiguration a owl:ObjectProperty ;
 
 oc:usesConfiguration a owl:ObjectProperty ;
     rdfs:label "uses configuration" ;
-    rdfs:subPropertyOf prov:used ; rdfs:domain prov:Activity ;
+    rdfs:subPropertyOf oeo:OEO_00140093 ; rdfs:domain obo:BFO_0000015 ;
     rdfs:range oc:ConfigurationSpecification ;
     rdfs:comment "Relates an actual execution to the configuration it uses. Do not assert this relation merely for a prospective configuration." .
 
@@ -138,17 +136,17 @@ oc:evidenceStatus a owl:AnnotationProperty ;
 
 oc:TimeSeriesRecord a owl:Class ;
     rdfs:label "time-series record" ;
-    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:subClassOf obo:IAO_0000030 ;
     rdfs:comment "Information identifying a numerical series, its component and configuration context, source revision, and temporal index description. The complete numerical array may remain in an external file. For an output series, generation refers to the logical result information produced by the model execution, not the later creation of RDF metadata describing it. This record is not the temporal region described by the indices, and its existence does not require one RDF individual per value." .
 
 oc:AggregatedResultRecord a owl:Class ;
     rdfs:label "aggregated result record" ;
-    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:subClassOf obo:IAO_0000030 ;
     rdfs:comment "A contextual record of a numerical summary derived from a series using a recorded method and scope. Its generating activity is the aggregation; the source model execution is retained through the series. It is not classified as a direct result of the source optimisation." .
 
 oc:sourceRevision a owl:ObjectProperty ;
     rdfs:label "has source revision" ;
-    rdfs:domain obo:IAO_0000030 ; rdfs:range prov:Entity ;
+    rdfs:domain obo:IAO_0000030 ; rdfs:range obo:IAO_0000030 ;
     rdfs:comment "Identifies a fixed source artifact whose selected content is represented by this information. The revision has its own identifier and evidence such as a content digest; a file path alone does not establish identity. This relation does not assert the causal direction of file serialization." .
 
 oc:hasIndexDescription a owl:ObjectProperty ;
@@ -163,7 +161,6 @@ oc:inSeries a owl:ObjectProperty ;
 
 oc:summarisesSeries a owl:ObjectProperty ;
     rdfs:label "summarises numerical series" ;
-    rdfs:subPropertyOf prov:wasDerivedFrom ;
     rdfs:domain oc:AggregatedResultRecord ; rdfs:range oc:TimeSeriesRecord ;
     rdfs:comment "Identifies the series from whose values a summary was derived. The summary's temporal index description specifies the aggregation scope, which must not be inferred from the number of individually exported records." .
 
@@ -226,7 +223,6 @@ oc:quantityDimension a owl:DatatypeProperty ; rdfs:range xsd:string ;
 @prefix oc: <https://w3id.org/ontocal/> .
 @prefix oeo: <https://openenergyplatform.org/ontology/oeo/> .
 @prefix obo: <http://purl.obolibrary.org/obo/> .
-@prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
@@ -238,7 +234,7 @@ oc:quantityDimension a owl:DatatypeProperty ; rdfs:range xsd:string ;
 
 oc:PhysicalCorrespondenceAssertion a owl:Class ;
     rdfs:label "physical correspondence assertion" ;
-    rdfs:subClassOf obo:IAO_0000030, prov:Entity ;
+    rdfs:subClassOf obo:IAO_0000030 ;
     rdfs:comment "An attributed assertion relating a model component to a stated physical referent or to a description of an aggregate or hypothetical arrangement. Its kind, scope and evidence must be supplied. The assertion is information; it neither identifies the component with its target nor entails that a hypothetical physical object exists." .
 oc:correspondenceTarget a owl:ObjectProperty ;
     rdfs:label "correspondence target" ;
@@ -251,7 +247,7 @@ oc:correspondenceScope a owl:DatatypeProperty ;
     rdfs:label "scope of physical correspondence" ; rdfs:domain oc:PhysicalCorrespondenceAssertion ; rdfs:range xsd:string ;
     rdfs:comment "The stated aspect and limits of a component's correspondence to its target, such as capacity-only aggregation or a proposed design." .
 oc:executionStatus a owl:DatatypeProperty ;
-    rdfs:label "reported execution status" ; rdfs:domain prov:Activity ; rdfs:range xsd:string ;
+    rdfs:label "reported execution status" ; rdfs:domain obo:BFO_0000015 ; rdfs:range xsd:string ;
     rdfs:comment "Explicitly reported execution outcome. The initial profile uses solved, infeasible and failed. A failed or infeasible attempt may generate diagnostics, but it must not acquire an ordinary solved ResultRecord. Missing status remains unknown." .
 oc:referenceScenario a owl:ObjectProperty ;
     rdfs:label "designated reference scenario" ; rdfs:domain oeo:OEO_00010252 ; rdfs:range oeo:OEO_00000364 ;
@@ -263,3 +259,34 @@ dct:spatial a owl:AnnotationProperty .
 dct:publisher a owl:AnnotationProperty .
 dct:references a owl:AnnotationProperty .
 dct:identifier a owl:AnnotationProperty .
+
+# Supplying information, contributing to its creation and taking responsibility for a process are distinct.
+oc:suppliedBy a owl:ObjectProperty ;
+    rdfs:label "supplied by" ;
+    rdfs:domain obo:IAO_0000030 ;
+    rdfs:range obo:BFO_0000002, [ a owl:Class ; owl:unionOf (oeo:OEO_00000323 oeo:OEO_00030022 obo:IAO_0000010) ] ;
+    rdfs:comment "Identifies the person, organisation or software that supplied the recorded information in this profile. It does not establish authorship, scientific endorsement or responsibility for a calculation. Use OEO has contributor when contribution to creating the record is known. Supplying a record alone does not establish such a contribution. This relation is not declared equivalent to PROV attribution." .
+
+oc:hasResponsibleAgent a owl:ObjectProperty ;
+    rdfs:label "has responsible person or organisation" ;
+    rdfs:domain obo:BFO_0000015 ;
+    rdfs:range obo:BFO_0000002, [ a owl:Class ; owl:unionOf (oeo:OEO_00000323 oeo:OEO_00030022) ] ;
+    rdfs:comment "Identifies a person or organisation recorded as responsible for the process. The relation does not assert that the person or organisation is an OEO agent role. Participating software is recorded separately with RO has participant, rather than assigning human responsibility to an information artifact." .
+
+oc:previousRevision a owl:AnnotationProperty ;
+    rdfs:label "previous recorded revision" ;
+    rdfs:comment "Records an identified earlier revision from which this revision was made. This is explicitly asserted metadata; it does not supply PROV revision, specialisation or derivation inference rules. It does not establish that the linked revision is the immediately preceding revision or that the revision history is complete." .
+
+# A fixed artifact revision may identify the broader artifact whose version it is.
+# This is metadata only; no PROV specialisation consequences are asserted.
+dct:isVersionOf a owl:AnnotationProperty .
+
+# These optional recorded times describe the process, not the modelled time horizon.
+oc:startedAtTime a owl:DatatypeProperty ;
+    rdfs:label "recorded process start time" ;
+    rdfs:domain obo:BFO_0000015 ; rdfs:range xsd:dateTime ;
+    rdfs:comment "A recorded date and time at which the process started. Preserve the supplied timezone information. Absence means that the start time is not recorded; it must not be reconstructed from a modelled timestep or a file modification time. No equivalence to a PROV-O property is asserted." .
+oc:endedAtTime a owl:DatatypeProperty ;
+    rdfs:label "recorded process end time" ;
+    rdfs:domain obo:BFO_0000015 ; rdfs:range xsd:dateTime ;
+    rdfs:comment "A recorded date and time at which the process ended. Preserve the supplied timezone information. Absence means that the end time is not recorded. When both process times are supplied, the application profile requires the end not to precede the start. No equivalence to a PROV-O property is asserted." .

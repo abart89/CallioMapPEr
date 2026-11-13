@@ -1,17 +1,25 @@
 PREFIX oc: <https://w3id.org/ontocal/>
 PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
-PREFIX obo: <http://purl.obolibrary.org/obo/>
-PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX dct: <http://purl.org/dc/terms/>
-# Missing rationale is an unbound value; two supplied accounts remain two rows.
-SELECT ?assignment ?assumption ?statement ?reason ?reasonText ?supplier ?assumptionSupplier ?source WHERE {
+# Missing reasons remain empty. Contribution and supply are not authorship.
+SELECT DISTINCT ?assignment ?assumption ?statement ?assumptionContributor ?assumptionSupplier
+       ?reason ?reasonText ?personOrganisationOrSoftware ?recordedRole ?source ?sourceAuthor WHERE {
  ?assignment oc:implementsAssumption ?assumption .
  ?assumption rdfs:comment ?statement .
- OPTIONAL { ?assumption prov:wasAttributedTo ?assumptionSupplier }
+ OPTIONAL { ?assumption oeo:OEO_00140008 ?assumptionContributor }
+ OPTIONAL { ?assumption oc:suppliedBy ?assumptionSupplier }
  OPTIONAL {
    ?assumption oc:hasRationale ?reason .
-   ?reason rdfs:comment ?reasonText ; prov:wasAttributedTo ?supplier .
-   OPTIONAL { ?reason dct:references ?source }
+   ?reason rdfs:comment ?reasonText .
+   { ?reason oeo:OEO_00140008 ?personOrganisationOrSoftware .
+     BIND("contributor to this record" AS ?recordedRole)
+   } UNION {
+     ?reason oc:suppliedBy ?personOrganisationOrSoftware .
+     BIND("supplier of this record" AS ?recordedRole)
+   }
+   OPTIONAL { ?reason (dct:source|dct:references) ?source .
+     OPTIONAL { ?source oeo:OEO_00000506 ?sourceAuthor }
+   }
  }
-} ORDER BY ?assignment ?reason
+} ORDER BY ?assignment ?reason ?recordedRole ?personOrganisationOrSoftware ?sourceAuthor

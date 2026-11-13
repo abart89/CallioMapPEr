@@ -1,7 +1,7 @@
 # Optional context for one saved Calliope export.
 # Start with this valid empty document. Add only records you can support.
 # See examples/annotations/README.md for fields and a complete worked example.
-schema_version: 1
+schema_version: 2
 agents: []
 sources: []
 scenarios: []
@@ -12,7 +12,9 @@ physical_correspondences: []
 component_correspondences: []
 
 # Example of the minimum contributor declaration (replace with your information):
-# default_supplier: modeller
+# default_contributor: modeller
+# Use contributor only when this person helped create the information.
+# Use default_supplier instead when they only supplied existing information.
 # default_evidence_status: Supplied by the modeller; see the cited evidence.
 # agents:
 #   - id: modeller

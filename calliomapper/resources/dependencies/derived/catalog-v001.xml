@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="public">
-  <uri name="urn:ontocal:dependency:prov-o-20130430-dl" uri="prov-o-dl.ttl"/>
-  <uri name="urn:ontocal:dependency:prov-o-20130430-dl:1" uri="prov-o-dl.ttl"/>
-  <uri name="urn:ontocal:dependency:oeo-2.12.0-dl" uri="oeo-dl.owl"/>
-  <uri name="urn:ontocal:dependency:oeo-2.12.0-dl:1" uri="oeo-dl.owl"/>
-</catalog>

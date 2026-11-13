@@ -1,6 +1,7 @@
 recursive-include calliomapper/resources *
 recursive-include calliomapper/templates *.yaml
 recursive-include calliomapper/query_files *.rq
+prune calliomapper/generated
 recursive-include examples *.yaml *.csv *.md *.py *.json *.nc
 recursive-include docs *.md *.svg
 recursive-include notebooks *.ipynb *.md

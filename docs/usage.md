@@ -1,10 +1,10 @@
 # Using CallioMapper
 
-CallioMapper `0.1.0rc2` is a release candidate for research trials. It reads a saved, successful Calliope CSV export and represents selected information using OntoCal. The primary target is stable Calliope 0.7.0; the included 0.7.0.dev7 exports provide historical regression cases. The supported variables and tests are bounded. This release does not claim to translate every Calliope model or mathematical extension.
+CallioMapper `0.1.0rc3` is a local candidate for internal research trials. It uses the OEO-based OntoCal draft and annotation schema 2; this local update is not a public release. It reads a saved, successful Calliope CSV export and represents selected information using OntoCal. The primary target is stable Calliope 0.7.0; the included 0.7.0.dev7 exports provide historical regression cases. The supported variables and tests are bounded. This release does not claim to translate every Calliope model or mathematical extension.
 
 ## Install and open the examples
 
-Use Python 3.10 or later. Python 3.13.2 was used for the recorded evaluation. From the repository directory, create and activate an environment, then install the package:
+Use Python 3.10 or later. The [evaluation record](evaluation.md) identifies the versions used for the current and earlier checks. From the repository directory, create and activate an environment, then install the package:
 
 ```sh
 python -m venv .venv
@@ -15,7 +15,7 @@ python -m pip install .
 The activation command above is for a Unix-like shell; Windows environments use the `Scripts` directory. If you have been given a built wheel, you can install that instead:
 
 ```sh
-python -m pip install /path/to/calliomapper-0.1.0rc2-py3-none-any.whl
+python -m pip install /path/to/calliomapper-0.1.0rc3-py3-none-any.whl
 ```
 
 Keep a copy of the repository or accompanying source archive for the saved examples and notebooks. They are not installed into the current directory by the wheel. No PyPI publication is assumed by these instructions.
@@ -146,6 +146,8 @@ reasons = run_query(annotated.translate(), "cq05")
 
 This reuses the namespace of the earlier capacity export, so unchanged model components retain their identifiers. The example annotation file contains invented tutorial context with explicit labels. It is not evidence about the original authors' research process. Its capacity-unit interpretation has separate evidence in source comments.
 
+Use `schema_version: 2` for annotations. A `contributor` helped create the information being recorded; a `supplier` supplied it. Defaults for these roles are separate, and neither assigns responsibility for a study or preparation process. A source report can identify its own `authors`, independently of the people adding annotations that cite it. See the [annotation guide](../examples/annotations/README.md) for examples and schema-1 migration instructions.
+
 Supplied statements are checked for their required structure and relationships. Passing those checks does not establish their scientific truth. An empty answer may mean that the needed context was never supplied; consult the information requirements for that query before interpreting it.
 
 ## Understand the graph, manifest and report
@@ -157,6 +159,8 @@ Saving `build/model.nq` produces:
 | `model.nq` | The RDF dataset in N-Quads format. It can be read without the companion JSON files. |
 | `model.nq.manifest.json` | A small record of the identifier namespace, configuration and execution fingerprints, and package and ontology versions. It supports deliberate reuse of identifiers when exporting again. |
 | `model.nq.report.json` | Details of extracted content, omissions and their reasons, source checksums, available version evidence, selected groups and validation results. |
+
+The graph uses the unchanged OEO distribution bundled with OntoCal. OEO relationships connect information to the processes that use and produce it; IAO software and RO participation describe the program involved. Actual saved execution times and the export's own times use OntoCal `startedAtTime` and `endedAtTime`. The model's simulated time labels remain separate. Source/version references are metadata and do not reproduce PROV derivation or specialisation rules.
 
 The graph contains asserted statements. Source and computed statements, supplied annotation additions, and graph-generation provenance occupy separate named graphs. Ordinary queries use their union; queries about graph provenance retain the graph identifiers. Runtime SHACL validation checks the combined assertions against the packaged OntoCal profile. It does not add OWL-inferred triples or run the separate OWL reasoning evaluation.
 

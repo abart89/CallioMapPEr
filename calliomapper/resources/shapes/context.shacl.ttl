@@ -1,8 +1,8 @@
+@prefix dct: <http://purl.org/dc/terms/> .
 @prefix oc: <https://w3id.org/ontocal/> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix obo: <http://purl.obolibrary.org/obo/> .
 @prefix oeo: <https://openenergyplatform.org/ontology/oeo/> .
-@prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
@@ -10,8 +10,10 @@
 oc:RecordedRationaleShape a sh:NodeShape ; sh:targetObjectsOf oc:hasRationale ;
     sh:property [ sh:path rdfs:comment ; sh:minCount 1 ; sh:datatype xsd:string ] ;
     sh:property oc:RationaleAttribution .
-oc:RationaleAttribution a sh:PropertyShape ; sh:path prov:wasAttributedTo ; sh:minCount 1 ;
-    sh:class prov:Agent ; sh:message "A supplied rationale must identify its supplier." .
+oc:RationaleAttribution a sh:PropertyShape ;
+    sh:path [ sh:alternativePath (oeo:OEO_00140008 oc:suppliedBy) ] ; sh:minCount 1 ;
+    sh:class obo:BFO_0000002 ;
+    sh:message "A rationale must identify a contributor to creating this record or its supplier. These are different relationships; neither establishes authorship of the cited source." .
 oc:StudyReferenceShape a sh:NodeShape ; sh:targetSubjectsOf oc:referenceScenario ;
     sh:property [ sh:path oc:referenceScenario ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oeo:OEO_00000364 ] ;
     sh:sparql [ sh:message "The designated reference must be a scenario investigated by this study." ;
@@ -24,17 +26,17 @@ oc:ReportedExecutionStatusShape a sh:NodeShape ; sh:targetSubjectsOf oc:executio
     sh:sparql oc:NoSolvedResultFromFailedExecution .
 oc:NoSolvedResultFromFailedExecution a sh:SPARQLConstraint ;
     sh:message "An infeasible or failed execution cannot generate an ordinary solved ResultRecord." ;
-    sh:select """PREFIX oc: <https://w3id.org/ontocal/>
-        PREFIX prov: <http://www.w3.org/ns/prov#>
+    sh:select """PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+PREFIX oc: <https://w3id.org/ontocal/>
         SELECT $this WHERE { $this oc:executionStatus ?status .
           FILTER (?status IN ("infeasible", "failed"))
-          ?result a oc:ResultRecord ; prov:wasGeneratedBy $this . }""" .
+          ?result a oc:ResultRecord ; oeo:OEO_00020190 $this . }""" .
 oc:PhysicalCorrespondenceShape a sh:NodeShape ; sh:targetClass oc:PhysicalCorrespondenceAssertion ;
     sh:property [ sh:path oc:forComponent ; sh:minCount 1 ; sh:maxCount 1 ; sh:class oeo:OEO_00000276 ] ;
     sh:property [ sh:path oc:correspondenceTarget ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
     sh:property [ sh:path oc:correspondenceKind ; sh:minCount 1 ; sh:maxCount 1 ; sh:in ("actual" "aggregate" "hypothetical") ] ;
     sh:property [ sh:path oc:correspondenceScope ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ; sh:minLength 1 ] ;
-    sh:property [ sh:path prov:wasAttributedTo ; sh:minCount 1 ; sh:class prov:Agent ] ;
+    sh:property oc:CorrespondenceAttribution ;
     sh:property oc:CorrespondenceEvidence ;
     sh:sparql [ sh:message "An actual correspondence target must explicitly be identified as a material entity." ;
         sh:select """PREFIX oc: <https://w3id.org/ontocal/>
@@ -53,8 +55,8 @@ oc:PhysicalCorrespondenceShape a sh:NodeShape ; sh:targetClass oc:PhysicalCorres
         PREFIX owl: <http://www.w3.org/2002/07/owl#>
         SELECT $this WHERE { $this oc:forComponent ?component ; oc:correspondenceTarget ?target .
           FILTER (?component = ?target || EXISTS { ?component owl:sameAs|^owl:sameAs ?target }) }""" ] .
-oc:CorrespondenceEvidence a sh:PropertyShape ; sh:path prov:wasDerivedFrom ;
-    sh:minCount 1 ; sh:class prov:Entity ; sh:message "A supplied correspondence must identify its recorded evidence source." .
+oc:CorrespondenceEvidence a sh:PropertyShape ; sh:path dct:source ;
+    sh:minCount 1 ; sh:class obo:IAO_0000030 ; sh:message "A supplied correspondence must identify its recorded evidence source." .
 oc:NoPhysicalHypothesis a sh:SPARQLConstraint ;
     sh:message "A hypothetical target description must not be asserted as a material entity or power plant." ;
     sh:select """PREFIX oc: <https://w3id.org/ontocal/>
@@ -62,3 +64,43 @@ oc:NoPhysicalHypothesis a sh:SPARQLConstraint ;
         PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
         SELECT $this WHERE { $this oc:correspondenceKind "hypothetical" ; oc:correspondenceTarget ?target .
           ?target a ?physicalType . FILTER (?physicalType IN (obo:BFO_0000040, oeo:OEO_00000031)) }""" .
+
+
+# Responsibility belongs to an explicitly identified person or organisation.
+# Software is represented as a participant in a process, not as its responsible party.
+oc:ResponsibleActivityShape a sh:NodeShape ; sh:targetSubjectsOf oc:hasResponsibleAgent ;
+    sh:class obo:BFO_0000015 ; sh:property oc:ResponsiblePartyType .
+oc:ResponsiblePartyType a sh:PropertyShape ; sh:path oc:hasResponsibleAgent ;
+    sh:or ( [ sh:class oeo:OEO_00000323 ] [ sh:class oeo:OEO_00030022 ] ) ;
+    sh:not [ sh:class obo:IAO_0000010 ] ;
+    sh:message "A responsible party must be an identified person or organisation; software must be recorded as a process participant." .
+
+
+# A named supplier must be identified as one of the kinds supported by this profile.
+oc:SuppliedInformationShape a sh:NodeShape ; sh:targetSubjectsOf oc:suppliedBy ;
+    sh:property oc:SupplierType .
+oc:SupplierType a sh:PropertyShape ; sh:path oc:suppliedBy ;
+    sh:or ( [ sh:class oeo:OEO_00000323 ] [ sh:class oeo:OEO_00030022 ] [ sh:class obo:IAO_0000010 ] ) ;
+    sh:message "A supplier must be identified as a person, organisation or software; an arbitrary physical entity is insufficient." .
+
+# A contributor took part in creating the information. A supplier may only have passed it on.
+oc:ContributedInformationShape a sh:NodeShape ; sh:targetSubjectsOf oeo:OEO_00140008 ;
+    sh:property oc:ContributorType .
+oc:ContributorType a sh:PropertyShape ; sh:path oeo:OEO_00140008 ;
+    sh:or ( [ sh:class oeo:OEO_00000323 ] [ sh:class oeo:OEO_00030022 ] [ sh:class obo:IAO_0000010 ] ) ;
+    sh:message "In this application profile a recorded contributor must be identified as a person, organisation or software that contributed to creating the information." .
+oc:CorrespondenceAttribution a sh:PropertyShape ;
+    sh:path [ sh:alternativePath (oeo:OEO_00140008 oc:suppliedBy) ] ; sh:minCount 1 ;
+    sh:class obo:BFO_0000002 ;
+    sh:message "A correspondence record must identify a contributor to creating the record or its supplier." .
+
+# Process times are optional. If supplied, they must be dates and times in a possible order.
+oc:RecordedProcessTimeShape a sh:NodeShape ;
+    sh:targetSubjectsOf oc:startedAtTime, oc:endedAtTime ; sh:class obo:BFO_0000015 ;
+    sh:property oc:ProcessStartTime, oc:ProcessEndTime .
+oc:ProcessStartTime a sh:PropertyShape ; sh:path oc:startedAtTime ;
+    sh:maxCount 1 ; sh:datatype xsd:dateTime ; sh:lessThanOrEquals oc:endedAtTime ;
+    sh:message "A recorded process start must be a valid date and time and must not be later than its recorded end." .
+oc:ProcessEndTime a sh:PropertyShape ; sh:path oc:endedAtTime ;
+    sh:maxCount 1 ; sh:datatype xsd:dateTime ;
+    sh:message "A recorded process end must be one valid date and time." .

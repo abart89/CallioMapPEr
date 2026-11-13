@@ -1,11 +1,10 @@
 PREFIX oc: <https://w3id.org/ontocal/>
 PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
-PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX dct: <http://purl.org/dc/terms/>
 # Supplied context is optional; unavailable facts remain unbound, not invented.
-SELECT ?run ?study ?question ?spatial ?scenario ?role ?first ?last ?solverVersion WHERE {
+SELECT ?run ?study ?question ?spatial ?scenario ?role ?first ?last ?software ?softwareVersion WHERE {
  ?run oc:usesConfiguration ?configuration .
  OPTIONAL {
    ?run obo:BFO_0000050 ?study . ?study a oeo:OEO_00010252 .
@@ -21,5 +20,6 @@ SELECT ?run ?study ?question ?spatial ?scenario ?role ?first ?last ?solverVersio
    ?study oc:referenceScenario ?reference ; oeo:OEO_00020226 ?scenario .
    BIND(IF(?reference = ?scenario, "reference", "alternative") AS ?role)
  }
- OPTIONAL { ?run prov:wasAssociatedWith ?solver . ?solver <http://www.w3.org/2002/07/owl#versionInfo> ?solverVersion }
+ OPTIONAL { ?run obo:RO_0000057 ?software . ?software a obo:IAO_0000010 .
+            OPTIONAL { ?software <http://www.w3.org/2002/07/owl#versionInfo> ?softwareVersion } }
 } ORDER BY ?run

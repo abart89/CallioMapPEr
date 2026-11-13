@@ -1,0 +1,18 @@
+PREFIX oeo: <https://openenergyplatform.org/ontology/oeo/>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX dct: <http://purl.org/dc/terms/>
+# This query uses OEO, RO/BFO and Dublin Core only, without inference.
+# The CQ07 preset additionally returns contributor/supplier attribution.
+# Context and graph provenance may be supplied in separate named graphs.
+SELECT DISTINCT ?dataset ?export ?catalogue ?model ?run ?result ?study ?studyTitle
+       ?publisher ?translation WHERE {
+  GRAPH ?export {
+    ?run a oeo:OEO_00000275 ; obo:RO_0000057 ?model ; oeo:OEO_00140094 ?result .
+    ?model a oeo:OEO_00000274 .
+  }
+  ?run oeo:OEO_00140093 ?dataset ; obo:BFO_0000050 ?study .
+  ?study dct:title ?studyTitle .
+  ?export oeo:OEO_00020190 ?translation .
+  GRAPH ?catalogue { ?dataset dct:publisher ?publisher }
+  FILTER (?catalogue != ?export)
+} ORDER BY ?dataset ?export ?run ?result

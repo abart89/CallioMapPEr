@@ -9,7 +9,7 @@ import yaml
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import DCTERMS, RDF, RDFS, XSD
 
-from calliomapper.mapper.annotations import AnnotationError, OC, OBO, OEO, PROV, add_annotations
+from calliomapper.mapper.annotations import AnnotationError, OC, OBO, OEO, add_annotations
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -22,7 +22,7 @@ def context():
                                       ("region2", "battery"): iri("component", "region2", "battery")})
     graph = ctx.graph
     graph.add((ctx.configuration, RDF.type, OC.ConfigurationSpecification))
-    graph.add((ctx.execution, RDF.type, PROV.Activity))
+    graph.add((ctx.execution, RDF.type, OBO.BFO_0000015))
     graph.add((ctx.execution, OC.usesConfiguration, ctx.configuration))
     graph.add((ctx.model, RDF.type, OEO.OEO_00000274))
     node = ctx.nodes["region1"]
@@ -44,7 +44,7 @@ def context():
         graph.add((record, OC.quantityDimension, Literal("dimensionless" if var == "flow_in_eff" else "power", datatype=XSD.string)))
         if carrier:
             graph.add((record, OC.carrierIndex, Literal(carrier, datatype=XSD.string)))
-            graph.add((record, PROV.wasGeneratedBy, ctx.execution))
+            graph.add((record, OEO.OEO_00020190, ctx.execution))
             graph.add((ctx.execution, OEO.OEO_00140094, datum))
     return ctx
 
@@ -69,17 +69,17 @@ def test_example_preserves_numbers_and_distinguishes_context_from_source_evidenc
     assert (ctx.configuration, OC.implementsScenario, scenario) in ctx.graph
     assert (ctx.iri("record", "flow_cap_max"), OC.implementsAssumption, assumption) in ctx.graph
     assert (assumption, OC.hasRationale, reason) in ctx.graph
-    assert (reason, PROV.wasAttributedTo, annotation(ctx, "demonstration_contributor")) in ctx.graph
+    assert (reason, OC.suppliedBy, annotation(ctx, "demonstration_contributor")) in ctx.graph
     assert not list(ctx.graph.objects(annotation(ctx, "unexplained_efficiency_assumption"), OC.hasRationale))
     assert "Synthetic" in str(ctx.graph.value(assumption, OC.evidenceStatus))
     quantity = annotation(ctx, "bound_unit_interpretation")
     assert "Interpretation grounded" in str(ctx.graph.value(quantity, OC.evidenceStatus))
-    assert (quantity, PROV.wasDerivedFrom, annotation(ctx, "capacity_comment")) in ctx.graph
+    assert (quantity, DCTERMS.source, annotation(ctx, "capacity_comment")) in ctx.graph
     assert ctx.graph.value(quantity, OEO.OEO_00140178).toPython() == 30000
     revision = URIRef("https://example.org/calliomapper/tutorial/dataset/capacity/revision-2")
-    assert (ctx.execution, PROV.used, revision) in ctx.graph
-    assert (ctx.iri("datum", "flow_cap_max"), PROV.wasDerivedFrom, revision) in ctx.graph
-    assert (revision, PROV.wasGeneratedBy, annotation(ctx, "invented_preparation")) in ctx.graph
+    assert (ctx.execution, OEO.OEO_00140093, revision) in ctx.graph
+    assert (ctx.iri("datum", "flow_cap_max"), DCTERMS.source, revision) in ctx.graph
+    assert (revision, OEO.OEO_00020190, annotation(ctx, "invented_preparation")) in ctx.graph
     target = URIRef("https://example.org/calliomapper/tutorial/proposed-plant-description")
     assert (target, RDF.type, OBO.IAO_0000030) in ctx.graph
     assert (target, RDF.type, OBO.BFO_0000040) not in ctx.graph
@@ -113,8 +113,130 @@ def test_empty_template_does_not_invent_context():
     assert not list(ctx.graph.subjects(RDF.type, OEO.OEO_00000063))
 
 
+def test_annotation_contributors_do_not_become_source_authors_or_suppliers(document):
+    ctx = context()
+    document.pop("default_supplier")
+    document["default_contributor"] = ["demonstration_contributor", "annotation_software"]
+    document["agents"] += [
+        {"id": "report_author", "kind": "person", "label": "Fictional report author"},
+        {"id": "annotation_software", "kind": "software", "label": "Fictional annotation software"},
+    ]
+    document["sources"][0]["authors"] = "report_author"
+    document["component_correspondences"] = [{
+        "id": "created_pairing", "source": {"node": "region1", "technology": "ccgt"},
+        "target": {"uri": "https://example.org/another-model/ccgt"},
+        "reason": "Synthetic correspondence annotation created for this test.",
+    }]
+    add_annotations(ctx, document)
+    reason, report = annotation(ctx, "capacity_reason"), annotation(ctx, "invented_report")
+    contributor = annotation(ctx, "demonstration_contributor")
+    software = annotation(ctx, "annotation_software")
+    author = annotation(ctx, "report_author")
+    assert set(ctx.graph.objects(reason, OEO.OEO_00140008)) == {contributor, software}
+    assert set(ctx.graph.objects(report, OEO.OEO_00000506)) == {author}
+    assert (reason, DCTERMS.source, report) in ctx.graph
+    assert not list(ctx.graph.objects(reason, OC.suppliedBy))
+    assert not list(ctx.graph.objects(reason, OEO.OEO_00000506))
+    assert (report, OEO.OEO_00000506, contributor) not in ctx.graph
+    assert not list(ctx.graph.triples((None, OC.hasResponsibleAgent, None)))
+    from calliomapper.utils.validation import validate
+    validate(ctx.graph)
+
+
+def test_supplier_only_information_does_not_assert_creation_or_process_responsibility(document):
+    ctx = context()
+    add_annotations(ctx, document)
+    supplier = annotation(ctx, "demonstration_contributor")
+    assert (annotation(ctx, "capacity_reason"), OC.suppliedBy, supplier) in ctx.graph
+    assert not list(ctx.graph.triples((None, OEO.OEO_00140008, None)))
+    assert not list(ctx.graph.triples((None, OEO.OEO_00000506, None)))
+    assert not list(ctx.graph.triples((None, OC.hasResponsibleAgent, None)))
+    for process_id in ("demonstration_study", "invented_preparation"):
+        process = annotation(ctx, process_id)
+        description, = ctx.graph.subjects(OBO.IAO_0000136, process)
+        assert (description, OC.suppliedBy, supplier) in ctx.graph
+        assert not list(ctx.graph.objects(process, OC.suppliedBy))
+
+
+def test_process_responsibility_is_explicit_and_distinct_from_software_participation(document):
+    ctx = context()
+    document["agents"] += [{"id": "processor", "kind": "software", "label": "Fictional processing software"}]
+    for process in (document["study"], document["datasets"][0]["preparation"]):
+        process["responsible"] = "demonstration_contributor"
+        process["participants"] = ["processor"]
+    add_annotations(ctx, document)
+    person, software = annotation(ctx, "demonstration_contributor"), annotation(ctx, "processor")
+    for process_id in ("demonstration_study", "invented_preparation"):
+        process = annotation(ctx, process_id)
+        assert set(ctx.graph.objects(process, OC.hasResponsibleAgent)) == {person}
+        assert set(ctx.graph.objects(process, OBO.RO_0000057)) == {software}
+        assert (process, OC.hasResponsibleAgent, software) not in ctx.graph
+    assert not any(str(term).startswith("http://www.w3.org/ns/prov#") for triple in ctx.graph for term in triple)
+
+
+def test_queries_keep_source_author_contributor_supplier_and_process_roles_distinct(document):
+    from calliomapper.queries import run_query
+    ctx = context()
+    document["agents"] += [
+        {"id": "original_author", "kind": "person", "label": "Fictional report author"},
+        {"id": "annotation_writer", "kind": "person", "label": "Fictional annotation writer"},
+        {"id": "processor", "kind": "software", "label": "Fictional processing software"},
+    ]
+    document["sources"][0]["authors"] = ["original_author"]
+    document["assumptions"][0]["reasons"][0]["contributor"] = "annotation_writer"
+    preparation = document["datasets"][0]["preparation"]
+    preparation["responsible"] = "annotation_writer"
+    preparation["participants"] = "processor"
+    add_annotations(ctx, document)
+    reason = annotation(ctx, "capacity_reason")
+    answers = [row for row in run_query(ctx.graph, "cq05") if row.reason == reason]
+    assert {(row.personOrganisationOrSoftware, str(row.recordedRole)) for row in answers} == {
+        (annotation(ctx, "annotation_writer"), "contributor to this record"),
+        (annotation(ctx, "demonstration_contributor"), "supplier of this record"),
+    }
+    assert {row.sourceAuthor for row in answers} == {annotation(ctx, "original_author")}
+    assert {row.source for row in answers} == {annotation(ctx, "invented_report")}
+    revision = URIRef(document["datasets"][0]["revision_uri"])
+    history = list(run_query(ctx.graph, "cq04", {"entity": revision}))
+    assert {(row.personOrganisationOrSoftware, str(row.recordedRole)) for row in history} == {
+        (annotation(ctx, "annotation_writer"), "responsible person or organisation"),
+        (annotation(ctx, "processor"), "software used"),
+    }
+    assert annotation(ctx, "original_author") in {row.sourceAuthor for row in history}
+
+
 @pytest.mark.parametrize("change, message", [
-    (lambda doc: doc.update(schema_version=2), "schema_version"),
+    (lambda doc: doc["agents"][0].update(kind="agent"), "agent.kind"),
+    (lambda doc: doc["agents"][0].update(kind="software") or doc["sources"][0].update(authors="demonstration_contributor"), "person or organization"),
+    (lambda doc: doc["agents"][0].update(kind="software") or doc["study"].update(responsible="demonstration_contributor"), "person or organization"),
+    (lambda doc: doc["scenarios"][0].update(contributor=["undeclared"]), "declared agents"),
+    (lambda doc: doc["scenarios"][0].update(contributor=None), "non-empty"),
+    (lambda doc: doc.update(default_contributor=[]), "non-empty"),
+    (lambda doc: doc["study"].update(participants="undeclared"), "declared agents"),
+    (lambda doc: doc.pop("default_supplier"), "identify a contributor"),
+])
+def test_invalid_attribution_is_rejected_before_changing_graph(document, change, message):
+    ctx = context()
+    original = set(ctx.graph)
+    change(document)
+    with pytest.raises(AnnotationError, match=message):
+        add_annotations(ctx, document)
+    assert set(ctx.graph) == original
+    assert not ctx.report
+
+
+def test_one_external_agent_uri_cannot_be_both_person_and_software(document):
+    document["agents"][0]["uri"] = "https://example.org/person"
+    document["agents"].append({"id": "bad_reuse", "kind": "software", "label": "Software", "uri": "https://example.org/person"})
+    ctx = context()
+    before = set(ctx.graph)
+    with pytest.raises(AnnotationError, match="different kinds"):
+        add_annotations(ctx, document)
+    assert set(ctx.graph) == before
+
+
+@pytest.mark.parametrize("change, message", [
+    (lambda doc: doc.update(schema_version=1), "schema_version"),
     (lambda doc: doc.update(default_supplier="unknown"), "default_supplier"),
     (lambda doc: doc["study"].update(queston="typo"), "unknown fields"),
     (lambda doc: doc["assumptions"][0]["targets"][0].update(node="missing"), "Unknown component"),
@@ -274,7 +396,7 @@ def test_annotation_file_revision_hashes_original_bytes():
     ctx.export_activity = ctx.iri("export-activity")
     path = ROOT / "examples/annotations/national.yaml"
     add_annotations(ctx, path)
-    revision = ctx.graph.value(ctx.export_activity, PROV.used)
+    revision = ctx.graph.value(ctx.export_activity, OEO.OEO_00140093)
     assert str(ctx.graph.value(revision, OC.contentSHA256)) == hashlib.sha256(path.read_bytes()).hexdigest()
     assert str(ctx.graph.value(revision, OC.sourcePath)) == "national.yaml"
     assert "canonical parsed JSON" in ctx.report["annotation_digest_representation"]

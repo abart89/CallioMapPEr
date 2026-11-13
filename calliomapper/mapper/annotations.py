@@ -19,7 +19,6 @@ from rdflib.namespace import DCTERMS, RDF, RDFS, XSD
 OC = Namespace("https://w3id.org/ontocal/")
 OEO = Namespace("https://openenergyplatform.org/ontology/oeo/")
 OBO = Namespace("http://purl.obolibrary.org/obo/")
-PROV = Namespace("http://www.w3.org/ns/prov#")
 
 # Fixed unit classes verified in the bundled OEO 2.12.0 dependency.
 SUPPORTED_UNITS = {
@@ -90,6 +89,7 @@ class _Annotations:
         for triple in ctx.graph:
             self.graph.add(triple)
         self.ids, self.agents, self.sources, self.scenarios = set(), {}, {}, {}
+        self.agent_kinds = {}
         self.counts = {}
         try:
             canonical = json.dumps(document, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
@@ -101,7 +101,7 @@ class _Annotations:
         return self.ctx.iri("annotation", str(self.ctx.execution), self.digest, *keys)
 
     def record(self, record, fields, required, where, *, claim=True):
-        common = {"id", "supplier", "evidence_status", "evidence"} if claim else {"id"}
+        common = {"id", "contributor", "supplier", "evidence_status", "evidence"} if claim else {"id"}
         _keys(record, common | set(fields), {"id"} | set(required), where)
         identifier = _text(record["id"], f"{where}.id")
         if identifier in self.ids:
@@ -122,30 +122,55 @@ class _Annotations:
 
     def types(self, subject, *classes):
         existing = set(self.graph.objects(subject, RDF.type)) | set(classes)
-        information = {OBO.IAO_0000030, OBO.IAO_0000027, OEO.OEO_00000276,
+        information = {OBO.IAO_0000030, OBO.IAO_0000027, OBO.IAO_0000010, OEO.OEO_00000276,
                        OEO.OEO_00000364, OEO.OEO_00000063, OEO.OEO_00000350}
-        material = {OBO.BFO_0000040, OEO.OEO_00000031}
-        processes = {PROV.Activity, OBO.BFO_0000015, OBO.BFO_0000003, OEO.OEO_00010252}
-        if ({PROV.Activity, PROV.Entity} <= existing or
-                (existing & information and existing & material) or
+        material = {OBO.BFO_0000040, OEO.OEO_00000031, OEO.OEO_00000323, OEO.OEO_00030022}
+        processes = {OBO.BFO_0000015, OBO.BFO_0000003, OEO.OEO_00010252, OEO.OEO_00000124}
+        if ((existing & information and existing & material) or
                 (existing & processes and existing & (information | material | {OBO.BFO_0000002}))):
             raise AnnotationError(f"Identifier {subject} would have incompatible activity, information or material types")
         for cls in classes:
             self.graph.add((subject, RDF.type, cls))
 
-    def claim(self, subject, record, *, evidence_required=False, activity=False):
-        self.graph.add((subject, DCTERMS.identifier, _literal(record["id"])))
-        supplier = _text(record.get("supplier", self.document.get("default_supplier")), f"{record['id']}.supplier")
-        if supplier not in self.agents:
-            raise AnnotationError(f"{record['id']}: supplier must identify a declared agent")
-        self.graph.add((subject, PROV.wasAssociatedWith if activity else PROV.wasAttributedTo, self.agents[supplier]))
+    def agent_references(self, value, where, *, people_only=False):
+        refs = [value] if isinstance(value, str) else _list(value, where, nonempty=True)
+        for ref in refs:
+            _text(ref, where)
+            if ref not in self.agents:
+                raise AnnotationError(f"{where} must identify declared agents")
+            if people_only and self.agent_kinds[ref] not in {"person", "organization"}:
+                raise AnnotationError(f"{where} must identify a declared person or organization, not software")
+        return [self.agents[ref] for ref in refs]
+
+    def claim(self, subject, record, *, evidence_required=False, identifier=True):
+        if identifier:
+            self.graph.add((subject, DCTERMS.identifier, _literal(record["id"])))
+        attribution = False
+        for field, predicate in (("contributor", OEO.OEO_00140008), ("supplier", OC.suppliedBy)):
+            if field in record or f"default_{field}" in self.document:
+                value = record.get(field, self.document.get(f"default_{field}"))
+                for agent in self.agent_references(value, f"{record['id']}.{field}"):
+                    self.graph.add((subject, predicate, agent))
+                attribution = True
+        if not attribution:
+            raise AnnotationError(f"{record['id']}: identify a contributor to creating this information, a supplier, or both")
         status = record.get("evidence_status", self.document.get("default_evidence_status"))
         self.graph.add((subject, OC.evidenceStatus, _literal(_text(status, f"{record['id']}.evidence_status"))))
         for ref in _list(record.get("evidence", []), f"{record['id']}.evidence", nonempty=evidence_required):
             _text(ref, "source reference")
             if ref not in self.sources:
                 raise AnnotationError(f"{record['id']}: unknown evidence source {ref!r}")
-            self.graph.add((subject, PROV.used if activity else PROV.wasDerivedFrom, self.sources[ref]))
+            self.graph.add((subject, DCTERMS.source, self.sources[ref]))
+
+    def process_context(self, subject, record):
+        self.graph.add((subject, DCTERMS.identifier, _literal(record["id"])))
+        status = record.get("evidence_status", self.document.get("default_evidence_status"))
+        self.graph.add((subject, OC.evidenceStatus, _literal(_text(status, f"{record['id']}.evidence_status"))))
+        for field, predicate, people_only in (("responsible", OC.hasResponsibleAgent, True),
+                                               ("participants", OBO.RO_0000057, False)):
+            if field in record:
+                for agent in self.agent_references(record[field], f"{record['id']}.{field}", people_only=people_only):
+                    self.graph.add((subject, predicate, agent))
 
     def component(self, selector, *, external=False):
         _keys(selector, {"node", "technology", "uri"}, set(), "component selector")
@@ -191,32 +216,43 @@ class _Annotations:
         return candidates[0]
 
     def build(self):
-        allowed = {"schema_version", "default_supplier", "default_evidence_status", "agents", "sources", "study", "scenarios", "assumptions", "units", "datasets", "physical_correspondences", "component_correspondences"}
+        allowed = {"schema_version", "default_contributor", "default_supplier", "default_evidence_status", "agents", "sources", "study", "scenarios", "assumptions", "units", "datasets", "physical_correspondences", "component_correspondences"}
         _keys(self.document, allowed, {"schema_version"}, "annotation document")
-        if type(self.document["schema_version"]) is not int or self.document["schema_version"] != 1:
-            raise AnnotationError("schema_version must be the integer 1")
+        if self.document["schema_version"] == 1:
+            raise AnnotationError("Annotation schema version 1 is no longer supported. Set schema_version to 2, "
+                                  "keep supplier for people who supplied information, and use contributor only "
+                                  "for those who helped create it. Declare agent kind as person, organization "
+                                  "or software. Supply process responsibility explicitly with responsible; "
+                                  "it is no longer inferred from supplier.")
+        if type(self.document["schema_version"]) is not int or self.document["schema_version"] != 2:
+            raise AnnotationError("schema_version must be the integer 2")
         if "default_evidence_status" in self.document:
             _text(self.document["default_evidence_status"], "default_evidence_status")
-        for section in allowed - {"schema_version", "default_supplier", "default_evidence_status", "study"}:
+        sections = allowed - {"schema_version", "default_contributor", "default_supplier", "default_evidence_status", "study"}
+        for section in sections:
             _list(self.document.get(section, []), section)
         for record in self.document.get("agents", []):
-            subject = self.record(record, {"label", "kind", "uri"}, {"label"}, "agent", claim=False)
+            subject = self.record(record, {"label", "kind", "uri"}, {"label", "kind"}, "agent", claim=False)
             subject = self.external_uri(record["uri"], "agent.uri") if "uri" in record else subject
-            kind = _text(record.get("kind", "agent"), "agent.kind")
-            if kind not in {"agent", "person", "organization", "software"}:
-                raise AnnotationError("agent.kind must be agent, person, organization or software")
-            self.types(subject, PROV.Agent)
-            if kind != "agent":
-                self.types(subject, {"person": PROV.Person, "organization": PROV.Organization, "software": PROV.SoftwareAgent}[kind])
+            kind = _text(record["kind"], "agent.kind")
+            if kind not in {"person", "organization", "software"}:
+                raise AnnotationError("agent.kind must be person, organization or software")
+            for other_id, other_subject in self.agents.items():
+                if other_subject == subject and self.agent_kinds[other_id] != kind:
+                    raise AnnotationError("One agent URI cannot identify different kinds of agent")
+            self.types(subject, OBO.BFO_0000002,
+                       {"person": OEO.OEO_00000323, "organization": OEO.OEO_00030022, "software": OBO.IAO_0000010}[kind])
             self.graph.add((subject, RDFS.label, _literal(_text(record["label"], "agent.label"))))
             self.graph.add((subject, DCTERMS.identifier, _literal(record["id"])))
             self.agents[record["id"]] = subject
-        if "default_supplier" in self.document and _text(self.document["default_supplier"], "default_supplier") not in self.agents:
-            raise AnnotationError("default_supplier must identify a declared agent")
+            self.agent_kinds[record["id"]] = kind
+        for field in ("default_contributor", "default_supplier"):
+            if field in self.document:
+                self.agent_references(self.document[field], field)
         for record in self.document.get("sources", []):
-            subject = self.record(record, {"title", "uri", "locator", "sha256"}, {"title"}, "source", claim=False)
+            subject = self.record(record, {"title", "uri", "locator", "sha256", "authors"}, {"title"}, "source", claim=False)
             subject = self.external_uri(record["uri"], "source.uri") if "uri" in record else subject
-            self.types(subject, OBO.IAO_0000030, PROV.Entity)
+            self.types(subject, OBO.IAO_0000030)
             self.graph.add((subject, DCTERMS.title, _literal(_text(record["title"], "source.title"))))
             if "locator" in record:
                 self.graph.add((subject, OC.sourceLocator, _literal(_text(record["locator"], "source.locator"))))
@@ -226,11 +262,14 @@ class _Annotations:
                     raise AnnotationError("source.sha256 must contain 64 lowercase hexadecimal digits")
                 self.graph.add((subject, OC.contentSHA256, _literal(digest)))
             self.graph.add((subject, DCTERMS.identifier, _literal(record["id"])))
+            if "authors" in record:
+                for author in self.agent_references(record["authors"], f"{record['id']}.authors", people_only=True):
+                    self.graph.add((subject, OEO.OEO_00000506, author))
             self.sources[record["id"]] = subject
         for record in self.document.get("scenarios", []):
             subject = self.record(record, {"label", "description", "implemented_by_configuration", "uri"}, {"label", "description"}, "scenario")
             subject = self.external_uri(record["uri"], "scenario.uri") if "uri" in record else subject
-            self.types(subject, OEO.OEO_00000364, PROV.Entity)
+            self.types(subject, OEO.OEO_00000364, OBO.IAO_0000030)
             self.graph.add((subject, RDFS.label, _literal(_text(record["label"], "scenario.label"))))
             self.graph.add((subject, RDFS.comment, _literal(_text(record["description"], "scenario.description"))))
             self.claim(subject, record)
@@ -246,23 +285,23 @@ class _Annotations:
                                 ("physical_correspondences", self.physical), ("component_correspondences", self.correspondence)):
             for record in self.document.get(section, []):
                 method(record)
-        self.counts = {section: len(self.document.get(section, [])) for section in allowed - {"schema_version", "default_supplier", "default_evidence_status", "study"}}
+        self.counts = {section: len(self.document.get(section, [])) for section in sections}
         self.counts["study"] = int("study" in self.document)
 
     def study(self, record):
-        subject = self.record(record, {"title", "question", "scenarios", "reference_scenario", "uri"}, {"title", "question", "scenarios"}, "study")
+        subject = self.record(record, {"title", "question", "scenarios", "reference_scenario", "uri", "responsible", "participants"}, {"title", "question", "scenarios"}, "study")
         subject = self.external_uri(record["uri"], "study.uri") if "uri" in record else subject
-        self.types(subject, OEO.OEO_00010252, OBO.BFO_0000015, PROV.Activity)
-        self.claim(subject, record, activity=True)
+        self.types(subject, OEO.OEO_00010252, OBO.BFO_0000015)
+        self.process_context(subject, record)
         self.graph.add((subject, RDFS.label, _literal(_text(record["title"], "study.title"))))
         self.graph.add((subject, DCTERMS.title, _literal(record["title"])))
         self.graph.add((subject, OBO.BFO_0000051, self.ctx.execution))
         self.graph.add((self.ctx.execution, OBO.BFO_0000050, subject))
         description = self.annotation_iri(record["id"], "description")
-        self.types(description, OBO.IAO_0000030, PROV.Entity)
+        self.types(description, OBO.IAO_0000030)
         self.graph.add((description, OBO.IAO_0000136, subject))
         self.graph.add((description, DCTERMS.description, _literal(_text(record["question"], "study.question"))))
-        self.claim(description, record)
+        self.claim(description, record, identifier=False)
         for scenario in _list(record["scenarios"], "study.scenarios", nonempty=True):
             if _text(scenario, "study scenario") not in self.scenarios:
                 raise AnnotationError(f"Unknown study scenario {scenario!r}")
@@ -278,7 +317,7 @@ class _Annotations:
         subject = self.record(record, {"statement", "scenario", "targets", "reasons"}, {"statement", "scenario", "targets"}, "assumption")
         if _text(record["scenario"], "assumption.scenario") not in self.scenarios:
             raise AnnotationError("assumption.scenario must identify a declared scenario")
-        self.types(subject, OEO.OEO_00000063, PROV.Entity)
+        self.types(subject, OEO.OEO_00000063, OBO.IAO_0000030)
         self.claim(subject, record)
         self.graph.add((subject, RDFS.comment, _literal(_text(record["statement"], "assumption.statement"))))
         scenario = self.scenarios[record["scenario"]]
@@ -291,7 +330,7 @@ class _Annotations:
             self.graph.add((target, OC.implementsAssumption, subject))
         for reason in _list(record.get("reasons", []), "assumption.reasons"):
             rationale = self.record(reason, {"statement"}, {"statement"}, "reason")
-            self.types(rationale, OBO.IAO_0000030, PROV.Entity)
+            self.types(rationale, OBO.IAO_0000030)
             self.claim(rationale, reason)
             self.graph.add((rationale, RDFS.comment, _literal(_text(reason["statement"], "reason.statement"))))
             self.graph.add((subject, OC.hasRationale, rationale))
@@ -314,7 +353,7 @@ class _Annotations:
         for existing in self.graph.objects(datum, OBO.IAO_0000136):
             if (existing, RDF.type, OEO.OEO_00000350) in self.graph:
                 raise AnnotationError("This datum already has a quantity interpretation; reconcile it instead of adding another")
-        self.types(subject, OEO.OEO_00000350, PROV.Entity)
+        self.types(subject, OEO.OEO_00000350, OBO.IAO_0000030)
         self.claim(subject, record, evidence_required=True)
         unit = self.annotation_iri(record["id"], "unit")
         self.types(unit, unit_class)
@@ -329,33 +368,39 @@ class _Annotations:
     def dataset(self, record):
         self.record(record, {"title", "revision_uri", "family_uri", "previous_revision_uri", "targets", "preparation"}, {"title", "revision_uri", "targets", "evidence"}, "dataset")
         revision = self.external_uri(record["revision_uri"], "dataset.revision_uri")
-        self.types(revision, PROV.Entity)
+        self.types(revision, OBO.IAO_0000030)
         self.claim(revision, record, evidence_required=True)
         self.graph.add((revision, DCTERMS.title, _literal(_text(record["title"], "dataset.title"))))
-        for key, predicate in (("family_uri", PROV.specializationOf), ("previous_revision_uri", PROV.wasRevisionOf)):
+        for key, predicate in (("family_uri", DCTERMS.isVersionOf), ("previous_revision_uri", OC.previousRevision)):
             if key in record:
                 other = self.external_uri(record[key], f"dataset.{key}")
                 if other == revision:
                     raise AnnotationError("A dataset revision must differ from its family and previous revision")
-                self.types(other, PROV.Entity)
+                self.types(other, OBO.IAO_0000030)
                 self.graph.add((revision, predicate, other))
+                if key == "previous_revision_uri":
+                    self.graph.add((revision, DCTERMS.source, other))
         for selector in _list(record["targets"], "dataset.targets", nonempty=True):
             target = self.target(selector)
             if (target, RDF.type, OC.InputAssignment) not in self.graph:
                 raise AnnotationError("Recorded dataset use must target an input assignment")
-            self.graph.add((self.graph.value(target, OC.hasDatum), PROV.wasDerivedFrom, revision))
-        self.graph.add((self.ctx.execution, PROV.used, revision))
+            self.graph.add((self.graph.value(target, OC.hasDatum), DCTERMS.source, revision))
+        self.graph.add((self.ctx.execution, OEO.OEO_00140093, revision))
         if "preparation" in record:
             preparation = record["preparation"]
-            process = self.record(preparation, {"description", "inputs"}, {"description", "inputs"}, "dataset preparation")
-            self.types(process, PROV.Activity, OBO.BFO_0000015)
-            self.claim(process, preparation, activity=True)
-            self.graph.add((process, RDFS.comment, _literal(_text(preparation["description"], "preparation.description"))))
+            process = self.record(preparation, {"description", "inputs", "responsible", "participants"}, {"description", "inputs"}, "dataset preparation")
+            self.types(process, OBO.BFO_0000015, OEO.OEO_00000124)
+            self.process_context(process, preparation)
+            description = self.annotation_iri(preparation["id"], "description")
+            self.types(description, OBO.IAO_0000030)
+            self.graph.add((description, OBO.IAO_0000136, process))
+            self.graph.add((description, DCTERMS.description, _literal(_text(preparation["description"], "preparation.description"))))
+            self.claim(description, preparation, identifier=False)
             for ref in _list(preparation["inputs"], "preparation.inputs", nonempty=True):
                 if ref not in self.sources:
                     raise AnnotationError(f"Unknown preparation input source {ref!r}")
-                self.graph.add((process, PROV.used, self.sources[ref]))
-            self.graph.add((revision, PROV.wasGeneratedBy, process))
+                self.graph.add((process, OEO.OEO_00140093, self.sources[ref]))
+            self.graph.add((revision, OEO.OEO_00020190, process))
 
     def physical(self, record):
         subject = self.record(record, {"component", "kind", "scope", "target_uri", "target_label"},
@@ -369,7 +414,7 @@ class _Annotations:
             raise AnnotationError("An actual material target cannot already be an information description")
         if kind != "actual" and ((target, RDF.type, OBO.BFO_0000040) in self.graph or (target, RDF.type, OEO.OEO_00000031) in self.graph):
             raise AnnotationError("An aggregate or hypothetical description cannot already be a material target")
-        self.types(subject, OC.PhysicalCorrespondenceAssertion, OBO.IAO_0000030, PROV.Entity)
+        self.types(subject, OC.PhysicalCorrespondenceAssertion, OBO.IAO_0000030)
         self.claim(subject, record, evidence_required=True)
         self.types(target, OBO.BFO_0000040 if kind == "actual" else OBO.IAO_0000030)
         self.graph.add((target, RDFS.label, _literal(_text(record["target_label"], "target_label"))))
@@ -382,7 +427,7 @@ class _Annotations:
         source, target = self.component(record["source"]), self.component(record["target"], external=True)
         if source == target:
             raise AnnotationError("Component correspondence requires two distinct component identifiers")
-        self.types(subject, OC.ComponentCorrespondence, OBO.IAO_0000030, PROV.Entity)
+        self.types(subject, OC.ComponentCorrespondence, OBO.IAO_0000030)
         self.types(target, OEO.OEO_00000276)
         self.claim(subject, record)
         self.graph.add((subject, OC.sourceComponent, source))
@@ -394,7 +439,7 @@ def add_annotations(ctx, annotations: dict | Path) -> None:
     """Add validated, attributed annotations to ``ctx.graph``.
 
     ``ctx`` provides graph, configuration, execution, nodes, components,
-    iri(kind, *keys), and report. See examples/annotations/README.md for version 1.
+    iri(kind, *keys), and report. See examples/annotations/README.md for version 2.
     """
     source_bytes = None
     if isinstance(annotations, (str, Path)):
@@ -409,18 +454,18 @@ def add_annotations(ctx, annotations: dict | Path) -> None:
     mapper.build()
     source_digest = hashlib.sha256(source_bytes).hexdigest() if source_bytes is not None else mapper.digest
     revision = ctx.iri("annotation-revision", source_digest)
-    mapper.types(revision, PROV.Entity)
+    mapper.types(revision, OBO.IAO_0000030)
     mapper.graph.add((revision, OC.contentSHA256, _literal(source_digest)))
-    description = ("SHA-256 identifies the original UTF-8 YAML file bytes; parsed using annotation schema version 1."
+    description = ("SHA-256 identifies the original UTF-8 YAML file bytes; parsed using annotation schema version 2."
                    if source_bytes is not None else
-                   "SHA-256 identifies the canonical JSON bytes of in-memory annotations using schema version 1.")
+                   "SHA-256 identifies the canonical JSON bytes of in-memory annotations using schema version 2.")
     mapper.graph.add((revision, DCTERMS.description, _literal(description)))
-    mapper.graph.add((revision, DCTERMS.identifier, _literal("CallioMapper annotation schema version 1")))
+    mapper.graph.add((revision, DCTERMS.identifier, _literal("CallioMapper annotation schema version 2")))
     mapper.graph.add((revision, OC.sourcePath, _literal(Path(annotations).name if source_bytes is not None else "in-memory annotations (canonical JSON)")))
     if hasattr(ctx, "export_activity"):
-        mapper.graph.add((ctx.export_activity, PROV.used, revision))
+        mapper.graph.add((ctx.export_activity, OEO.OEO_00140093, revision))
     for triple in mapper.graph:
         ctx.graph.add(triple)
     ctx.report["annotations"] = mapper.counts
     ctx.report["annotation_sha256"] = mapper.digest
-    ctx.report["annotation_digest_representation"] = "canonical parsed JSON, schema version 1"
+    ctx.report["annotation_digest_representation"] = "canonical parsed JSON, schema version 2"

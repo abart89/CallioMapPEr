@@ -11,7 +11,7 @@ import yaml
 from rdflib import Graph, Literal, RDF, URIRef, XSD
 
 from calliomapper.mapper.quantities import add_quantities
-from calliomapper.vocabulary import OC, OEO, OBO, PROV
+from calliomapper.vocabulary import OC, OEO, OBO, DCT
 
 EXAMPLES = Path(__file__).resolve().parents[1] / "examples"
 
@@ -49,7 +49,7 @@ class Context:
         }
         self.graph.add((self.configuration, RDF.type, OC.ConfigurationSpecification))
         self.graph.add((self.model, RDF.type, OEO.OEO_00000274))
-        for kind in (PROV.Activity, OEO.OEO_00000275, OBO.BFO_0000015):
+        for kind in (OBO.BFO_0000015, OEO.OEO_00000275, OBO.BFO_0000015):
             self.graph.add((self.execution, RDF.type, kind))
         self.graph.add((self.execution, OC.usesConfiguration, self.configuration))
         self.graph.add((self.execution, OC.executionStatus, Literal("solved")))
@@ -70,8 +70,8 @@ class Context:
         revision = self.iri("revision", filename)
         artifact = self.iri("file", filename)
         for entity in (revision, artifact):
-            self.graph.add((entity, RDF.type, PROV.Entity))
-        self.graph.add((revision, PROV.specializationOf, artifact))
+            self.graph.add((entity, RDF.type, OBO.IAO_0000030))
+        self.graph.add((revision, DCT.isVersionOf, artifact))
         self.graph.add((revision, OC.sourcePath, Literal(filename, datatype=XSD.string)))
         self.graph.add((revision, OC.contentSHA256, Literal(self.source.file_hash(filename), datatype=XSD.string)))
         return revision
@@ -135,10 +135,10 @@ def test_default_energy_retains_series_and_computes_known_total_without_points()
     assert value(ctx, summary) == Decimal("3408773.846")
     assert not list(ctx.graph.subjects(RDF.type, OC.ResultRecord))
     series = ctx.graph.value(summary, OC.summarisesSeries)
-    assert ctx.graph.value(series, PROV.wasGeneratedBy) == ctx.execution
-    activity = ctx.graph.value(summary, PROV.wasGeneratedBy)
+    assert ctx.graph.value(series, OEO.OEO_00020190) == ctx.execution
+    activity = ctx.graph.value(summary, OEO.OEO_00020190)
     assert activity != ctx.execution
-    assert (activity, PROV.used, series) in ctx.graph
+    assert (activity, OEO.OEO_00140093, series) in ctx.graph
     coverage = ctx.graph.value(series, OC.hasIndexDescription)
     assert ctx.graph.value(coverage, OC.indexCount).toPython() == 120
     assert ctx.graph.value(summary, OC.hasIndexDescription) == coverage

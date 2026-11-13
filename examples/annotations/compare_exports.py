@@ -15,7 +15,7 @@ from rdflib import Dataset, Literal, RDF, RDFS, URIRef
 
 from calliomapper import Translator
 from calliomapper.queries import run_query
-from calliomapper.vocabulary import OC, OEO, OBO, PROV, DCT
+from calliomapper.vocabulary import OC, OEO, OBO, DCT
 
 
 TUTORIAL = "https://example.org/calliomapper/independent-exports/"
@@ -99,8 +99,8 @@ def build_demo(destination, results_directory=None, annotations_path=None):
     revision = URIRef(annotations["a"]["datasets"][0]["revision_uri"])
     publisher = URIRef(TUTORIAL + "fictional-publisher")
     catalogue_graph.add((revision, DCT.publisher, publisher))
-    catalogue_graph.add((revision, RDF.type, PROV.Entity))
-    catalogue_graph.add((publisher, RDF.type, PROV.Agent))
+    catalogue_graph.add((revision, RDF.type, OBO.IAO_0000030))
+    catalogue_graph.add((publisher, RDF.type, OEO.OEO_00030022))
     catalogue_graph.add((publisher, RDFS.label, Literal("Fictional publisher for the integration example")))
     catalogue_graph.add((catalogue_graph.identifier, OC.evidenceStatus, Literal("Synthetic catalogue metadata; no actual publisher is asserted.")))
     catalogue_path = destination / "catalogue.nq"

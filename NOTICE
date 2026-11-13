@@ -17,10 +17,10 @@ https://doi.org/10.21105/joss.00825
 
 Ontology resources
 ------------------
-The bundled OntoCal draft uses OEO, PROV-O and their documented dependencies.
-Upstream ontology headers, attribution metadata, OEO's CC0 notice and reuse
-records are retained under calliomapper/resources/dependencies. Consult those
-records for the relevant contributions and terms. The project's local OEO and
-PROV-O derivatives are identified separately and are not official upstream
-releases. The transformation records accompany them; docs/dependencies.md
-explains their use and limits.
+The bundled OntoCal draft imports the unchanged OEO 2.12.0 merged release,
+including the foundational vocabulary distributed with that release. It has
+no PROV-O import. The upstream ontology header, OEO's CC0 notice, citation,
+reuse record and source checksums are retained under
+calliomapper/resources/dependencies. Consult those records for the relevant
+contributions and terms. OntoCal's local additions are not an upstream OEO
+release. docs/dependencies.md explains the representation and its limits.
