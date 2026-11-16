@@ -1,6 +1,6 @@
 # Using CallioMapper
 
-CallioMapper `0.1.0rc3` is a local candidate for internal research trials. It uses the OEO-based OntoCal draft and annotation schema 2; this local update is not a public release. It reads a saved, successful Calliope CSV export and represents selected information using OntoCal. The primary target is stable Calliope 0.7.0; the included 0.7.0.dev7 exports provide historical regression cases. The supported variables and tests are bounded. This release does not claim to translate every Calliope model or mathematical extension.
+CallioMapper `0.1.0rc3` is a release candidate for review and research trials, available as source in this repository. It uses the OEO-based OntoCal draft and annotation schema 2; this repository update is not a PyPI or tagged GitHub release. It reads a saved, successful Calliope CSV export and represents selected information using OntoCal. The primary target is stable Calliope 0.7.0; the included 0.7.0.dev7 exports provide historical regression cases. The supported variables and tests are bounded. This release does not claim to translate every Calliope model or mathematical extension.
 
 ## Install and open the examples
 

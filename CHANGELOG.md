@@ -1,8 +1,8 @@
 # Changes
 
-## 0.1.0rc3 — local candidate, 13 November 2026
+## 0.1.0rc3 — OEO-based review candidate
 
-This is an internal evaluation candidate and has not been published as a new release.
+Prepared and evaluated on 13 November 2026; shared as repository source for review on 16 November. The update includes documentation and executed notebooks. It is not a PyPI or tagged GitHub release.
 
 - Adopt OntoCal `2026-11-13-stage1` with unchanged OEO 2.12.0, replacing the active OEO/PROV derivative combination.
 - Generate OEO information-input/output relationships and describe software as IAO software participating in processes. Preserve source revisions and actual process timestamps through the documented metadata and OntoCal properties.
